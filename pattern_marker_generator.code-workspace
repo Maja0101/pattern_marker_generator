@@ -1,0 +1,40 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"debug.openDebug": "openOnSessionStart",
+		"cmake.options.statusBarVisibility": "visible",
+		"cmake.options.advanced": {
+			"cpack": {
+        		"statusBarVisibility": "hidden"
+    		},
+			"packagePreset": {
+				"statusBarVisibility": "hidden"
+			},
+			"workflow": {
+				"statusBarVisibility": "hidden"
+			},
+			"workflowPreset": {
+				"statusBarVisibility": "hidden"
+			},
+			"configurePreset": {
+				"statusBarVisibility": "visible"
+			},
+			"buildPreset": {
+				"statusBarVisibility": "hidden"
+			},
+			"testPreset": {
+				"statusBarVisibility": "hidden"
+			},
+			"ctest": {
+				"statusBarVisibility": "hidden"
+			},
+			"launchTarget": {
+				"statusBarVisibility": "visible"
+			}
+		}
+	}
+}
