@@ -1,5 +1,7 @@
 #pragma once
 
 namespace pmg::logging {
-    bool initialize();
-}
+
+bool initialize();
+
+} // namespace pmg::logging

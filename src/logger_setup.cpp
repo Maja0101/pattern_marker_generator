@@ -5,14 +5,14 @@
 
 namespace pmg::logging {
 
-    bool initialize() {
-        auto console = spdlog::stdout_color_mt("console");
+bool initialize() {
+    auto console = spdlog::stdout_color_mt("console");
 
-        console->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%8l%$] [%s:%#] [%!] %v");
+    console->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%8l%$] [%s:%#] [%!] %v");
 
-        spdlog::set_default_logger(console);
+    spdlog::set_default_logger(console);
 
-        return true;
-    }
+    return true;
+}
     
 } // namespace pmg::logging
