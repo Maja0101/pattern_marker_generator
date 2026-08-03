@@ -4,9 +4,10 @@
 
 namespace pmg {
 
-Timer::Timer() {
-    start = std::chrono::high_resolution_clock::now();
-}
+Timer::Timer(std::source_location location) :
+    m_logger(spdlog::get("basicConsole")),
+    location(location),
+    start(std::chrono::high_resolution_clock::now()){}
 
 Timer::~Timer() {
     end = std::chrono::high_resolution_clock::now();
@@ -14,7 +15,7 @@ Timer::~Timer() {
 
     float ms = duration.count() * 1000.0f;
 
-    SPDLOG_INFO("Execution time: {:.6f} ms", ms);
+    SPDLOG_LOGGER_INFO(m_logger, "[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
 }
 
 } // namespace pmg
