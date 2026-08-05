@@ -7,7 +7,7 @@ C++ project, responsible for solving 2d nesting problem, to be used as part of a
 ## Requirements
 
 - CMake 3.18+
-- C++ Compiler with C++17 support (e.g. g++)
+- C++ Compiler with C++20 support (e.g. g++)
 - (Optional) VS Code + extensions:
   - CMake Tools
   - C/C++ (ms-vscode.cpptools)
