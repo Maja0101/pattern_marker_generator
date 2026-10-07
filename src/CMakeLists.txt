@@ -1,17 +1,14 @@
-# All .cpp i .h files in this directory
-file(GLOB SRC_FILES "*.cpp")
-file(GLOB HDR_FILES "*.h" "*.hpp")
-
-# Subdirectories
+# Add subdirectories
 add_subdirectory(utils)
+add_subdirectory(geometry)
+add_subdirectory(pattern)
+add_subdirectory(nesting)
 
 # Create executable from all src files
-add_executable(pattern_marker_generator ${SRC_FILES})
+add_executable(pattern_marker_generator main.cpp)
 
 # Link static library targets to the executable
-target_link_libraries(pattern_marker_generator PRIVATE utils_module)
-
-# Specify include directories to use when compiling 
-target_include_directories(pattern_marker_generator PRIVATE
-	${CMAKE_CURRENT_SOURCE_DIR}
+target_link_libraries(pattern_marker_generator PRIVATE 
+	utils_module
+	nesting_module
 )
