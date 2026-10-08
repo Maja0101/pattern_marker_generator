@@ -1,17 +1,19 @@
 #include "placed_instance.hpp"
 #include <iostream>
+#include <format>
+#include <string>
 
 namespace pmg::nesting {
 
 PlacedInstance::PlacedInstance(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept
     : position(pos), variantRef(variant) {}
 
-void PlacedInstance::render() const {
-    if (!variantRef) return;
+std::string PlacedInstance::toString() const {
+    if (!variantRef) return "";
 
-    std::cout << "Placed variant at (" << position.x << ", " << position.y << ") "
-              << "[Angle: " << variantRef->rotationAngle << " deg, Mirrored: " 
-              << std::boolalpha << variantRef->isMirrored << "]\n";
+    return std::format("Placed instance at {} [{}]",
+                       position.toString(),
+                       variantRef->toString());
 }
 
 } // namespace pmg::nesting

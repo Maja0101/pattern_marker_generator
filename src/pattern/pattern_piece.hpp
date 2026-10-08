@@ -8,13 +8,13 @@
 
 namespace pmg::pattern {
 
-class PieceBase {
+class PatternPiece {
 private:
     int64_t id;
     std::vector<geometry::Point64> originalBoundary;
     std::vector<PieceVariant> allowedVariants;
 public:
-    PieceBase(int pieceId, 
+    PatternPiece(int pieceId, 
               std::vector<geometry::Point64> originalPoints, 
               const std::vector<VariantConstraint>& constraints);
 

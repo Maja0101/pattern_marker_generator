@@ -13,7 +13,7 @@ private:
 public:
     PlacedInstance(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept;
 
-    void render() const;
+    std::string toString() const;
 
     geometry::Point64 getPosition() const noexcept { return position; }
     const pattern::PieceVariant* getVariant() const noexcept { return variantRef; }
