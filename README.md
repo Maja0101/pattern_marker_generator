@@ -19,7 +19,7 @@ C++ project, responsible for solving 2d nesting problem, to be used as part of a
 ```bash
 cmake --preset debug
 cmake --build --preset debug
-./build/pattern_marker_generator
+./build/debug/pattern_marker_generator
 ```
 
 ### Release
@@ -27,7 +27,7 @@ cmake --build --preset debug
 ```bash
 cmake --preset release
 cmake --build --preset release
-./build-release/pattern_marker_generator
+./build/release/pattern_marker_generator
 ```
 
 ## Unit tests using CLI
