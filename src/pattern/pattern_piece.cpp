@@ -1,6 +1,7 @@
+#include <utility>
+
 #include "pattern_piece.hpp"
 #include "geometry/transformations.hpp"
-#include <utility>
 
 namespace pmg::pattern {
 

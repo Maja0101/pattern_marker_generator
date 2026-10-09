@@ -1,11 +1,12 @@
+#include <fstream>
+#include <iomanip>
+#include <array>
+
 #include "geometry/svg_exporter.hpp"
 #include "nesting/placed_instance.hpp"
 #include "pattern/piece_variant.hpp"
 #include "geometry/geometry_types.hpp"
 
-#include <fstream>
-#include <iomanip>
-#include <array>
 
 namespace pmg::geometry {
 

@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <source_location>
+
 #include <spdlog/spdlog.h>
 
 namespace pmg {

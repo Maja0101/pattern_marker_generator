@@ -1,12 +1,14 @@
 #pragma once
 
-#include "geometry/geometry_types.hpp"
-
 #include <vector>
 #include <format>
 #include <string>
 #include <numeric>
 #include <ranges>
+
+// #include <clipper2/clipper.h>
+
+#include "geometry/geometry_types.hpp"
 
 namespace pmg::pattern {
 

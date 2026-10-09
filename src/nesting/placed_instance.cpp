@@ -1,7 +1,8 @@
-#include "placed_instance.hpp"
 #include <iostream>
 #include <format>
 #include <string>
+
+#include "placed_instance.hpp"
 
 namespace pmg::nesting {
 

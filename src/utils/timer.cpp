@@ -1,6 +1,6 @@
-#include "timer.hpp"
-
 #include <spdlog/spdlog.h>
+
+#include "timer.hpp"
 
 namespace pmg {
 

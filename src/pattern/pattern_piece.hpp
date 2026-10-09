@@ -2,6 +2,9 @@
 
 #include <string>
 #include <vector>
+
+// #include <clipper2/clipper.h>
+
 #include "geometry/geometry_types.hpp"
 #include "piece_variant.hpp"
 #include "variant_constraint.hpp"

@@ -1,20 +1,20 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <cmath>
+#include <algorithm>
+
+#include <spdlog/spdlog.h>
+#include <clipper2/clipper.h>
+
 #include "utils/logger_setup.hpp"
 #include "utils/timer.hpp"
 #include "geometry/svg_exporter.hpp"
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "nesting/placed_instance.hpp"
-
-#include <spdlog/spdlog.h>
-#include <clipper2/clipper.h>
-
-#include <iostream>
-#include <vector>
-#include <memory>
-#include <cmath>
-#include <algorithm>
 
 using namespace pmg;
 
