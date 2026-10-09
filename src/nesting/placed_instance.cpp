@@ -2,7 +2,7 @@
 #include <format>
 #include <string>
 
-#include "placed_instance.hpp"
+#include "nesting/placed_instance.hpp"
 
 namespace pmg::nesting {
 

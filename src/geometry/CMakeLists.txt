@@ -1,8 +1,13 @@
-add_library(geometry_module STATIC 
-    svg_exporter.cpp
-    transformations.cpp    
+add_library(geometry 
+    svg_exporter.cpp 
+    transformations.cpp 
 )
 
-target_include_directories(geometry_module PUBLIC
-    ${CMAKE_SOURCE_DIR}/src
+target_include_directories(geometry PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+
+target_link_libraries(geometry PUBLIC 
+    nesting 
+    pattern
 )

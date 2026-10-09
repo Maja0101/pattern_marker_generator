@@ -1,15 +1,20 @@
 # Add subdirectories
 add_subdirectory(utils)
-add_subdirectory(geometry)
-add_subdirectory(pattern)
 add_subdirectory(nesting)
+add_subdirectory(pattern)
+add_subdirectory(geometry)
 
-# Create executable from all src files
+# Create executable from main
 add_executable(pattern_marker_generator main.cpp)
 
-# Link static library targets to the executable
+# Link library targets to the executable
 target_link_libraries(pattern_marker_generator PRIVATE 
 	Clipper2
 	utils_module
-	nesting_module
+	nesting
+	pattern
+	geometry
 )
+
+
+

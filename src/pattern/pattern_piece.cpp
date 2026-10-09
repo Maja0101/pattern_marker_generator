@@ -1,6 +1,6 @@
 #include <utility>
 
-#include "pattern_piece.hpp"
+#include "pattern/pattern_piece.hpp"
 #include "geometry/transformations.hpp"
 
 namespace pmg::pattern {
@@ -36,5 +36,7 @@ const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored)
     }
     return nullptr;
 }
+
+
 
 } // namespace pmg::pattern

@@ -16,6 +16,4 @@ struct Point64 {
     }
 };
 
-// bounding box, etc.
-
 } // namespace pmg:geometry

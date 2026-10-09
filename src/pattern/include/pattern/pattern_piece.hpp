@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-// #include <clipper2/clipper.h>
+#include "clipper2/clipper.h"
 
 #include "geometry/geometry_types.hpp"
 #include "piece_variant.hpp"
@@ -22,6 +22,7 @@ public:
               const std::vector<VariantConstraint>& constraints);
 
     const PieceVariant* getVariant(int rotationAngle, bool isMirrored) const noexcept;
+    // variantsToClipperPaths
 
     const std::vector<PieceVariant>& getVariants() const noexcept { return allowedVariants; }
     int64_t getId() const noexcept { return id; }
