@@ -15,7 +15,7 @@ struct PieceVariant {
     int requiredQuantity{0};
     std::vector<geometry::Point64> transformedBoundary;
 
-    // toClipperPath
+    Clipper2Lib::Path64 toClipperPath() const;
     std::string toString() const;
 };
 

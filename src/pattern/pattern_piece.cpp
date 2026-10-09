@@ -37,6 +37,15 @@ const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored)
     return nullptr;
 }
 
+Clipper2Lib::Paths64 PatternPiece::variantsToClipperPaths() const {
+    Clipper2Lib::Paths64 paths;
+    paths.reserve(allowedVariants.size());
 
+    for (const auto& variant : allowedVariants) {
+        paths.push_back(variant.toClipperPath());
+    }
+
+    return paths;
+}
 
 } // namespace pmg::pattern

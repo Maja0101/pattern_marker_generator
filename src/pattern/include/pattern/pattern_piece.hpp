@@ -22,7 +22,7 @@ public:
               const std::vector<VariantConstraint>& constraints);
 
     const PieceVariant* getVariant(int rotationAngle, bool isMirrored) const noexcept;
-    // variantsToClipperPaths
+    Clipper2Lib::Paths64 variantsToClipperPaths() const;
 
     const std::vector<PieceVariant>& getVariants() const noexcept { return allowedVariants; }
     int64_t getId() const noexcept { return id; }

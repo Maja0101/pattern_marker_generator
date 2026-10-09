@@ -6,7 +6,15 @@
 
 namespace pmg::pattern {
 
-
+Clipper2Lib::Path64 PieceVariant::toClipperPath() const
+{
+    Clipper2Lib::Path64 path;
+    path.reserve(transformedBoundary.size());
+    for (const auto& point : transformedBoundary) {
+        path.push_back({point.x, point.y});
+    }
+    return path;
+}
 
 std::string PieceVariant::toString() const
 {
