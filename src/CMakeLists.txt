@@ -9,6 +9,7 @@ add_executable(pattern_marker_generator main.cpp)
 
 # Link static library targets to the executable
 target_link_libraries(pattern_marker_generator PRIVATE 
+	Clipper2
 	utils_module
 	nesting_module
 )
