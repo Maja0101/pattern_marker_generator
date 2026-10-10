@@ -10,7 +10,7 @@ add_executable(pattern_marker_generator main.cpp)
 # Link library targets to the executable
 target_link_libraries(pattern_marker_generator PRIVATE 
 	Clipper2
-	utils_module
+	utils
 	nesting
 	pattern
 	geometry
