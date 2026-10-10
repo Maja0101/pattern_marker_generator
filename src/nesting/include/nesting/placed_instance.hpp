@@ -1,7 +1,7 @@
 #pragma once
 
 #include "geometry/geometry_types.hpp"
-#include "pattern/piece_variant.hpp"
+#include "pattern/shapes.hpp"
 
 namespace pmg::nesting {
 

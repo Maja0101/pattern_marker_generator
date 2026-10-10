@@ -6,7 +6,7 @@
 #include "clipper2/clipper.h"
 
 #include "geometry/geometry_types.hpp"
-#include "piece_variant.hpp"
+#include "shapes.hpp"
 #include "variant_constraint.hpp"
 
 namespace pmg::pattern {

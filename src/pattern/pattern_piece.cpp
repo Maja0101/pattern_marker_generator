@@ -18,10 +18,10 @@ PatternPiece::PatternPiece(int pieceId,
         variant.isMirrored = req.isMirrored;
         variant.requiredQuantity = req.requiredQuantity;
 
-        variant.transformedBoundary.reserve(m_originalBoundary.size());
+        variant.boundary.reserve(m_originalBoundary.size());
         for (const auto& point: m_originalBoundary) {
             auto transformedPoint = geometry::transformPoint(point, req.rotationAngle, req.isMirrored);
-            variant.transformedBoundary.push_back(transformedPoint);
+            variant.boundary.push_back(transformedPoint);
         }
 
         m_allowedVariants.push_back(std::move(variant));

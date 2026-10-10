@@ -1,6 +1,6 @@
 add_library(pattern 
-    pattern_piece.cpp 
-    piece_variant.cpp
+    pattern_piece.cpp
+    shapes.cpp
 )
 
 target_include_directories(pattern PUBLIC

@@ -4,7 +4,7 @@
 
 #include "geometry/svg_exporter.hpp"
 #include "nesting/placed_instance.hpp"
-#include "pattern/piece_variant.hpp"
+#include "pattern/shapes.hpp"
 #include "geometry/geometry_types.hpp"
 
 
@@ -43,7 +43,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
 
         out << "  <polygon points=\"";
 
-        for (const auto& pt : variant->transformedBoundary) {
+        for (const auto& pt : variant->boundary) {
             double worldX = static_cast<double>(pos.x + pt.x) / 1000.0;
             double worldY = static_cast<double>(pos.y + pt.y) / 1000.0;
 
