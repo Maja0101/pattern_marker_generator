@@ -13,16 +13,15 @@ PatternPiece::PatternPiece(int pieceId,
     m_allowedVariants.reserve(constraints.size());
 
     for (const auto& req : constraints) {
-        PieceVariant variant;
-        variant.rotationAngle = req.rotationAngle;
-        variant.isMirrored = req.isMirrored;
-        variant.requiredQuantity = req.requiredQuantity;
+        std::vector<pmg::geometry::Point64> transformedBoundary;
+        transformedBoundary.reserve(m_originalBoundary.size());
 
-        variant.boundary.reserve(m_originalBoundary.size());
         for (const auto& point: m_originalBoundary) {
             auto transformedPoint = geometry::transformPoint(point, req.rotationAngle, req.isMirrored);
-            variant.boundary.push_back(transformedPoint);
+            transformedBoundary.push_back(transformedPoint);
         }
+
+        PieceVariant variant(req.rotationAngle, req.isMirrored, req.requiredQuantity, transformedBoundary);
 
         m_allowedVariants.push_back(std::move(variant));
     }
@@ -30,7 +29,7 @@ PatternPiece::PatternPiece(int pieceId,
 
 const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored) const noexcept {
     for (const auto& variant : m_allowedVariants) {
-        if (variant.rotationAngle == rotationAngle && variant.isMirrored == isMirrored) {
+        if (variant.getRotationAngle() == rotationAngle && variant.getIsMirrored() == isMirrored) {
             return &variant;
         }
     }
@@ -42,7 +41,7 @@ Clipper2Lib::Paths64 PatternPiece::variantsToClipperPaths() const {
     paths.reserve(m_allowedVariants.size());
 
     for (const auto& variant : m_allowedVariants) {
-        paths.push_back(variant.toClipperPath());
+        paths.push_back(variant.getPath());
     }
 
     return paths;

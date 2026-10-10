@@ -43,7 +43,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
 
         out << "  <polygon points=\"";
 
-        for (const auto& pt : variant->boundary) {
+        for (const auto& pt : variant->getBoundary()) {
             double worldX = static_cast<double>(pos.x + pt.x) / 1000.0;
             double worldY = static_cast<double>(pos.y + pt.y) / 1000.0;
 

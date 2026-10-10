@@ -12,13 +12,11 @@ namespace pmg::nesting {
 class BottomLeft {
 private:
     pattern::Fabric m_fabric;
-    Clipper2Lib::Path64 m_fabric_clipper_path;
-    Clipper2Lib::Rect64 m_fabric_bounds;
 
     int64_t m_step_size;
 
     std::vector<PlacedInstance> m_results;
-    Clipper2Lib::Paths64 m_placed_pieces_as_clipper_polygons;
+    Clipper2Lib::Paths64 m_placed_pieces_polygons;
 
     bool isCollision(const Clipper2Lib::Path64& placed_piece);
     bool isWithinFabric(const Clipper2Lib::Path64& placed_piece);

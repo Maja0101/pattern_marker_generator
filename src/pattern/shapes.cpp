@@ -7,13 +7,16 @@
 namespace pmg::pattern {
 
 Shape::Shape(std::vector<geometry::Point64> initalBoundary)
-    : boundary(std::move(initalBoundary)) {}
+    : m_boundary(std::move(initalBoundary)) {
+        m_shape_path = toClipperPath();
+        m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
+    }
 
 Clipper2Lib::Path64 Shape::toClipperPath() const
 {
     Clipper2Lib::Path64 path;
-    path.reserve(boundary.size());
-    for (const auto& point : boundary) {
+    path.reserve(m_boundary.size());
+    for (const auto& point : m_boundary) {
         path.push_back({point.x, point.y});
     }
     return path;
@@ -22,8 +25,8 @@ Clipper2Lib::Path64 Shape::toClipperPath() const
 std::string Shape::toString() const
 {
     std::string boundaryStr = std::accumulate(
-        std::next(boundary.begin()), boundary.end(),
-        boundary.front().toString(),
+        std::next(m_boundary.begin()), m_boundary.end(),
+        m_boundary.front().toString(),
         [](std::string a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }
@@ -32,20 +35,23 @@ std::string Shape::toString() const
     return std::format("boundary: ({})", boundaryStr);
 }
 
-std::string PieceVariant::toString() const 
+PieceVariant::PieceVariant(int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
+    : Shape(initalBoundary), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {}
+
+std::string PieceVariant::toString() const
 {
     std::string boundaryStr = std::accumulate(
-        std::next(boundary.begin()), boundary.end(),
-        boundary.front().toString(),
+        std::next(m_boundary.begin()), m_boundary.end(),
+        m_boundary.front().toString(),
         [](std::string a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }
     );
 
     return std::format("rotationAngle: {}, isMirrored: {}, requiredQuantity: {}, boundary: ({})",
-                        rotationAngle,
-                        isMirrored,
-                        requiredQuantity,
+                        m_rotationAngle,
+                        m_isMirrored,
+                        m_requiredQuantity,
                         boundaryStr);
 }
 

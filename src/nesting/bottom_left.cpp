@@ -12,15 +12,16 @@ bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64 &placed_piece)
     Clipper2Lib::Rect64 piece_bounding_box = Clipper2Lib::GetBounds(placed_piece);
 
     // Fast check using bounding box
-    if (piece_bounding_box.left < m_fabric_bounds.left || piece_bounding_box.right > m_fabric_bounds.right ||
-        piece_bounding_box.bottom < m_fabric_bounds.bottom || piece_bounding_box.top > m_fabric_bounds.top) {
+    const auto& fabricBounds = m_fabric.getBoundingBox();
+    if (piece_bounding_box.left < fabricBounds.left || piece_bounding_box.right > fabricBounds.right ||
+        piece_bounding_box.bottom < fabricBounds.bottom || piece_bounding_box.top > fabricBounds.top) {
             return false;
     }
 
     // Precise check 
     Clipper2Lib::Paths64 overflow = Clipper2Lib::Difference(
         Clipper2Lib::Paths64{ placed_piece },
-        Clipper2Lib::Paths64{ m_fabric_clipper_path },
+        Clipper2Lib::Paths64{ m_fabric.getPath() },
         Clipper2Lib::FillRule::NonZero
     );
 
@@ -40,12 +41,7 @@ bool BottomLeft::findPosition(Clipper2Lib::Path64 piece)
 }
 
 BottomLeft::BottomLeft(pattern::Fabric fabric, int64_t step_size)
-    : m_fabric(std::move(fabric)), m_step_size(step_size) {
-
-        m_fabric_clipper_path = m_fabric.toClipperPath();
-
-        m_fabric_bounds = Clipper2Lib::GetBounds(m_fabric_clipper_path);
-}
+    : m_fabric(std::move(fabric)), m_step_size(step_size) {}
 
 std::vector<PlacedInstance> BottomLeft::performNesting(std::vector<pattern::PieceVariant> variants)
 {
