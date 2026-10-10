@@ -8,9 +8,9 @@ namespace pmg::pattern {
 PatternPiece::PatternPiece(int pieceId, 
               std::vector<geometry::Point64> originalPoints, 
               const std::vector<VariantConstraint>& constraints)
-    : id(pieceId), originalBoundary(std::move(originalPoints)) 
+    : m_id(pieceId), m_originalBoundary(std::move(originalPoints)) 
 {
-    allowedVariants.reserve(constraints.size());
+    m_allowedVariants.reserve(constraints.size());
 
     for (const auto& req : constraints) {
         PieceVariant variant;
@@ -18,18 +18,18 @@ PatternPiece::PatternPiece(int pieceId,
         variant.isMirrored = req.isMirrored;
         variant.requiredQuantity = req.requiredQuantity;
 
-        variant.transformedBoundary.reserve(originalBoundary.size());
-        for (const auto& point: originalBoundary) {
+        variant.transformedBoundary.reserve(m_originalBoundary.size());
+        for (const auto& point: m_originalBoundary) {
             auto transformedPoint = geometry::transformPoint(point, req.rotationAngle, req.isMirrored);
             variant.transformedBoundary.push_back(transformedPoint);
         }
 
-        allowedVariants.push_back(std::move(variant));
+        m_allowedVariants.push_back(std::move(variant));
     }
 }
 
 const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored) const noexcept {
-    for (const auto& variant : allowedVariants) {
+    for (const auto& variant : m_allowedVariants) {
         if (variant.rotationAngle == rotationAngle && variant.isMirrored == isMirrored) {
             return &variant;
         }
@@ -39,9 +39,9 @@ const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored)
 
 Clipper2Lib::Paths64 PatternPiece::variantsToClipperPaths() const {
     Clipper2Lib::Paths64 paths;
-    paths.reserve(allowedVariants.size());
+    paths.reserve(m_allowedVariants.size());
 
-    for (const auto& variant : allowedVariants) {
+    for (const auto& variant : m_allowedVariants) {
         paths.push_back(variant.toClipperPath());
     }
 
