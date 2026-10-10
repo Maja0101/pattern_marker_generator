@@ -9,8 +9,22 @@ bool BottomLeft::isCollision(const Clipper2Lib::Path64 &placed_piece)
 
 bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64 &placed_piece)
 {
-    // chcek if the whole piece is inside fabric
-    return false;
+    Clipper2Lib::Rect64 piece_bounding_box = Clipper2Lib::GetBounds(placed_piece);
+
+    // Fast check using bounding box
+    if (piece_bounding_box.left < m_fabric_bounds.left || piece_bounding_box.right > m_fabric_bounds.right ||
+        piece_bounding_box.bottom < m_fabric_bounds.bottom || piece_bounding_box.top > m_fabric_bounds.top) {
+            return false;
+    }
+
+    // Precise check 
+    Clipper2Lib::Paths64 overflow = Clipper2Lib::Difference(
+        Clipper2Lib::Paths64{ placed_piece },
+        Clipper2Lib::Paths64{ m_fabric_clipper_path },
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    return overflow.empty();
 }
 
 Clipper2Lib::Path64 BottomLeft::translate(const Clipper2Lib::Path64 &, int64_t dx, int64_t dy)
