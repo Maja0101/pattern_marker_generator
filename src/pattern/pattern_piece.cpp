@@ -12,6 +12,7 @@ PatternPiece::PatternPiece(int pieceId,
 {
     m_allowedVariants.reserve(constraints.size());
 
+    // TODO the transformation of the original boundary into all possible variants should be updated 
     for (const auto& req : constraints) {
         std::vector<pmg::geometry::Point64> transformedBoundary;
         transformedBoundary.reserve(m_originalBoundary.size());

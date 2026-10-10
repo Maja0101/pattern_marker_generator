@@ -17,11 +17,13 @@ private:
 
     std::vector<PlacedInstance> m_results;
     Clipper2Lib::Paths64 m_placed_pieces_polygons;
+    std::vector<Clipper2Lib::Rect64> m_placed_pieces_boxes;
 
-    bool isCollision(const Clipper2Lib::Path64& placed_piece);
-    bool isWithinFabric(const Clipper2Lib::Path64& placed_piece);
+    bool isCollision(const Clipper2Lib::Path64& piece_path, const Clipper2Lib::Rect64& piece_bounding_box);
+    bool isWithinFabric(const Clipper2Lib::Path64& piece_path, const Clipper2Lib::Rect64& piece_bounding_box);
 
     Clipper2Lib::Path64 translate(const Clipper2Lib::Path64&, int64_t dx, int64_t dy);
+    bool aabbCollision(const Clipper2Lib::Rect64& a, const Clipper2Lib::Rect64& b);
 
     bool findPosition(Clipper2Lib::Path64 piece);
 public:

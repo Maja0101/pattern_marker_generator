@@ -34,6 +34,7 @@ public:
 
 class PieceVariant : public Shape {
 private:
+    // TODO piece variant will need update - two-way pattern pieces
     int m_rotationAngle;
     bool m_isMirrored;
     int m_requiredQuantity;

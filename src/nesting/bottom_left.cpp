@@ -1,16 +1,37 @@
 #include "nesting/bottom_left.hpp"
 
 namespace pmg::nesting {
-bool BottomLeft::isCollision(const Clipper2Lib::Path64 &placed_piece)
+bool BottomLeft::isCollision(const Clipper2Lib::Path64& piece_path, const Clipper2Lib::Rect64& piece_bounding_box)
 {
-    // check if piece collide with previously placed pieces
-    return false;
+    // TODO might need chang; check first if the piece does not collide at the position and then move to the position
+
+    // Fast check using bounding boxes and store potential collision shapes
+    Clipper2Lib::Paths64 potential_obstacles;
+    for (size_t i = 0; i < m_placed_pieces_boxes.size(); ++i) {
+        if (aabbCollision(piece_bounding_box, m_placed_pieces_boxes[i])) {
+            potential_obstacles.push_back(m_placed_pieces_polygons[i]);
+        }
+    }
+
+    // No collision if there are no overlapping bounding boxes
+    if (potential_obstacles.empty()) {
+        return false;
+    }
+
+    // Detailed check
+    Clipper2Lib::Paths64 piece_paths = Clipper2Lib::Paths64{ piece_path };
+
+    Clipper2Lib::Paths64 intersection = Clipper2Lib::Intersect(
+        piece_paths, 
+        potential_obstacles, 
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    return !intersection.empty();
 }
 
-bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64 &placed_piece)
+bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64& piece_path, const Clipper2Lib::Rect64& piece_bounding_box)
 {
-    Clipper2Lib::Rect64 piece_bounding_box = Clipper2Lib::GetBounds(placed_piece);
-
     // Fast check using bounding box
     const auto& fabricBounds = m_fabric.getBoundingBox();
     if (piece_bounding_box.left < fabricBounds.left || piece_bounding_box.right > fabricBounds.right ||
@@ -20,7 +41,7 @@ bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64 &placed_piece)
 
     // Precise check 
     Clipper2Lib::Paths64 overflow = Clipper2Lib::Difference(
-        Clipper2Lib::Paths64{ placed_piece },
+        Clipper2Lib::Paths64{ piece_path },
         Clipper2Lib::Paths64{ m_fabric.getPath() },
         Clipper2Lib::FillRule::NonZero
     );
@@ -32,6 +53,12 @@ Clipper2Lib::Path64 BottomLeft::translate(const Clipper2Lib::Path64 &, int64_t d
 {
     // translate single piece by (dx, dy)
     return Clipper2Lib::Path64();
+}
+
+bool BottomLeft::aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
+{
+    return (a.left <= b.right && a.right >= b.left) &&
+            (a.bottom <= b.top && a.top >= b.bottom);
 }
 
 bool BottomLeft::findPosition(Clipper2Lib::Path64 piece)
