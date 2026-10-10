@@ -1,5 +1,6 @@
 add_library(nesting 
     placed_instance.cpp
+    bottom_left.cpp
 )
 
 target_include_directories(nesting PUBLIC
