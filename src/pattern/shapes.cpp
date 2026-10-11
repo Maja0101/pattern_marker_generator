@@ -22,6 +22,30 @@ Clipper2Lib::Path64 Shape::toClipperPath() const
     return path;
 }
 
+const Clipper2Lib::Path64 Shape::getPathAt(int64_t x, int64_t y) const
+{
+    Clipper2Lib::Path64 tranlated_path;
+
+    tranlated_path.reserve(m_shape_path.size());
+
+    for (const auto& point : m_shape_path) {
+        tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
+    }
+    return tranlated_path;
+}
+
+const Clipper2Lib::Rect64 Shape::getBoundingBoxAt(int64_t x, int64_t y) const
+{
+    Clipper2Lib::Rect64 tranlated_box = m_shape_bounding_box;
+
+    tranlated_box.left   += x;
+    tranlated_box.right  += x;
+    tranlated_box.top    += y;
+    tranlated_box.bottom += y;
+
+    return tranlated_box;
+}
+
 std::string Shape::toString() const
 {
     std::string boundaryStr = std::accumulate(

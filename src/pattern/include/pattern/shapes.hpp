@@ -24,6 +24,9 @@ public:
     const Clipper2Lib::Path64 getPath() const { return m_shape_path; }
     const Clipper2Lib::Rect64 getBoundingBox() const { return m_shape_bounding_box; }
     
+    const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y) const;
+    const Clipper2Lib::Rect64 getBoundingBoxAt(int64_t x, int64_t y) const;
+
     virtual std::string toString() const;
 };
 
