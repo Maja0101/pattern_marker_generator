@@ -1,5 +1,5 @@
 add_library(nesting 
-    placed_instance.cpp
+    nested_item.cpp
     bottom_left.cpp
 )
 

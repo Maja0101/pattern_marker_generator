@@ -14,7 +14,7 @@
 #include "geometry/svg_exporter.hpp"
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
-#include "nesting/placed_instance.hpp"
+#include "nesting/nested_item.hpp"
 
 using namespace pmg;
 
@@ -103,30 +103,30 @@ int main()
             5, dualTrapeziumPts, defaultConstraints
         );
 
-        std::vector<pmg::nesting::PlacedInstance> placedInstances;
+        std::vector<pmg::nesting::NestedItem> nestedItems;
 
-        placedInstances.emplace_back(
+        nestedItems.emplace_back(
             geometry::Point64{20000, 110000}, pieceTrapezium->getVariant(0, false)
         );
-        placedInstances.emplace_back(
+        nestedItems.emplace_back(
             geometry::Point64{80000, 80000}, pieceSquare->getVariant(0, false)
         );
-        placedInstances.emplace_back(
+        nestedItems.emplace_back(
             geometry::Point64{160000, 40000}, pieceRect->getVariant(0, false)
         );
-        placedInstances.emplace_back(
+        nestedItems.emplace_back(
             geometry::Point64{220000, 50000}, pieceOctagon->getVariant(0, false)
         );
-        placedInstances.emplace_back(
+        nestedItems.emplace_back(
             geometry::Point64{270000, 85000}, pieceDualTrapezium->getVariant(0, false)
         );
 
-        for (const auto& piece : placedInstances) {
+        for (const auto& piece : nestedItems) {
             SPDLOG_INFO(piece.toString());
         }
 
         result = pmg::geometry::SvgExporter::exportLayout(
-            "debug_output.svg", 350, 150, placedInstances
+            "debug_output.svg", 350, 150, nestedItems
         );
 
         SPDLOG_INFO("Placed geometric pieces");

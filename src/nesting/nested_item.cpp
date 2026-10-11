@@ -2,17 +2,17 @@
 #include <format>
 #include <string>
 
-#include "nesting/placed_instance.hpp"
+#include "nesting/nested_item.hpp"
 
 namespace pmg::nesting {
 
-PlacedInstance::PlacedInstance(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept
+NestedItem::NestedItem(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept
     : m_position(pos), m_variantRef(variant) {}
 
-std::string PlacedInstance::toString() const {
+std::string NestedItem::toString() const {
     if (!m_variantRef) return "";
 
-    return std::format("Placed instance at {} [{}]",
+    return std::format("Placed item at {} [{}]",
                        m_position.toString(),
                        m_variantRef->toString());
 }

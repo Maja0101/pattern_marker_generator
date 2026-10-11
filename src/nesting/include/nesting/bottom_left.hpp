@@ -5,7 +5,7 @@
 #include <clipper2/clipper.h>
 
 #include "pattern/shapes.hpp"
-#include "nesting/placed_instance.hpp"
+#include "nesting/nested_item.hpp"
 
 namespace pmg::nesting {
 
@@ -15,7 +15,7 @@ private:
 
     int64_t m_step_size;
 
-    std::vector<PlacedInstance> m_results;
+    std::vector<NestedItem> m_results;
     Clipper2Lib::Paths64 m_placed_pieces_polygons;
     std::vector<Clipper2Lib::Rect64> m_placed_pieces_boxes;
 
@@ -29,9 +29,9 @@ private:
 public:
     BottomLeft(pattern::Fabric fabric, int64_t step_size = 1000);
 
-    std::vector<PlacedInstance> performNesting(std::vector<pattern::PieceVariant> variants);
+    std::vector<NestedItem> performNesting(std::vector<pattern::PieceVariant> variants);
 
-    std::vector<PlacedInstance> getResults() const noexcept { return m_results; }
+    std::vector<NestedItem> getResults() const noexcept { return m_results; }
 };
 
 } // namespace pmg::nesting

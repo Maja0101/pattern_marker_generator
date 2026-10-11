@@ -3,7 +3,7 @@
 #include <array>
 
 #include "geometry/svg_exporter.hpp"
-#include "nesting/placed_instance.hpp"
+#include "nesting/nested_item.hpp"
 #include "pattern/shapes.hpp"
 #include "geometry/geometry_types.hpp"
 
@@ -13,7 +13,7 @@ namespace pmg::geometry {
 bool SvgExporter::exportLayout(const std::string& filepath, 
                              int64_t fabricWidth,
                              int64_t fabricHeight,
-                             const std::vector<nesting::PlacedInstance>& instances)
+                             const std::vector<nesting::NestedItem>& items)
 {
     std::ofstream out(filepath);
     if (!out.is_open()) {
@@ -35,11 +35,11 @@ bool SvgExporter::exportLayout(const std::string& filepath,
     out << "  <!-- Placed Pieces -->\n";
     const char* strokeColor = "#8046E1";
 
-    for (const auto& instance : instances) {
-        const auto* variant = instance.getVariant();
+    for (const auto& item : items) {
+        const auto* variant = item.getVariant();
         if (!variant) continue;
 
-        const auto pos = instance.getPosition();
+        const auto pos = item.getPosition();
 
         out << "  <polygon points=\"";
 

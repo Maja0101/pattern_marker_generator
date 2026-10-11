@@ -5,13 +5,13 @@
 
 namespace pmg::nesting {
 
-class PlacedInstance {
+class NestedItem {
 private:
     geometry::Point64 m_position;
     const pattern::PieceVariant* m_variantRef;
 
 public:
-    PlacedInstance(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept;
+    NestedItem(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept;
 
     std::string toString() const;
 

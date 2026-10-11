@@ -3,7 +3,7 @@
 namespace pmg::nesting {
 bool BottomLeft::isCollision(const Clipper2Lib::Path64& piece_path, const Clipper2Lib::Rect64& piece_bounding_box)
 {
-    // TODO might need chang; check first if the piece does not collide at the position and then move to the position
+    // TODO might need change; check first if the piece does not collide at the position and then move to the position
 
     // Fast check using bounding boxes and store potential collision shapes
     Clipper2Lib::Paths64 potential_obstacles;
@@ -18,7 +18,7 @@ bool BottomLeft::isCollision(const Clipper2Lib::Path64& piece_path, const Clippe
         return false;
     }
 
-    // Detailed check
+    // Detailed intersection check
     Clipper2Lib::Paths64 piece_paths = Clipper2Lib::Paths64{ piece_path };
 
     Clipper2Lib::Paths64 intersection = Clipper2Lib::Intersect(
@@ -39,7 +39,7 @@ bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64& piece_path, const Cli
             return false;
     }
 
-    // Precise check 
+    // Precise check using difference between two paths
     Clipper2Lib::Paths64 overflow = Clipper2Lib::Difference(
         Clipper2Lib::Paths64{ piece_path },
         Clipper2Lib::Paths64{ m_fabric.getPath() },
@@ -70,10 +70,10 @@ bool BottomLeft::findPosition(Clipper2Lib::Path64 piece)
 BottomLeft::BottomLeft(pattern::Fabric fabric, int64_t step_size)
     : m_fabric(std::move(fabric)), m_step_size(step_size) {}
 
-std::vector<PlacedInstance> BottomLeft::performNesting(std::vector<pattern::PieceVariant> variants)
+std::vector<NestedItem> BottomLeft::performNesting(std::vector<pattern::PieceVariant> variants)
 {
     // perform the nesting for the pattern
-    return std::vector<PlacedInstance>();
+    return std::vector<NestedItem>();
 }
 
 } // namespace pmg::nesting

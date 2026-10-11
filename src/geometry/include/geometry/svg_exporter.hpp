@@ -5,7 +5,7 @@
 #include <cstdint>
 
 namespace pmg::nesting {
-    class PlacedInstance;
+    class NestedItem;
 }
 
 namespace pmg::geometry {
@@ -15,7 +15,7 @@ public:
     static bool exportLayout(const std::string& filepath, 
                              int64_t fabricWidth,
                              int64_t fabricHeight,
-                             const std::vector<nesting::PlacedInstance>& instances); 
+                             const std::vector<nesting::NestedItem>& items); 
 };
 
 } // namespace pmg::geometry
