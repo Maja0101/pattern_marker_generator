@@ -1,7 +1,7 @@
 #include "nesting/bottom_left.hpp"
 
 namespace pmg::nesting {
-bool BottomLeft::isCollision(const Clipper2Lib::Path64& piece_path, const Clipper2Lib::Rect64& piece_bounding_box)
+bool BottomLeft::isCollision(const Clipper2Lib::Path64 &piece_path, const Clipper2Lib::Rect64 &piece_bounding_box)
 {
     // TODO might need change; check first if the piece does not collide at the position and then move to the position
 
@@ -30,7 +30,7 @@ bool BottomLeft::isCollision(const Clipper2Lib::Path64& piece_path, const Clippe
     return !intersection.empty();
 }
 
-bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64& piece_path, const Clipper2Lib::Rect64& piece_bounding_box)
+bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64 &piece_path, const Clipper2Lib::Rect64 &piece_bounding_box)
 {
     // Fast check using bounding box
     const auto& fabricBounds = m_fabric.getBoundingBox();
@@ -49,10 +49,14 @@ bool BottomLeft::isWithinFabric(const Clipper2Lib::Path64& piece_path, const Cli
     return overflow.empty();
 }
 
-Clipper2Lib::Path64 BottomLeft::translate(const Clipper2Lib::Path64 &, int64_t dx, int64_t dy)
+Clipper2Lib::Path64 BottomLeft::translate(const Clipper2Lib::Path64 &path, int64_t dx, int64_t dy)
 {
-    // translate single piece by (dx, dy)
-    return Clipper2Lib::Path64();
+    Clipper2Lib::Path64 result;
+    result.reserve(path.size());
+    for (const auto& point : path) {
+        result.push_back(Clipper2Lib::Point64(point.x + dx, point.y + dy));
+    }
+    return result;
 }
 
 bool BottomLeft::aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
@@ -61,8 +65,9 @@ bool BottomLeft::aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::
             (a.bottom <= b.top && a.top >= b.bottom);
 }
 
-bool BottomLeft::findPosition(Clipper2Lib::Path64 piece)
+bool BottomLeft::findPosition(NestedItem &item)
 {
+
     // find the position of the piece using Bottom Left Algorithm 
     return false;
 }
@@ -70,7 +75,7 @@ bool BottomLeft::findPosition(Clipper2Lib::Path64 piece)
 BottomLeft::BottomLeft(pattern::Fabric fabric, int64_t step_size)
     : m_fabric(std::move(fabric)), m_step_size(step_size) {}
 
-std::vector<NestedItem> BottomLeft::performNesting(std::vector<pattern::PieceVariant> variants)
+std::vector<NestedItem> BottomLeft::performNesting(std::vector<NestedItem> items)
 {
     // perform the nesting for the pattern
     return std::vector<NestedItem>();

@@ -9,7 +9,7 @@ class NestedItem {
 private:
     geometry::Point64 m_position;
     const pattern::PieceVariant* m_variantRef;
-
+    bool m_isLocked;
 public:
     NestedItem(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept;
 
