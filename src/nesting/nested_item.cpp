@@ -6,8 +6,8 @@
 
 namespace pmg::nesting {
 
-NestedItem::NestedItem(geometry::Point64 pos, const pattern::PieceVariant* variant) noexcept
-    : m_position(pos), m_variantRef(variant), m_isLocked(false) {}
+NestedItem::NestedItem(const pattern::PieceVariant* variant) noexcept
+    : m_position(geometry::Point64()), m_variantRef(variant), m_isLocked(false) {}
 
 const Clipper2Lib::Path64 NestedItem::getItemPathAt(int64_t x, int64_t y) const
 {
@@ -17,6 +17,13 @@ const Clipper2Lib::Path64 NestedItem::getItemPathAt(int64_t x, int64_t y) const
 const Clipper2Lib::Rect64 NestedItem::getItemBoundingBoxAt(int64_t x, int64_t y) const
 {
     return m_variantRef->getBoundingBoxAt(x, y);
+}
+
+void NestedItem::lockInPosition(int64_t x, int64_t y)
+{
+    m_isLocked = true;
+    m_position.x += x;
+    m_position.y += y;
 }
 
 std::string NestedItem::toString() const

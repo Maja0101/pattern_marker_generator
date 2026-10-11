@@ -19,11 +19,10 @@ private:
     Clipper2Lib::Paths64 m_placed_pieces_polygons;
     std::vector<Clipper2Lib::Rect64> m_placed_pieces_boxes;
 
+    bool aabbCollision(const Clipper2Lib::Rect64& a, const Clipper2Lib::Rect64& b);
     bool isCollision(const NestedItem& item, int64_t x, int64_t y);
     bool isWithinFabric(const NestedItem& item, int64_t x, int64_t y);
     bool canPlaceAt(const NestedItem& item, int64_t x, int64_t y);
-
-    bool aabbCollision(const Clipper2Lib::Rect64& a, const Clipper2Lib::Rect64& b);
 
     bool findPosition(NestedItem& item);
 public:

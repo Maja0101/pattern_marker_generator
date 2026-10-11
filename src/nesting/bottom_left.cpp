@@ -1,6 +1,13 @@
 #include "nesting/bottom_left.hpp"
 
 namespace pmg::nesting {
+
+bool BottomLeft::aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
+{
+    return (a.left <= b.right && a.right >= b.left) &&
+            (a.bottom <= b.top && a.top >= b.bottom);
+}
+
 bool BottomLeft::isCollision(const NestedItem &item, int64_t x, int64_t y)
 {
     // Bounding boxes of item at potential position
@@ -71,32 +78,50 @@ bool BottomLeft::canPlaceAt(const NestedItem &item, int64_t x, int64_t y)
     return true;
 }
 
-
-bool BottomLeft::aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
-{
-    return (a.left <= b.right && a.right >= b.left) &&
-            (a.bottom <= b.top && a.top >= b.bottom);
-}
-
 bool BottomLeft::findPosition(NestedItem &item)
 {
     // Calculate width and height of item's bounding box and determine the starting position
+    Clipper2Lib::Rect64 fabricBounds = m_fabric.getBoundingBox();
     Clipper2Lib::Rect64 item_bounding_box = item.getVariant()->getBoundingBox();
 
-    int64_t item_height = item_bounding_box.Width();
+    int64_t item_width = item_bounding_box.Width();
     int64_t item_height = item_bounding_box.Height();
 
-    int64_t current_x = m_fabric.getBoundingBox().left;
-    int64_t current_y = m_fabric.getBoundingBox().top - item_height;
+    int64_t current_x = fabricBounds.left;
+    int64_t current_y = fabricBounds.top - item_height;
 
-    // check if can place
+    // Verify starting position and move right if blocked
+    while (!canPlaceAt(item, current_x, current_y)) {
+        current_x += m_step_size;
+        if (current_x + item_width > fabricBounds.right) {
+            return false;
+        }
+    }
 
-    // slide down, slide left loop
+    // Down-Left loop
+    bool wasMoved = true;
+    while (wasMoved) {
+        wasMoved = false;
 
-    // lock item
+        // Slide down 
+        while (canPlaceAt(item, current_x, current_y - m_step_size)) {
+            current_y -= m_step_size;
+            wasMoved = true;
+        }
 
-    // return result
-    return false;
+        // Slide left
+        while (canPlaceAt(item, current_x - m_step_size, current_y)) {
+            current_x -= m_step_size;
+            wasMoved = true;
+        }
+    }
+
+    // Lock item into place
+    m_placed_pieces_polygons.push_back(item.getItemPathAt(current_x, current_y));
+    m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAt(current_x, current_y));
+    item.lockInPosition(current_x, current_y);
+
+    return true;
 }
 
 BottomLeft::BottomLeft(pattern::Fabric fabric, int64_t step_size)
