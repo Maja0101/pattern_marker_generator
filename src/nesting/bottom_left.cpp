@@ -11,7 +11,7 @@ bool BottomLeft::aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::
 bool BottomLeft::isCollision(const NestedItem &item, int64_t x, int64_t y)
 {
     // Bounding boxes of item at potential position
-    Clipper2Lib::Rect64 itemBoundsAt = item.getItemBoundingBoxAt(x, y);
+    Clipper2Lib::Rect64 itemBoundsAt = item.getItemBoundingBoxAtPosition(x, y);
 
     // Fast check using bounding boxes and store potential collision shapes
     Clipper2Lib::Paths64 potential_obstacles;
@@ -28,7 +28,7 @@ bool BottomLeft::isCollision(const NestedItem &item, int64_t x, int64_t y)
     }
 
     // Item path at potential position
-    Clipper2Lib::Path64 itemPathAt = item.getItemPathAt(x, y);
+    Clipper2Lib::Path64 itemPathAt = item.getItemPathAtPosition(x, y);
 
     // Detailed intersection check
     Clipper2Lib::Paths64 intersection = Clipper2Lib::Intersect(
@@ -44,7 +44,7 @@ bool BottomLeft::isWithinFabric(const NestedItem &item, int64_t x, int64_t y)
 {
     // Bounding boxes of fabric and item at potential position
     Clipper2Lib::Rect64 fabricBounds = m_fabric.getBoundingBox();
-    Clipper2Lib::Rect64 itemBoundsAt = item.getItemBoundingBoxAt(x, y);
+    Clipper2Lib::Rect64 itemBoundsAt = item.getItemBoundingBoxAtPosition(x, y);
 
     // Fast check using bounding box
     if (itemBoundsAt.left < fabricBounds.left || itemBoundsAt.right > fabricBounds.right ||
@@ -53,7 +53,7 @@ bool BottomLeft::isWithinFabric(const NestedItem &item, int64_t x, int64_t y)
     }
 
     // Item path at potential position
-    Clipper2Lib::Path64 itemPathAt = item.getItemPathAt(x, y);
+    Clipper2Lib::Path64 itemPathAt = item.getItemPathAtPosition(x, y);
 
     // Precise check using difference between two paths
     Clipper2Lib::Paths64 overflow = Clipper2Lib::Difference(
@@ -117,8 +117,8 @@ bool BottomLeft::findPosition(NestedItem &item)
     }
 
     // Lock item into place
-    m_placed_pieces_polygons.push_back(item.getItemPathAt(current_x, current_y));
-    m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAt(current_x, current_y));
+    m_placed_pieces_polygons.push_back(item.getItemPathAtPosition(current_x, current_y));
+    m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAtPosition(current_x, current_y));
     item.lockInPosition(current_x, current_y);
 
     return true;
@@ -127,10 +127,15 @@ bool BottomLeft::findPosition(NestedItem &item)
 BottomLeft::BottomLeft(pattern::Fabric fabric, int64_t step_size)
     : m_fabric(std::move(fabric)), m_step_size(step_size) {}
 
-std::vector<NestedItem> BottomLeft::performNesting(std::vector<NestedItem> items)
+bool BottomLeft::performNesting(std::vector<NestedItem> &items)
 {
-    // perform the nesting for the pattern
-    return std::vector<NestedItem>();
+    for (auto& item : items) {
+        if (!findPosition(item)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace pmg::nesting

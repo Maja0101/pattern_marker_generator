@@ -28,9 +28,7 @@ private:
 public:
     BottomLeft(pattern::Fabric fabric, int64_t step_size = 1000);
 
-    std::vector<NestedItem> performNesting(std::vector<NestedItem> items);
-
-    std::vector<NestedItem> getResults() const noexcept { return m_results; }
+    bool performNesting(std::vector<NestedItem>& items);
 };
 
 } // namespace pmg::nesting

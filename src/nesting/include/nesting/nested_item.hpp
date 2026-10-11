@@ -16,8 +16,10 @@ public:
     geometry::Point64 getPosition() const noexcept { return m_position; }
     const pattern::PieceVariant* getVariant() const noexcept { return m_variantRef; }
 
-    const Clipper2Lib::Path64 getItemPathAt(int64_t x, int64_t y) const;
-    const Clipper2Lib::Rect64 getItemBoundingBoxAt(int64_t x, int64_t y) const;
+    const Clipper2Lib::Path64 getItemPathAtPosition(int64_t x, int64_t y) const;
+    const Clipper2Lib::Path64 getItemPathAtPosition() const;
+    const Clipper2Lib::Rect64 getItemBoundingBoxAtPosition(int64_t x, int64_t y) const;
+    const Clipper2Lib::Rect64 getItemBoundingBoxAtPosition() const;
 
     void lockInPosition(int64_t x, int64_t y);
 
