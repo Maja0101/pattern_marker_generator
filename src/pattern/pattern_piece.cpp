@@ -60,9 +60,18 @@ std::string PatternPiece::toString() const
         }
     );
 
-    return std::format("Pattern piece no. {} [{}]",
+    std::string variantsStr = std::accumulate(
+        std::next(m_allowedVariants.begin()), m_allowedVariants.end(),
+        m_allowedVariants.front().toString(),
+        [](std::string a, pattern::PieceVariant b) {
+            return a + "; " + b.toString();
+        }
+    );
+
+    return std::format("Pattern piece no. {} [{}] with variants: {}",
                             m_id,
-                            boundaryStr);
+                            boundaryStr,
+                            variantsStr);
 }
 
 } // namespace pmg::pattern

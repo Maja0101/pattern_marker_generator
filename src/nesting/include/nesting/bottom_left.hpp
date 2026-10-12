@@ -15,7 +15,6 @@ private:
 
     int64_t m_step_size;
 
-    std::vector<NestedItem> m_results;
     Clipper2Lib::Paths64 m_placed_pieces_polygons;
     std::vector<Clipper2Lib::Rect64> m_placed_pieces_boxes;
 
