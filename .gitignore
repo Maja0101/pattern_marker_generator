@@ -6,3 +6,6 @@
 *.obj
 *.exe
 *.out
+
+# Debug svg file
+*.svg
