@@ -47,7 +47,9 @@ bool SvgExporter::exportLayout(const std::string& filepath,
             double worldX = static_cast<double>(pos.x + pt.x) / 1000.0;
             double worldY = static_cast<double>(pos.y + pt.y) / 1000.0;
 
-            out << worldX << "," << worldY << " ";
+            double svgY = static_cast<double>(fabricHeight) - worldY;
+
+            out << worldX << "," << svgY << " ";
         }
 
         out << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" "

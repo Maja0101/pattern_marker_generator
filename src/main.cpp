@@ -14,7 +14,9 @@
 #include "geometry/svg_exporter.hpp"
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
+#include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
+#include "nesting/basic_algorithm.hpp"
 
 using namespace pmg;
 
@@ -27,40 +29,42 @@ std::vector<pattern::PatternPiece> getSamplePieces() {
     // Create points for pattern pieces
     // Trapezium 
     std::vector<geometry::Point64> trapeziumPts = {
-        {     0,      0},
-        {     0, -40000},
-        {-90000, -25000},
-        {-90000, -15000}
+        {    0, 15000},  
+        {90000,     0},  
+        {90000, 40000},  
+        {    0, 25000} 
     };
 
-    // Square 
+    // Square
     std::vector<geometry::Point64> squarePts = {
-        {    0,      0},
-        {60000,      0},
-        {60000, -60000},
-        {    0, -60000}
+        {    0,     0}, 
+        {60000,     0}, 
+        {60000, 60000}, 
+        {    0, 60000}  
     };
 
-    // Rectangle 
+    // Rectangle
     std::vector<geometry::Point64> rectPts = {
-        {    0,      0},
-        {42000,      0},
-        {42000, -17000},
-        {    0, -17000}
+        {    0,     0},  
+        {42000,     0},  
+        {42000, 17000}, 
+        {    0, 17000}  
     };
+
 
     // Octagon
     constexpr double sideA = 12000.0;
     const double R = sideA / (2.0 * std::sin(M_PI / 8.0));
     std::vector<geometry::Point64> rawOctagonPts;
 
-    double minX = 1e9, maxY = -1e9;
+    double minX = 1e9, minY = 1e9;
     for (int i = 0; i < 8; ++i) {
-        double angle = (M_PI / 8.0) + i * (M_PI / 4.0);
+        double angle = (5.0 * M_PI / 4.0) + i * (M_PI / 4.0);
         double x = R * std::cos(angle);
         double y = R * std::sin(angle);
         minX = std::min(minX, x);
-        maxY = std::max(maxY, y); 
+        minY = std::min(minY, y);
+        
         auto px = static_cast<int64_t>(std::round(x));
         auto py = static_cast<int64_t>(std::round(y));
         rawOctagonPts.push_back({px, py});
@@ -68,20 +72,20 @@ std::vector<pattern::PatternPiece> getSamplePieces() {
 
     std::vector<geometry::Point64> octagonPts;
     int64_t offsetX = std::round(minX);
-    int64_t offsetY = std::round(maxY);
+    int64_t offsetY = std::round(minY);
 
     for (const auto& pt : rawOctagonPts) {
         octagonPts.push_back({pt.x - offsetX, pt.y - offsetY});
     }
 
-    // Double Trapezium
+    // Double Trapezium 
     std::vector<geometry::Point64> doubleTrapeziumPts = {
-        {     0,  -5000},
-        {     0, -30000},
-        {-50000, -35000},
-        {-65000, -25000},
-        {-65000, -20000},
-        {-50000,      0}
+        {15000,     0}, 
+        {65000,  5000}, 
+        {65000, 30000}, 
+        {15000, 35000},  
+        {    0, 15000}, 
+        {    0, 10000}  
     };
 
     // Add them to vector of pattern pieces
@@ -108,119 +112,46 @@ int main()
 
     std::vector<pattern::PatternPiece> samplePieces = getSamplePieces();
 
-    // bool result;
+    std::vector<geometry::Point64> fabricPts = {
+        {    0,       0},  
+        {350000,      0},  
+        {350000, 150000}, 
+        {     0, 150000}  
+    };
+    pattern::Fabric fabric(fabricPts);
 
-    // {
-    //     Timer timer;
+    nesting::BasicAlgorithm alg(fabric);
+    alg.execute(samplePieces);
 
-        // const std::vector<pattern::VariantConstraint> defaultConstraints = {
-        //     { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1 }
-        // };
+    // std::vector<nesting::NestedItem> nestedItems;
 
-        // std::vector<geometry::Point64> trapeziumPts = {
-        //     {     0,      0},
-        //     {     0, -40000},
-        //     {-90000, -25000},
-        //     {-90000, -15000}
-        // };
-        // auto pieceTrapezium = std::make_shared<pattern::PatternPiece>(
-        //     1, trapeziumPts, defaultConstraints
-        // );
+    // nesting::NestedItem trapezium(samplePieces[0].getVariant(0, false));
+    // trapezium.lockInPosition(10000, 10000);
+    // nestedItems.emplace_back(trapezium);
 
-        // std::vector<geometry::Point64> squarePts = {
-        //     {    0,      0},
-        //     {60000,      0},
-        //     {60000, -60000},
-        //     {    0, -60000}
-        // };
-        // auto pieceSquare = std::make_shared<pattern::PatternPiece>(
-        //     2, squarePts, defaultConstraints
-        // );
+    // nesting::NestedItem square(samplePieces[1].getVariant(0, false));
+    // square.lockInPosition(120000, 10000);
+    // nestedItems.emplace_back(square);
 
-        // std::vector<geometry::Point64> rectPts = {
-        //     {    0,      0},
-        //     {42000,      0},
-        //     {42000, -17000},
-        //     {    0, -17000}
-        // };
-        // auto pieceRect = std::make_shared<pattern::PatternPiece>(
-        //     3, rectPts, defaultConstraints
-        // );
+    // nesting::NestedItem rect(samplePieces[2].getVariant(0, false));
+    // rect.lockInPosition(10000, 60000);
+    // nestedItems.emplace_back(rect);
 
-        // constexpr double sideA = 12000.0;
-        // const double R = sideA / (2.0 * std::sin(M_PI / 8.0));
-        // std::vector<geometry::Point64> rawOctagonPts;
+    // nesting::NestedItem octagon(samplePieces[3].getVariant(0, false));
+    // octagon.lockInPosition(60000, 60000);
+    // nestedItems.emplace_back(octagon);
 
-        // double minX = 1e9, maxY = -1e9;
-        // for (int i = 0; i < 8; ++i) {
-        //     double angle = (M_PI / 8.0) + i * (M_PI / 4.0);
-        //     double x = R * std::cos(angle);
-        //     double y = R * std::sin(angle);
-        //     minX = std::min(minX, x);
-        //     maxY = std::max(maxY, y); 
-        //     auto px = static_cast<int64_t>(std::round(x));
-        //     auto py = static_cast<int64_t>(std::round(y));
-        //     rawOctagonPts.push_back({px, py});
-        // }
+    // nesting::NestedItem dualTrapezium(samplePieces[4].getVariant(0, false));
+    // dualTrapezium.lockInPosition(200000, 10000);
+    // nestedItems.emplace_back(dualTrapezium);
 
-        // std::vector<geometry::Point64> octagonPts;
-        // int64_t offsetX = std::round(minX);
-        // int64_t offsetY = std::round(maxY);
-
-        // for (const auto& pt : rawOctagonPts) {
-        //     octagonPts.push_back({pt.x - offsetX, pt.y - offsetY});
-        // }
-
-        // auto pieceOctagon = std::make_shared<pattern::PatternPiece>(
-        //     4, octagonPts, defaultConstraints
-        // );
-
-        // std::vector<geometry::Point64> dualTrapeziumPts = {
-        //     {     0,  -5000},
-        //     {     0, -30000},
-        //     {-50000, -35000},
-        //     {-65000, -25000},
-        //     {-65000, -20000},
-        //     {-50000,      0}
-        // };
-        // auto pieceDualTrapezium = std::make_shared<pattern::PatternPiece>(
-        //     5, dualTrapeziumPts, defaultConstraints
-        // );
-
-        // std::vector<nesting::NestedItem> nestedItems;
-
-        // nesting::NestedItem trapezium(pieceTrapezium->getVariant(0, false));
-        // trapezium.lockInPosition(100000, 130000);
-        // nestedItems.emplace_back(trapezium);
-
-        // nesting::NestedItem square(pieceSquare->getVariant(0, false));
-        // square.lockInPosition(80000, 80000);
-        // nestedItems.emplace_back(square);
-
-        // nesting::NestedItem rect(pieceRect->getVariant(0, false));
-        // rect.lockInPosition(160000, 40000);
-        // nestedItems.emplace_back(rect);
-
-        // nesting::NestedItem octagon(pieceOctagon->getVariant(0, false));
-        // octagon.lockInPosition(220000, 50000);
-        // nestedItems.emplace_back(octagon);
-
-        // nesting::NestedItem dualTrapezium(pieceDualTrapezium->getVariant(0, false));
-        // dualTrapezium.lockInPosition(330000, 90000);
-        // nestedItems.emplace_back(dualTrapezium);
-
-        // for (const auto& piece : nestedItems) {
-        //     SPDLOG_INFO(piece.toString());
-        // }
-
-        // result = pmg::geometry::SvgExporter::exportLayout(
-        //     "debug_output.svg", 350, 150, nestedItems
-        // );
-
-    //     SPDLOG_INFO("Placed geometric pieces");
+    // for (const auto& piece : nestedItems) {
+    //     SPDLOG_INFO(piece.toString());
     // }
 
-    // return result ? 0 : 1;
+    // bool result = pmg::geometry::SvgExporter::exportLayout(
+    //     "debug_output.svg", 350, 150, nestedItems
+    // );
 
     return 0;
 }
