@@ -2,7 +2,7 @@
 
 #include "utils/timer.hpp"
 
-namespace pmg {
+namespace pmg::timing {
 
 Timer::Timer(std::source_location location) :
     m_logger(spdlog::get("basicConsole")),
@@ -18,4 +18,4 @@ Timer::~Timer() {
     SPDLOG_LOGGER_INFO(m_logger, "[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
 }
 
-} // namespace pmg
+} // namespace pmg::timing
