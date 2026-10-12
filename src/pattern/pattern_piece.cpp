@@ -1,11 +1,13 @@
 #include <utility>
+#include <format>
+#include <string>
 
 #include "pattern/pattern_piece.hpp"
 #include "geometry/transformations.hpp"
 
 namespace pmg::pattern {
 
-PatternPiece::PatternPiece(int pieceId, 
+PatternPiece::PatternPiece(int64_t pieceId, 
               std::vector<geometry::Point64> originalPoints, 
               const std::vector<VariantConstraint>& constraints)
     : m_id(pieceId), m_originalBoundary(std::move(originalPoints)) 
@@ -46,6 +48,21 @@ Clipper2Lib::Paths64 PatternPiece::variantsToClipperPaths() const {
     }
 
     return paths;
+}
+
+std::string PatternPiece::toString() const
+{
+    std::string boundaryStr = std::accumulate(
+        std::next(m_originalBoundary.begin()), m_originalBoundary.end(),
+        m_originalBoundary.front().toString(),
+        [](std::string a, geometry::Point64 b) {
+            return a + ", " + b.toString();
+        }
+    );
+
+    return std::format("Pattern piece no. {} [{}]",
+                            m_id,
+                            boundaryStr);
 }
 
 } // namespace pmg::pattern

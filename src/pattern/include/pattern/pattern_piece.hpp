@@ -17,7 +17,7 @@ private:
     std::vector<geometry::Point64> m_originalBoundary;
     std::vector<PieceVariant> m_allowedVariants;
 public:
-    PatternPiece(int pieceId, 
+    PatternPiece(int64_t pieceId, 
               std::vector<geometry::Point64> originalPoints, 
               const std::vector<VariantConstraint>& constraints);
 
@@ -26,6 +26,8 @@ public:
 
     const std::vector<PieceVariant>& getVariants() const noexcept { return m_allowedVariants; }
     int64_t getId() const noexcept { return m_id; }
+
+    std::string toString() const;
 };
 
 } // namespace pmg::pattern 
