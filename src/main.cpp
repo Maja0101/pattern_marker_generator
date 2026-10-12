@@ -34,10 +34,10 @@ int main()
         };
 
         std::vector<geometry::Point64> trapeziumPts = {
-            {    0,      0},
-            {40000,      0},
-            {25000, -90000},
-            {15000, -90000}
+            {     0,      0},
+            {     0, -40000},
+            {-90000, -25000},
+            {-90000, -15000}
         };
         auto pieceTrapezium = std::make_shared<pattern::PatternPiece>(
             1, trapeziumPts, defaultConstraints
@@ -92,34 +92,38 @@ int main()
         );
 
         std::vector<geometry::Point64> dualTrapeziumPts = {
-            { 5000,      0}, // Bottom-Left
-            {30000,      0}, // Bottom-Right
-            {35000, -50000}, // Joint Right
-            {25000, -65000}, // Top-Right
-            {20000, -65000}, // Top-Left
-            {    0, -50000}  // Joint Left
+            {     0,  -5000},
+            {     0, -30000},
+            {-50000, -35000},
+            {-65000, -25000},
+            {-65000, -20000},
+            {-50000,      0}
         };
         auto pieceDualTrapezium = std::make_shared<pattern::PatternPiece>(
             5, dualTrapeziumPts, defaultConstraints
         );
 
-        std::vector<pmg::nesting::NestedItem> nestedItems;
+        std::vector<nesting::NestedItem> nestedItems;
 
-        nestedItems.emplace_back(
-            geometry::Point64{20000, 110000}, pieceTrapezium->getVariant(0, false)
-        );
-        nestedItems.emplace_back(
-            geometry::Point64{80000, 80000}, pieceSquare->getVariant(0, false)
-        );
-        nestedItems.emplace_back(
-            geometry::Point64{160000, 40000}, pieceRect->getVariant(0, false)
-        );
-        nestedItems.emplace_back(
-            geometry::Point64{220000, 50000}, pieceOctagon->getVariant(0, false)
-        );
-        nestedItems.emplace_back(
-            geometry::Point64{270000, 85000}, pieceDualTrapezium->getVariant(0, false)
-        );
+        nesting::NestedItem trapezium(pieceTrapezium->getVariant(0, false));
+        trapezium.lockInPosition(100000, 130000);
+        nestedItems.emplace_back(trapezium);
+
+        nesting::NestedItem square(pieceSquare->getVariant(0, false));
+        square.lockInPosition(80000, 80000);
+        nestedItems.emplace_back(square);
+
+        nesting::NestedItem rect(pieceRect->getVariant(0, false));
+        rect.lockInPosition(160000, 40000);
+        nestedItems.emplace_back(rect);
+
+        nesting::NestedItem octagon(pieceOctagon->getVariant(0, false));
+        octagon.lockInPosition(220000, 50000);
+        nestedItems.emplace_back(octagon);
+
+        nesting::NestedItem dualTrapezium(pieceDualTrapezium->getVariant(0, false));
+        dualTrapezium.lockInPosition(330000, 90000);
+        nestedItems.emplace_back(dualTrapezium);
 
         for (const auto& piece : nestedItems) {
             SPDLOG_INFO(piece.toString());
