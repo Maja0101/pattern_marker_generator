@@ -46,7 +46,7 @@ std::string NestedItem::toString() const
                             m_variantRef->toString());
     }
 
-    return std::format("Item to be placed [{}]",
+    return std::format("Item to be placed {} [{}]",
                             m_position.toString(),
                             m_variantRef->toString());
 }

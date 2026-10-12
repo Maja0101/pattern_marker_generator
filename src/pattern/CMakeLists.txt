@@ -9,5 +9,6 @@ target_include_directories(pattern PUBLIC
 
 target_link_libraries(pattern PUBLIC 
     geometry 
+    utils
     Clipper2
 )
