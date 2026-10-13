@@ -2,7 +2,7 @@
 
 #include "nesting/bottom_left.hpp"
 #include "utils/config.hpp"
-#include "nesting/bl_helpers.hpp"
+#include "nesting/calculations.hpp"
 
 namespace pmg::nesting::calculations {
 
@@ -93,6 +93,44 @@ bool canPlaceAt(const BLStateView &view, const NestedItem &item, int64_t x, int6
     }
 
     return true;
+}
+
+std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece> &patternPieces)
+{
+    std::vector<nesting::NestedItem> items;
+
+    for (const auto& piece : patternPieces) {
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO(piece.toString());
+        }
+        for (const auto& variant : piece.getVariants()) {
+            if constexpr (config::DEBUG_MODE) {
+                SPDLOG_INFO(variant.toString());
+            }
+            for (int i = 0; i < variant.getRequiredQuantity(); ++i) {
+                if constexpr (config::DEBUG_MODE) {
+                    SPDLOG_INFO(std::format("Loop no. {}", i+1));
+                }
+
+                items.emplace_back(&variant);
+            }
+        }
+    }
+
+    if constexpr (config::DEBUG_MODE) {
+        for (const auto& item : items) {
+            SPDLOG_INFO(item.toString());
+        }
+    }
+    
+    return items;
+}
+
+bool evaluate(const std::vector<nesting::NestedItem> &items)
+{
+    // TODO evaluation function for layout 
+    
+    return false;
 }
 
 } // namespace pmg::nesting::calculations
