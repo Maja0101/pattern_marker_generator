@@ -7,6 +7,7 @@ namespace pmg::nesting {
 
 bool BottomLeft::aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
 {
+    // Checking bounding box collision (bottom, top, left, right)
     // if constexpr (config::DEBUG_MODE) {
     //     SPDLOG_CRITICAL(std::format("a l={}, r={}, b={}, t={}", a.left, a.right, a.bottom, a.top));
     //     SPDLOG_CRITICAL(std::format("b l={}, r={}, b={}, t={}", b.left, b.right, b.bottom, b.top));
@@ -188,11 +189,7 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
         SPDLOG_INFO("Starting nesting");
     }
 
-    int i = 1;
     for (auto& item : items) {
-        // if (i > 2) {
-        //     throw std::invalid_argument("the next item");
-        // }
         if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO(std::format("Nesting for {}", item.toString()));
         }
@@ -203,7 +200,6 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
             }
             return false;
         }
-        i++;
     }
 
     return true;

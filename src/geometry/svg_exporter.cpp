@@ -30,10 +30,11 @@ bool SvgExporter::exportLayout(const std::string& filepath,
 
     out << "  <!-- Sheet Frame -->\n";
     out << "  <rect width=\"" << fabricWidth << "\" height=\"" << fabricHeight << "\" "
-        << "fill=\"#FAF7F7\" stroke=\"#404040\" stroke-width=\"1.5\" />\n\n";
+        << "fill=\"#FAF7F7\" stroke=\"#404040\" stroke-width=\"0.0\" />\n\n";
 
     out << "  <!-- Placed Pieces -->\n";
     const char* strokeColor = "#8046E1";
+    const char* borderColor = "#B84A8D";
 
     for (const auto& item : items) {
         const auto* variant = item.getVariant();
@@ -53,7 +54,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
         }
 
         out << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" "
-            << "stroke=\"" << strokeColor << "\" stroke-width=\"0.8\" />\n";
+            << "stroke=\"" << borderColor << "\" stroke-width=\"0.0\" />\n";
     }
 
     out << "</svg>\n";
