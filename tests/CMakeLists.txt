@@ -21,6 +21,13 @@ if(TEST_FILES)
 
   # Specify include directories to use when compiling 
   target_include_directories(unit_tests PRIVATE ${CATCH2_SOURCE_DIR})
+  
+  # Link libraries needed for testing
+  target_link_libraries(unit_tests PRIVATE 
+  nesting 
+  Clipper2
+  )
+  
   # Add a test to the project
   add_test(NAME unit_tests COMMAND unit_tests)
 endif()

@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Place executables in build directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# Load CTest framework and FetchContent modeule
+# Load CTest framework and FetchContent module
 include(CTest)
 include(FetchContent)
 
