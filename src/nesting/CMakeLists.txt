@@ -3,6 +3,7 @@ add_library(nesting
     bottom_left.cpp
     algorithm_base.cpp
     basic_algorithm.cpp
+    bl_helpers.cpp
 )
 
 target_include_directories(nesting PUBLIC
