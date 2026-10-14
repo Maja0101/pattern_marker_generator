@@ -35,26 +35,35 @@ bool SvgExporter::exportLayout(const std::string& filepath,
     out << "  <!-- Placed Pieces -->\n";
     const char* strokeColor = "#8046E1";
     const char* borderColor = "#B84A8D";
+    const float borderWidth = 20.0f;
 
+    size_t idCounter = 0;
     for (const auto& item : items) {
         const auto* variant = item.getVariant();
         if (!variant) continue;
 
         const auto pos = item.getPosition();
 
-        out << "  <polygon points=\"";
-
+        std::ostringstream pointsStream;
         for (const auto& pt : variant->getBoundary()) {
             double worldX = static_cast<double>(pos.x + pt.x) / 1000.0;
             double worldY = static_cast<double>(pos.y + pt.y) / 1000.0;
-
             double svgY = static_cast<double>(fabricHeight) - worldY;
 
-            out << worldX << "," << svgY << " ";
+            pointsStream << worldX << "," << svgY << " ";
         }
+        const std::string points = pointsStream.str();
+        std::string clipId = "clip_" + std::to_string(idCounter++);
 
-        out << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" "
-            << "stroke=\"" << borderColor << "\" stroke-width=\"0.0\" />\n";
+        // Output clipPath definition
+        out << "  <clipPath id=\"" << clipId << "\">\n"
+            << "    <polygon points=\"" << points << "\" />\n"
+            << "  </clipPath>\n";
+
+        // Output polygon referencing the clipPath
+        out << "  <polygon points=\"" << points << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" "
+            << "stroke=\"" << borderColor << "\" stroke-width=\"" << (borderWidth * 2.0) << "\" "
+            << "clip-path=\"url(#" << clipId << ")\" />\n";
     }
 
     out << "</svg>\n";

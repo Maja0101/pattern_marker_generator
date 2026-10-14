@@ -1,6 +1,7 @@
 #include <spdlog/spdlog.h>
 
 #include "utils/config.hpp"
+#include "utils/timer.hpp"
 #include "nesting/basic_algorithm.hpp"
 #include "geometry/svg_exporter.hpp"
 
@@ -24,7 +25,13 @@ bool BasicAlgorithm::runAlgorithm()
         SPDLOG_INFO("End of queue");
     }
 
-    bool result = runSingleBottomLeft(sorted_items);
+    bool result;
+
+    {
+        timing::Timer timer;
+
+        result = runSingleBottomLeft(sorted_items);
+    }
 
     if constexpr (config::DEBUG_MODE) {
         SPDLOG_INFO("Items after single BL");
@@ -41,12 +48,16 @@ bool BasicAlgorithm::runAlgorithm()
         );
     }
 
-    bool exportResult = pmg::geometry::SvgExporter::exportLayout(
-        "debug_output.svg", 
-        (m_fabric.getBoundingBox().Width()) / 1000, 
-        (m_fabric.getBoundingBox().Height()) / 1000, 
-        sorted_items
-    );
+    {
+        timing::Timer timer;
+
+        bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+            "debug_output.svg", 
+            (m_fabric.getBoundingBox().Width()) / 1000, 
+            (m_fabric.getBoundingBox().Height()) / 1000, 
+            sorted_items
+        );
+    }
 
     return result;
 }

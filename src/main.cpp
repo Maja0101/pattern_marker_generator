@@ -23,37 +23,37 @@ using namespace pmg;
 std::vector<pattern::PatternPiece> getSamplePieces() {
     // Default constraints
     const std::vector<pattern::VariantConstraint> defaultConstraints = {
-        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1 }
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 2 }
     };
 
     // Create points for pattern pieces
     // Trapezium 
     std::vector<geometry::Point64> trapeziumPts = {
-        {    0, 15000},  
-        {90000,     0},  
-        {90000, 40000},  
-        {    0, 25000} 
+        {      0, 1500000},  
+        {9000000,       0},  
+        {9000000, 4000000},  
+        {      0, 2500000} 
     };
 
     // Square
     std::vector<geometry::Point64> squarePts = {
-        {    0,     0}, 
-        {60000,     0}, 
-        {60000, 60000}, 
-        {    0, 60000}  
+        {      0,       0}, 
+        {6000000,       0}, 
+        {6000000, 6000000}, 
+        {      0, 6000000}  
     };
 
     // Rectangle
     std::vector<geometry::Point64> rectPts = {
-        {    0,     0},  
-        {42000,     0},  
-        {42000, 17000}, 
-        {    0, 17000}  
+        {      0,       0},  
+        {4200000,       0},  
+        {4200000, 1700000}, 
+        {      0, 1700000}  
     };
 
 
     // Octagon
-    constexpr double sideA = 12000.0;
+    constexpr double sideA = 1200000.0;
     const double R = sideA / (2.0 * std::sin(M_PI / 8.0));
     std::vector<geometry::Point64> rawOctagonPts;
 
@@ -80,12 +80,12 @@ std::vector<pattern::PatternPiece> getSamplePieces() {
 
     // Double Trapezium 
     std::vector<geometry::Point64> doubleTrapeziumPts = {
-        {15000,     0}, 
-        {65000,  5000}, 
-        {65000, 30000}, 
-        {15000, 35000},  
-        {    0, 15000}, 
-        {    0, 10000}  
+        {1500000,       0}, 
+        {6500000,  500000}, 
+        {6500000, 3000000}, 
+        {1500000, 3500000},  
+        {      0, 1500000}, 
+        {      0, 1000000}  
     };
 
     // Add them to vector of pattern pieces
@@ -113,45 +113,15 @@ int main()
     std::vector<pattern::PatternPiece> samplePieces = getSamplePieces();
 
     std::vector<geometry::Point64> fabricPts = {
-        {    0,       0},  
-        {350000,      0},  
-        {350000, 150000}, 
-        {     0, 150000}  
+        {       0,         0},  
+        {35000000,        0},  
+        {35000000, 15000000}, 
+        {       0, 15000000}  
     };
     pattern::Fabric fabric(fabricPts);
 
     nesting::BasicAlgorithm alg(fabric);
     alg.execute(samplePieces);
-
-    // std::vector<nesting::NestedItem> nestedItems;
-
-    // nesting::NestedItem trapezium(samplePieces[0].getVariant(0, false));
-    // trapezium.lockInPosition(10000, 10000);
-    // nestedItems.emplace_back(trapezium);
-
-    // nesting::NestedItem square(samplePieces[1].getVariant(0, false));
-    // square.lockInPosition(120000, 10000);
-    // nestedItems.emplace_back(square);
-
-    // nesting::NestedItem rect(samplePieces[2].getVariant(0, false));
-    // rect.lockInPosition(10000, 60000);
-    // nestedItems.emplace_back(rect);
-
-    // nesting::NestedItem octagon(samplePieces[3].getVariant(0, false));
-    // octagon.lockInPosition(60000, 60000);
-    // nestedItems.emplace_back(octagon);
-
-    // nesting::NestedItem dualTrapezium(samplePieces[4].getVariant(0, false));
-    // dualTrapezium.lockInPosition(200000, 10000);
-    // nestedItems.emplace_back(dualTrapezium);
-
-    // for (const auto& piece : nestedItems) {
-    //     SPDLOG_INFO(piece.toString());
-    // }
-
-    // bool result = pmg::geometry::SvgExporter::exportLayout(
-    //     "debug_output.svg", 350, 150, nestedItems
-    // );
 
     return 0;
 }
