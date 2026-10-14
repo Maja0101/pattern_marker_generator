@@ -19,10 +19,7 @@ PatternPiece::PatternPiece(int64_t pieceId,
         std::vector<pmg::geometry::Point64> transformedBoundary;
         transformedBoundary.reserve(m_originalBoundary.size());
 
-        for (const auto& point: m_originalBoundary) {
-            auto transformedPoint = geometry::transformPoint(point, req.rotationAngle, req.isMirrored);
-            transformedBoundary.push_back(transformedPoint);
-        }
+        transformedBoundary = geometry::transformPolygon(m_originalBoundary, req.rotationAngle, req.isMirrored);
 
         PieceVariant variant(req.rotationAngle, req.isMirrored, req.requiredQuantity, transformedBoundary);
 
