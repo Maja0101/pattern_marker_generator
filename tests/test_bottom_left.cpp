@@ -2,7 +2,6 @@
 
 #include "nesting/bottom_left.hpp"
 #include "pattern/shapes.hpp"
-#include "geometry/svg_exporter.hpp"
 
 TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
     struct ExpectedItem {

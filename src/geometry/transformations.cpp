@@ -11,7 +11,7 @@ namespace pmg::geometry {
     
 constexpr double DEG_TO_RAD = std::numbers::pi / 180.0;
 
-std::vector<Point64> transformPolygon(std::vector<Point64> polygon, int rotationAngle, bool isMirrored) noexcept {
+std::vector<Point64> transformPolygon(const std::vector<Point64> polygon, int rotationAngle, bool isMirrored) noexcept {
     if (polygon.empty()) return {};
 
     // Normalize rotation angle
@@ -36,9 +36,9 @@ std::vector<Point64> transformPolygon(std::vector<Point64> polygon, int rotation
 
             switch (rotationAngle)
             {
-                case 90:  rx = -y; ry =  x; break;
+                case 90:  rx =  y; ry = -x; break;
                 case 180: rx = -x; ry = -y; break;
-                case 270: rx =  y; ry = -x; break;
+                case 270: rx = -y; ry =  x; break;
                 default:  rx =  x; ry =  y; break;
             }
 
@@ -57,8 +57,8 @@ std::vector<Point64> transformPolygon(std::vector<Point64> polygon, int rotation
             double x = static_cast<double>(isMirrored ? -polygon[i].x : polygon[i].x);
             double y = static_cast<double>(polygon[i].y);
 
-            int64_t rx = static_cast<int64_t>(std::llround(x * cosA - y * sinA));
-            int64_t ry = static_cast<int64_t>(std::llround(x * sinA + y * cosA));
+            int64_t rx = static_cast<int64_t>(std::llround(x * cosA + y * sinA));
+            int64_t ry = static_cast<int64_t>(std::llround(-x * sinA + y * cosA));
 
             transformed[i].x = rx;
             transformed[i].y = ry;
@@ -69,8 +69,8 @@ std::vector<Point64> transformPolygon(std::vector<Point64> polygon, int rotation
     }
 
     for (size_t i = 0; i < size; ++i) {
-        polygon[i].x -= minX;
-        polygon[i].y -= minY;
+        transformed[i].x -= minX;
+        transformed[i].y -= minY;
     }
 
     if (isMirrored) {
