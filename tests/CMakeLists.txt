@@ -20,6 +20,7 @@ if(TEST_FILES)
     test_example.cpp
     test_nested_item.cpp
     test_calculations.cpp
+    test_bottom_left.cpp
   )
 
   # Specify include directories to use when compiling 
