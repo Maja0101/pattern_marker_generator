@@ -4,22 +4,29 @@
 
 #include "pattern/pattern_piece.hpp"
 #include "geometry/transformations.hpp"
+#include "geometry/calculations.hpp"
 
 namespace pmg::pattern {
-
 PatternPiece::PatternPiece(int64_t pieceId, 
-              std::vector<geometry::Point64> originalPoints, 
-              const std::vector<VariantConstraint>& constraints)
-    : m_id(pieceId), m_originalBoundary(std::move(originalPoints)) 
+        std::vector<geometry::Point64> originalPoints, 
+        const std::vector<VariantConstraint>& constraints,
+        int64_t seamAllowance, int64_t cuttingAllowance)
+    : m_id(pieceId), m_originalPolygon(std::move(originalPoints)) 
 {
     m_allowedVariants.reserve(constraints.size());
 
-    // TODO the transformation of the original boundary into all possible variants should be updated 
+    std::vector<geometry::Point64> offsetPath = 
+        geometry::calculations::calculatePolygonWithAllowance(
+            m_originalPolygon, 
+            seamAllowance, 
+            cuttingAllowance
+    );
+
     for (const auto& req : constraints) {
         std::vector<pmg::geometry::Point64> transformedBoundary;
-        transformedBoundary.reserve(m_originalBoundary.size());
+        transformedBoundary.reserve(offsetPath.size());
 
-        transformedBoundary = geometry::transformPolygon(m_originalBoundary, req.rotationAngle, req.isMirrored);
+        transformedBoundary = geometry::transformPolygon(offsetPath, req.rotationAngle, req.isMirrored);
 
         PieceVariant variant(req.rotationAngle, req.isMirrored, req.requiredQuantity, transformedBoundary);
 
@@ -50,8 +57,8 @@ Clipper2Lib::Paths64 PatternPiece::variantsToClipperPaths() const {
 std::string PatternPiece::toString() const
 {
     std::string boundaryStr = std::accumulate(
-        std::next(m_originalBoundary.begin()), m_originalBoundary.end(),
-        m_originalBoundary.front().toString(),
+        std::next(m_originalPolygon.begin()), m_originalPolygon.end(),
+        m_originalPolygon.front().toString(),
         [](std::string a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }

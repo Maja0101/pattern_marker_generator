@@ -6,7 +6,8 @@
 
 namespace pmg::samples {
     std::vector<pattern::PatternPiece> getSimpleSamplePieces(
-        std::vector<pattern::VariantConstraint> defaultConstraints) {
+        std::vector<pattern::VariantConstraint> defaultConstraints,
+        int64_t seamAllowance, int64_t cuttingAllowance) {
             // Create points for pattern pieces
             // Trapezium 
             std::vector<geometry::Point64> trapeziumPts = {
@@ -72,11 +73,11 @@ namespace pmg::samples {
             // Add them to vector of pattern pieces
             std::vector<pattern::PatternPiece> patternPieces;
             patternPieces.reserve(5);
-            patternPieces.emplace_back(1, trapeziumPts, defaultConstraints);
-            patternPieces.emplace_back(2, squarePts, defaultConstraints);
-            patternPieces.emplace_back(3, rectPts, defaultConstraints);
-            patternPieces.emplace_back(4, octagonPts, defaultConstraints);
-            patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints);
+            patternPieces.emplace_back(1, trapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(2, squarePts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(3, rectPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(4, octagonPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
 
 
             if constexpr (config::DEBUG_MODE_DETAILED) {

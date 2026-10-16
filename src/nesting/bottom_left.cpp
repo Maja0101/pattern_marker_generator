@@ -1,7 +1,7 @@
 #include <spdlog/spdlog.h>
 
 #include "nesting/bottom_left.hpp"
-#include "nesting/calculations.hpp"
+#include "geometry/calculations.hpp"
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
 
@@ -31,7 +31,7 @@ bool BottomLeft::findPosition(NestedItem &item)
     }
 
     // Verify starting position and move right if blocked
-    while (!calculations::canPlaceAt(makeCurrStateView(), item, current_x, current_y)) {
+    while (!geometry::calculations::canPlaceAt(makeCurrStateView(), item, current_x, current_y)) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Starting point not valid, moving to the right");
         }
@@ -50,7 +50,7 @@ bool BottomLeft::findPosition(NestedItem &item)
         wasMoved = false;
 
         // Slide down 
-        while (calculations::canPlaceAt(makeCurrStateView(), item, current_x, current_y - m_step_size)) {
+        while (geometry::calculations::canPlaceAt(makeCurrStateView(), item, current_x, current_y - m_step_size)) {
             current_y -= m_step_size;
             wasMoved = true;
             if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -59,7 +59,7 @@ bool BottomLeft::findPosition(NestedItem &item)
         }
 
         // Slide left
-        while (calculations::canPlaceAt(makeCurrStateView(), item, current_x - m_step_size, current_y)) {
+        while (geometry::calculations::canPlaceAt(makeCurrStateView(), item, current_x - m_step_size, current_y)) {
             current_x -= m_step_size;
             wasMoved = true;
             if constexpr (config::DEBUG_MODE_DETAILED) {

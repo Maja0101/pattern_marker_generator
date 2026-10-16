@@ -14,12 +14,13 @@ namespace pmg::pattern {
 class PatternPiece {
 private:
     int64_t m_id;
-    std::vector<geometry::Point64> m_originalBoundary;
+    std::vector<geometry::Point64> m_originalPolygon;
     std::vector<PieceVariant> m_allowedVariants;
 public:
     PatternPiece(int64_t pieceId, 
-              std::vector<geometry::Point64> originalPoints, 
-              const std::vector<VariantConstraint>& constraints);
+                std::vector<geometry::Point64> originalPoints, 
+                const std::vector<VariantConstraint>& constraints,
+                int64_t seamAllowance = 0, int64_t cuttingAllowance = 0);
 
     const PieceVariant* getVariant(int rotationAngle, bool isMirrored) const noexcept;
     Clipper2Lib::Paths64 variantsToClipperPaths() const;

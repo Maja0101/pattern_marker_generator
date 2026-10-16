@@ -3,9 +3,40 @@
 #include "nesting/bottom_left.hpp"
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
-#include "nesting/calculations.hpp"
+#include "geometry/calculations.hpp"
 
-namespace pmg::nesting::calculations {
+namespace pmg::geometry::calculations {
+Clipper2Lib::Path64 toClipperPath(const std::vector<geometry::Point64> &polygon)
+{
+    Clipper2Lib::Path64 path;
+    path.reserve(polygon.size());
+    for (const auto& point : polygon) {
+        path.push_back({point.x, point.y});
+    }
+    return path;
+}
+
+std::vector<geometry::Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
+{
+    std::vector<geometry::Point64> polygon;
+    polygon.reserve(path.size());
+    for (const auto& point : path) {
+        polygon.push_back({point.x, point.y});
+    }
+    return polygon;
+}
+
+std::vector<geometry::Point64> calculatePolygonWithAllowance(const std::vector<geometry::Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
+{
+    Clipper2Lib::Paths64 offsetPaths = Clipper2Lib::InflatePaths(
+        { toClipperPath(polygon) },
+        static_cast<double>(seamAllowance + cuttingAllowance),
+        Clipper2Lib::JoinType::Miter,
+        Clipper2Lib::EndType::Polygon
+    );
+
+    return fromClipperPath(offsetPaths[0]);
+}
 
 bool aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
 {
@@ -13,7 +44,7 @@ bool aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
             (a.top <= b.bottom && a.bottom >= b.top); // (aMinY <= bMaxY && aMaxY >= bMinY)
 }
 
-bool isCollision(const BLStateView &view, const NestedItem &item, int64_t x, int64_t y)
+bool isCollision(const nesting::BLStateView &view, const nesting::NestedItem &item, int64_t x, int64_t y)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Checking for collision at x={}, y={}", x, y));
@@ -52,7 +83,7 @@ bool isCollision(const BLStateView &view, const NestedItem &item, int64_t x, int
     return !intersection.empty();
 }
 
-bool isWithinFabric(const BLStateView &view, const NestedItem &item, int64_t x, int64_t y)
+bool isWithinFabric(const nesting::BLStateView &view, const nesting::NestedItem &item, int64_t x, int64_t y)
 {
     // Bounding boxes of fabric and item at potential position
     Clipper2Lib::Rect64 fabricBounds = view.fabric.getBoundingBox();
@@ -77,7 +108,7 @@ bool isWithinFabric(const BLStateView &view, const NestedItem &item, int64_t x, 
     return overflow.empty();
 }
 
-bool canPlaceAt(const BLStateView &view, const NestedItem &item, int64_t x, int64_t y)
+bool canPlaceAt(const nesting::BLStateView &view, const nesting::NestedItem &item, int64_t x, int64_t y)
 {
     if (!isWithinFabric(view, item, x, y)) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -136,4 +167,4 @@ bool evaluate(const std::vector<nesting::NestedItem> &items)
     return false;
 }
 
-} // namespace pmg::nesting::calculations
+} // namespace pmg::geometry::calculations

@@ -1,6 +1,7 @@
 add_library(geometry 
     svg_exporter.cpp 
     transformations.cpp 
+    calculations.cpp
 )
 
 target_include_directories(geometry PUBLIC

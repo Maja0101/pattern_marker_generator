@@ -3,7 +3,7 @@
 #include "utils/config.hpp"
 #include "nesting/algorithm_base.hpp"
 #include "nesting/bottom_left.hpp"
-#include "nesting/calculations.hpp"
+#include "geometry/calculations.hpp"
 
 namespace pmg::nesting {
 
@@ -23,9 +23,9 @@ bool AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPie
 {
     // TODO should return the layout and the statistics data
 
-    m_originalItems = calculations::prepareItems(patternPieces);
+    m_originalItems = geometry::calculations::prepareItems(patternPieces);
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& item : m_originalItems) {
             SPDLOG_INFO(item.toString());
         }
