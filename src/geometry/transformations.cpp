@@ -30,8 +30,8 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> polygon, int ro
 
     if (rotationAngle == 0 || rotationAngle == 90 || rotationAngle == 180 || rotationAngle == 270) {
         for (size_t i = 0; i < size; ++i) {
-            int64_t x = isMirrored ? -polygon[i].x : polygon[i].x;
-            int64_t y = polygon[i].y;
+            int64_t x = polygon[i].x;
+            int64_t y = isMirrored ? -polygon[i].y : polygon[i].y;
             int64_t rx, ry;
 
             switch (rotationAngle)
@@ -54,8 +54,8 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> polygon, int ro
         const double sinA = std::sin(radians);
 
         for (size_t i = 0; i < size; ++i) {
-            double x = static_cast<double>(isMirrored ? -polygon[i].x : polygon[i].x);
-            double y = static_cast<double>(polygon[i].y);
+            double x = static_cast<double>(polygon[i].x);
+            double y = static_cast<double>(isMirrored ? -polygon[i].y : polygon[i].y);
 
             int64_t rx = static_cast<int64_t>(std::llround(x * cosA + y * sinA));
             int64_t ry = static_cast<int64_t>(std::llround(-x * sinA + y * cosA));
