@@ -2,6 +2,7 @@
 
 #include "nesting/bottom_left.hpp"
 #include "utils/config.hpp"
+#include "utils/timer.hpp"
 #include "nesting/calculations.hpp"
 
 namespace pmg::nesting::calculations {
@@ -14,7 +15,7 @@ bool aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
 
 bool isCollision(const BLStateView &view, const NestedItem &item, int64_t x, int64_t y)
 {
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Checking for collision at x={}, y={}", x, y));
     }
     
@@ -27,7 +28,7 @@ bool isCollision(const BLStateView &view, const NestedItem &item, int64_t x, int
     for (size_t i = 0; i < view.placed_pieces_boxes.size(); ++i) {
         if (aabbCollision(itemBoundsAt, view.placed_pieces_boxes[i])) {
             potential_obstacles.push_back(view.placed_pieces_polygons[i]);
-            if constexpr (config::DEBUG_MODE) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_WARN(std::format("Potential obstacle found", x, y));
             }   
         }
@@ -79,14 +80,14 @@ bool isWithinFabric(const BLStateView &view, const NestedItem &item, int64_t x, 
 bool canPlaceAt(const BLStateView &view, const NestedItem &item, int64_t x, int64_t y)
 {
     if (!isWithinFabric(view, item, x, y)) {
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Item not wihin fabric");
         }
         return false;
     }
 
     if (isCollision(view, item, x, y)) {
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Item has collision");
         }
         return false;
@@ -97,18 +98,20 @@ bool canPlaceAt(const BLStateView &view, const NestedItem &item, int64_t x, int6
 
 std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece> &patternPieces)
 {
+    timing::Timer timer;
+
     std::vector<nesting::NestedItem> items;
 
     for (const auto& piece : patternPieces) {
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(piece.toString());
         }
         for (const auto& variant : piece.getVariants()) {
-            if constexpr (config::DEBUG_MODE) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(variant.toString());
             }
             for (int i = 0; i < variant.getRequiredQuantity(); ++i) {
-                if constexpr (config::DEBUG_MODE) {
+                if constexpr (config::DEBUG_MODE_DETAILED) {
                     SPDLOG_INFO(std::format("Loop no. {}", i+1));
                 }
 
@@ -117,7 +120,7 @@ std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::Pattern
         }
     }
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& item : items) {
             SPDLOG_INFO(item.toString());
         }
