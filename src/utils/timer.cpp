@@ -15,7 +15,11 @@ Timer::~Timer() {
 
     float ms = duration.count() * 1000.0f;
 
-    SPDLOG_LOGGER_INFO(m_logger, "[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
+    if (m_logger) {
+        SPDLOG_LOGGER_INFO(m_logger, "[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
+    } else {
+        spdlog::info("[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
+    }
 }
 
 } // namespace pmg::timing

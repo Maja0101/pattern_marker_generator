@@ -29,7 +29,6 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
 
         SECTION("No pieces to place") {
             std::vector<pmg::nesting::NestedItem> items;
-
             REQUIRE(bottomLeft.performNesting(items));
             REQUIRE(items.empty());
         }

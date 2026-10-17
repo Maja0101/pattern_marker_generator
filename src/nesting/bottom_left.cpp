@@ -94,8 +94,6 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
         SPDLOG_INFO("Starting nesting");
     }
 
-    timing::Timer timer;
-
     int i = 0;
     for (auto& item : items) {
         ++i;
