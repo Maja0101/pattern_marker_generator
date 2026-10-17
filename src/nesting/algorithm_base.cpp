@@ -25,6 +25,8 @@ bool AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPie
 
     m_originalItems = geometry::calculations::prepareItems(patternPieces);
 
+    // TODO based on variants in pattern pieces prepare cache for nfp and ifp
+
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& item : m_originalItems) {
             SPDLOG_INFO(item.toString());

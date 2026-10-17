@@ -1,10 +1,14 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
+
+#include <clipper2/clipper.h>
 
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
+#include "geometry/nfp_key.hpp"
 
 namespace pmg::nesting {
 
@@ -12,6 +16,8 @@ class AlgorithmBase {
 protected:
     pattern::Fabric m_fabric;
     std::vector<nesting::NestedItem> m_originalItems;
+    std::unordered_map<int, Clipper2Lib::Paths64> m_ifpCache; 
+    std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64> m_nfpCache; 
 
     virtual bool runAlgorithm() = 0;
 

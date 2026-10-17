@@ -38,12 +38,14 @@ public:
 class PieceVariant : public Shape {
 private:
     // TODO piece variant will need update - two-way pattern pieces
+    int m_id;
     int m_rotationAngle;
     bool m_isMirrored;
     int m_requiredQuantity;
 public:
-    PieceVariant(int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
+    PieceVariant(int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
 
+    const int getId() const { return m_id; }
     const int getRotationAngle() const { return m_rotationAngle; }
     const bool getIsMirrored() const { return m_isMirrored; }
     const int getRequiredQuantity() const { return m_requiredQuantity; }

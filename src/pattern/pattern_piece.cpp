@@ -22,15 +22,18 @@ PatternPiece::PatternPiece(int64_t pieceId,
             cuttingAllowance
     );
 
+    int variantId = 0;
     for (const auto& req : constraints) {
-        std::vector<pmg::geometry::Point64> transformedBoundary;
-        transformedBoundary.reserve(offsetPath.size());
+        if (req.requiredQuantity > 0) {
+            std::vector<pmg::geometry::Point64> transformedBoundary;
+            transformedBoundary.reserve(offsetPath.size());
 
-        transformedBoundary = geometry::transformPolygon(offsetPath, req.rotationAngle, req.isMirrored);
+            transformedBoundary = geometry::transformPolygon(offsetPath, req.rotationAngle, req.isMirrored);
 
-        PieceVariant variant(req.rotationAngle, req.isMirrored, req.requiredQuantity, transformedBoundary);
+            PieceVariant variant(++variantId, req.rotationAngle, req.isMirrored, req.requiredQuantity, transformedBoundary);
 
-        m_allowedVariants.push_back(std::move(variant));
+            m_allowedVariants.push_back(std::move(variant));
+        }
     }
 }
 

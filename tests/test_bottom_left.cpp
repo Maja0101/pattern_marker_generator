@@ -43,7 +43,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                 {2500, 2500}
             };
 
-            pmg::pattern::PieceVariant variant(0, false, 1, variantPts);
+            pmg::pattern::PieceVariant variant(1, 0, false, 1, variantPts);
 
             std::vector<pmg::nesting::NestedItem> items = { pmg::nesting::NestedItem(&variant) };
 
@@ -76,9 +76,9 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     {   0, 1000}  
                 };
 
-                pmg::pattern::PieceVariant variant1(0, false, 1, rectanglePts);
-                pmg::pattern::PieceVariant variant2(0, false, 1, tallRectPts);
-                pmg::pattern::PieceVariant variant3(0, false, 1, smallRectPts);
+                pmg::pattern::PieceVariant variant1(1, 0, false, 1, rectanglePts);
+                pmg::pattern::PieceVariant variant2(2, 0, false, 1, tallRectPts);
+                pmg::pattern::PieceVariant variant3(3, 0, false, 1, smallRectPts);
 
                 std::vector<pmg::nesting::NestedItem> items = { 
                     pmg::nesting::NestedItem(&variant1), 
@@ -119,8 +119,8 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     {    0, 5000}
                 };
 
-                pmg::pattern::PieceVariant variant1(0, false, 1, firstTrainglePts);
-                pmg::pattern::PieceVariant variant2(0, false, 1, secondTrainglePts);
+                pmg::pattern::PieceVariant variant1(1, 0, false, 1, firstTrainglePts);
+                pmg::pattern::PieceVariant variant2(2, 0, false, 1, secondTrainglePts);
 
                 std::vector<pmg::nesting::NestedItem> items = { 
                     pmg::nesting::NestedItem(&variant1), 
@@ -157,8 +157,8 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                 {    0,  9000}  
             };
 
-            pmg::pattern::PieceVariant variantSquare(0, false, 1, squarePts);
-            pmg::pattern::PieceVariant variant2Rect(0, false, 1, rectanglePts);
+            pmg::pattern::PieceVariant variantSquare(1, 0, false, 1, squarePts);
+            pmg::pattern::PieceVariant variant2Rect(2, 0, false, 1, rectanglePts);
 
             std::vector<pmg::nesting::NestedItem> items = { 
                 pmg::nesting::NestedItem(&variantSquare), 

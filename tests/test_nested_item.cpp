@@ -14,7 +14,7 @@ TEST_CASE("NestedItem accessing path and bounding box", "[path][rect]") {
         {    0, 10000}  
     };
 
-    pmg::pattern::PieceVariant testVariant(0, false, 1, testBoundaryPts);
+    pmg::pattern::PieceVariant testVariant(1, 0, false, 1, testBoundaryPts);
 
     pmg::nesting::NestedItem testItem(&testVariant);
 

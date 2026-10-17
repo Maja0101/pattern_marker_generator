@@ -59,8 +59,8 @@ std::string Shape::toString() const
     return std::format("boundary: ({})", boundaryStr);
 }
 
-PieceVariant::PieceVariant(int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
-    : Shape(initalBoundary), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {}
+PieceVariant::PieceVariant(int id, int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
+    : Shape(initalBoundary), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {}
 
 std::string PieceVariant::toString() const
 {

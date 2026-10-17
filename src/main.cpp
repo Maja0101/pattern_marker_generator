@@ -28,18 +28,18 @@ int main()
     SPDLOG_INFO("Starting Pattern Marker Generator...");
 
     std::vector<pattern::VariantConstraint> defaultConstraints = {
-        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1 },
-        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1 }
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1 },
+        { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1 }
     };
 
-    int64_t sa = 100000; 
-    int64_t ca =  5000; 
+    int64_t sa = 0; 
+    int64_t ca =  0; 
 
     std::vector<pattern::PatternPiece> samplePieces = 
         pmg::samples::getSimpleSamplePieces(defaultConstraints, sa, ca);
 
     std::vector<geometry::Point64> fabricPts = {
-        {       0,         0},  
+        {       0,        0},  
         {35000000,        0},  
         {35000000, 15000000}, 
         {       0, 15000000}  
@@ -47,6 +47,8 @@ int main()
     pattern::Fabric fabric(fabricPts);
 
     nesting::BasicAlgorithm alg(fabric);
+
+    std::vector<pattern::PatternPiece> emptyPieces;
 
     alg.execute(samplePieces);
 
