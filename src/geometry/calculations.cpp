@@ -167,4 +167,33 @@ bool evaluate(const std::vector<nesting::NestedItem> &items)
     return false;
 }
 
+bool isAARectangle(const Clipper2Lib::Path64 &path, const Clipper2Lib::Rect64& boundingBox)
+{
+    if (path.size() != 4) {
+        return false;
+    }
+
+    for (const auto& point : path) {
+        bool isCorner = 
+            (point.x == boundingBox.left || point.x == boundingBox.right) &&
+            (point.y == boundingBox.bottom || point.y == boundingBox.top);
+        if (!isCorner) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64 &path)
+{
+    Clipper2Lib::Path64 inverted;
+    inverted.reserve(path.size());
+    for (const auto& point : path) {
+        inverted.push_back(Clipper2Lib::Point64(-point.x, -point.y));
+    }
+    return inverted;
+}
+
+
 } // namespace pmg::geometry::calculations

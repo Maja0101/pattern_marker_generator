@@ -23,4 +23,7 @@ bool canPlaceAt(const nesting::BLStateView& view, const nesting::NestedItem& ite
 std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece>& patternPieces);
 bool evaluate(const std::vector<nesting::NestedItem>& items);
 
+bool isAARectangle(const Clipper2Lib::Path64& path, const Clipper2Lib::Rect64& boundingBox);
+Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64& path);
+
 } // namespace pmg::geometry::calculations
