@@ -32,7 +32,7 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::ve
 
 Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, int64_t margin)
 {
-    // TODO calculate IFP
+    // TODO finish calculation of  IFP - concave to convex
     Clipper2Lib::Rect64 fabricBounds = fabric.getBoundingBox();
     Clipper2Lib::Path64 fabricPath = fabric.getPath();
 
@@ -77,7 +77,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
             Clipper2Lib::FillRule::NonZero
         );
 
-        // Construction of inverted shape
+        // Construction of the inverted shape
         std::vector<Clipper2Lib::Path64> decomposedSubShapes; // TODO calculate sub shapes -> change concave shape to multiple convex shapes
         std::vector<Clipper2Lib::Path64> invSubShapes;
         invSubShapes.reserve(decomposedSubShapes.size()); 
@@ -117,9 +117,48 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
 
 Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pattern::PieceVariant &variantB)
 {
-    // TODO calculate NFP
+    // TODO finish calculation of  NFP - concave to convex
 
-    return Clipper2Lib::Paths64();
+    // NFP can be calculated as adding the inverted shape B to the shape A 
+
+    // Fast IFP calculation for convex shapes
+    // If A and B is convex
+    Clipper2Lib::Path64 invertedB = invertPath(variantB.getPath());
+    Clipper2Lib::Paths64 nfp = Clipper2Lib::MinkowskiSum(
+        variantA.getPath(),
+        invertedB,
+        true
+    );
+    return Clipper2Lib::SimplifyPaths(nfp, 0.0);
+
+    // Detailed calculation for concave shapes
+    // If A or B is concave get decomposed sub shapes
+    std::vector<Clipper2Lib::Path64> subShapesA;
+    std::vector<Clipper2Lib::Path64> subShapesB;
+
+    Clipper2Lib::Paths64 subNFPs;
+    subNFPs.reserve(subShapesA.size() * subShapesB.size());
+
+    for (const auto& subA : subShapesA) {
+        for (const auto& subB : subShapesB) {
+            Clipper2Lib::Path64 invertedSubB = invertPath(subB);
+
+            Clipper2Lib::Paths64 pairNfp = Clipper2Lib::MinkowskiSum(
+                subA,
+                invertedSubB,
+                true
+            );
+
+            subNFPs.insert(subNFPs.end(), pairNfp.begin(), pairNfp.end());
+        }
+    }
+
+    Clipper2Lib::Paths64 nfp = Clipper2Lib::Union(
+        subNFPs,
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    return Clipper2Lib::SimplifyPaths(nfp, 0.0);
 }
 
 } // namespace pmg::geometry::calculations
