@@ -99,30 +99,6 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         REQUIRE(
             pmg::geometry::transformPolygon(polygon, 0, true) == 
             std::vector<pmg::geometry::Point64>{
-                {30000, 40000},
-                {20000, 40000},
-                {20000, 10000},
-                {    0, 10000},
-                {    0,     0},
-                {30000,     0}
-        });
-
-        // 90 deg
-        REQUIRE(
-            pmg::geometry::transformPolygon(polygon, 90, true) == 
-            std::vector<pmg::geometry::Point64>{
-                {40000,     0}, 
-                {40000, 10000}, 
-                {10000, 10000}, 
-                {10000, 30000}, 
-                {    0, 30000}, 
-                {    0,     0}
-        });
-
-        // 180 deg
-        REQUIRE(
-            pmg::geometry::transformPolygon(polygon, 180, true) == 
-            std::vector<pmg::geometry::Point64>{
                 {    0,     0},
                 {10000,     0},
                 {10000, 30000},
@@ -131,9 +107,9 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
                 {    0, 40000}
         });
 
-        // 270 deg
+        // 90 deg
         REQUIRE(
-            pmg::geometry::transformPolygon(polygon, 270, true) == 
+            pmg::geometry::transformPolygon(polygon, 90, true) == 
             std::vector<pmg::geometry::Point64>{
                 {    0, 30000},
                 {    0, 20000},
@@ -141,6 +117,30 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
                 {30000,     0},
                 {40000,     0},
                 {40000, 30000}
+        });
+
+        // 180 deg
+        REQUIRE(
+            pmg::geometry::transformPolygon(polygon, 180, true) == 
+            std::vector<pmg::geometry::Point64>{
+                {30000, 40000},
+                {20000, 40000},
+                {20000, 10000},
+                {    0, 10000},
+                {    0,     0},
+                {30000,     0}
+        });
+
+        // 270 deg
+        REQUIRE(
+            pmg::geometry::transformPolygon(polygon, 270, true) == 
+            std::vector<pmg::geometry::Point64>{
+                {40000,     0},
+                {40000, 10000},
+                {10000, 10000},
+                {10000, 30000},
+                {    0, 30000},
+                {    0,     0}
         });
     }
 
@@ -185,36 +185,36 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
     SECTION("Flipping, custom rotation") {
         // 30 deg
         std::vector<pmg::geometry::Point64> expected = {
-            {45981, 34641},
-            {37321, 39641},
-            {22321, 13660},
-            { 5000, 23660},
-            {    0, 15000},
-            {25981,     0}
+            {    0,  5000},
+            { 8660,     0},
+            {23660, 25981},
+            {40981, 15981},
+            {45981, 24641},
+            {20000, 39641}
         };
         std::vector<pmg::geometry::Point64> result = pmg::geometry::transformPolygon(polygon, 30, true);
         REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
 
         // 45 deg
         expected = {
-            {49497, 28284},
-            {42426, 35355},
-            {21213, 14142},
-            { 7071, 28284},
-            {    0, 21213},
-            {21213,     0}
+            {    0,  7071},
+            { 7071,     0},
+            {28284, 21213},
+            {42426,  7071},
+            {49497, 14142},
+            {28284, 35355}
         };
         result = pmg::geometry::transformPolygon(polygon, 45, true);
         REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
-
+        
         // 60 deg
         expected = {
-            {49641, 20000},
-            {44641, 28660},
-            {18660, 13660},
-            { 8660, 30981},
-            {    0, 25981},
-            {15000,     0}
+            {    0, 10981},
+            { 5000,  2321},
+            {30981, 17321},
+            {40981,     0},
+            {49641,  5000},
+            {34641, 30981}
         };
         result = pmg::geometry::transformPolygon(polygon, 60, true);
         REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
