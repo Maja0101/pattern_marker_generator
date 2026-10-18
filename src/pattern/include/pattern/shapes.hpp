@@ -20,9 +20,9 @@ public:
     Shape(std::vector<geometry::Point64> initalBoundary = {});
     virtual ~Shape() = default;
     
-    const std::vector<geometry::Point64> getBoundary() const { return m_boundary; }
-    const Clipper2Lib::Path64 getPath() const { return m_shape_path; }
-    const Clipper2Lib::Rect64 getBoundingBox() const { return m_shape_bounding_box; }
+    const std::vector<geometry::Point64>& getBoundary() const { return m_boundary; }
+    const Clipper2Lib::Path64& getPath() const { return m_shape_path; }
+    const Clipper2Lib::Rect64& getBoundingBox() const { return m_shape_bounding_box; }
     
     const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y) const;
     const Clipper2Lib::Rect64 getBoundingBoxAt(int64_t x, int64_t y) const;
@@ -48,6 +48,8 @@ private:
     bool checkConvexity();
 public:
     PieceVariant(int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
+
+    const std::vector<Clipper2Lib::Path64>& getDecomposedShape() const { return m_decomposedShape; }
 
     const int getId() const { return m_id; }
     const int getRotationAngle() const { return m_rotationAngle; }

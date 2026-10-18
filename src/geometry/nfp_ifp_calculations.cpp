@@ -32,13 +32,12 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::ve
 
 Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, int64_t margin)
 {
-    // TODO finish calculation of  IFP - concave to convex
-    Clipper2Lib::Rect64 fabricBounds = fabric.getBoundingBox();
-    Clipper2Lib::Path64 fabricPath = fabric.getPath();
+    const Clipper2Lib::Rect64& fabricBounds = fabric.getBoundingBox();
+    const Clipper2Lib::Path64& fabricPath = fabric.getPath();
 
     if (isAARectangle(fabricPath, fabricBounds)) {
         // Fast IFP calculation for rectangular fabric
-        Clipper2Lib::Rect64 variantBounds = variant.getBoundingBox();
+        const Clipper2Lib::Rect64& variantBounds = variant.getBoundingBox();
 
         int64_t minX = fabricBounds.left - variantBounds.left;
         int64_t maxX = fabricBounds.right - variantBounds.right;
@@ -58,83 +57,80 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         };
 
         return Clipper2Lib::Paths64{ ifp };
-    } else {
-        // Detailed calculation for irregular fabric
+    } 
 
-        // IFP can be calculated as subtracting the complement of the fabric and the Minkowski sum with the inverted shape from the fabric
+    // Detailed calculation for irregular fabric
 
-        // Construction of the finite complement of the fabric
-        Clipper2Lib::Path64 outerBox = {
-            {fabricBounds.left - margin, fabricBounds.bottom - margin},
-            {fabricBounds.right + margin, fabricBounds.bottom - margin},
-            {fabricBounds.right + margin, fabricBounds.top + margin},
-            {fabricBounds.left - margin, fabricBounds.top + margin},
-        };
+    // IFP can be calculated as subtracting the complement of the fabric and the Minkowski sum with the inverted shape from the fabric
 
-        Clipper2Lib::Paths64 fabricComplement = Clipper2Lib::Difference(
-            Clipper2Lib::Paths64{ outerBox },
-            Clipper2Lib::Paths64{ fabricPath },
-            Clipper2Lib::FillRule::NonZero
-        );
+    // Construction of the finite complement of the fabric
+    Clipper2Lib::Path64 outerBox = {
+        {fabricBounds.left - margin, fabricBounds.bottom - margin},
+        {fabricBounds.right + margin, fabricBounds.bottom - margin},
+        {fabricBounds.right + margin, fabricBounds.top + margin},
+        {fabricBounds.left - margin, fabricBounds.top + margin},
+    };
 
-        // Construction of the inverted shape
-        std::vector<Clipper2Lib::Path64> decomposedSubShapes; // TODO calculate sub shapes -> change concave shape to multiple convex shapes
-        std::vector<Clipper2Lib::Path64> invSubShapes;
-        invSubShapes.reserve(decomposedSubShapes.size()); 
+    Clipper2Lib::Paths64 fabricComplement = Clipper2Lib::Difference(
+        Clipper2Lib::Paths64{ outerBox },
+        Clipper2Lib::Paths64{ fabricPath },
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    // Construction of the inverted shape
+    const std::vector<Clipper2Lib::Path64>& decomposedSubShapes = variant.getDecomposedShape(); 
+
+    // Minkowski sums
+    Clipper2Lib::Paths64 subNFPs;
+    subNFPs.reserve(fabricComplement.size() * decomposedSubShapes.size());
+
+    for (const auto& fabricComplementFragment : fabricComplement) {
         for (const auto& subShape : decomposedSubShapes) {
-            invSubShapes.push_back(invertPath(subShape));
+            Clipper2Lib::Paths64 pairNfp = Clipper2Lib::MinkowskiSum(
+                fabricComplementFragment,
+                invertPath(subShape),
+                true
+            );
+
+            subNFPs.insert(subNFPs.end(), pairNfp.begin(), pairNfp.end());
         }
-
-        // Minkowski sums
-        Clipper2Lib::Paths64 nfp;
-        for (const auto& fabricComplementFragment : fabricComplement) {
-            for (const auto& invSubShape : invSubShapes) {
-                Clipper2Lib::Paths64 pairNfp = Clipper2Lib::MinkowskiSum(
-                    fabricComplementFragment,
-                    invSubShape,
-                    true
-                );
-
-                nfp = Clipper2Lib::Union(
-                    nfp,
-                    pairNfp,
-                    Clipper2Lib::FillRule::NonZero
-                );
-            }
-        }
-
-        // Subtract NFP from fabric path to get IFP
-        Clipper2Lib::Paths64 ifp = Clipper2Lib::Difference(
-            Clipper2Lib::Paths64{ fabricPath },
-            nfp,
-            Clipper2Lib::FillRule::NonZero
-        );
-
-        return Clipper2Lib::SimplifyPaths(ifp, 0.0); // Remove redundant vertexes (wihout changing the geometric shape)
     }
+
+    Clipper2Lib::Paths64 nfp = Clipper2Lib::Union(
+        subNFPs,
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    // Subtract NFP from fabric path to get IFP
+    Clipper2Lib::Paths64 ifp = Clipper2Lib::Difference(
+        Clipper2Lib::Paths64{ fabricPath },
+        nfp,
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    return Clipper2Lib::SimplifyPaths(ifp, 0.0); // Remove redundant vertexes (wihout changing the geometric shape)
 
 }
 
 Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pattern::PieceVariant &variantB)
 {
-    // TODO finish calculation of  NFP - concave to convex
-
     // NFP can be calculated as adding the inverted shape B to the shape A 
 
-    // Fast IFP calculation for convex shapes
-    // If A and B is convex
-    Clipper2Lib::Path64 invertedB = invertPath(variantB.getPath());
-    Clipper2Lib::Paths64 nfp = Clipper2Lib::MinkowskiSum(
-        variantA.getPath(),
-        invertedB,
-        true
-    );
-    return Clipper2Lib::SimplifyPaths(nfp, 0.0);
+    if (variantA.getIsConvex() && variantB.getIsConvex()) {
+        // Fast IFP calculation for convex shapes
+        Clipper2Lib::Path64 invertedB = invertPath(variantB.getPath());
+        Clipper2Lib::Paths64 nfp = Clipper2Lib::MinkowskiSum(
+            variantA.getPath(),
+            invertedB,
+            true
+        );
+        return Clipper2Lib::SimplifyPaths(nfp, 0.0);
 
+    } 
+    
     // Detailed calculation for concave shapes
-    // If A or B is concave get decomposed sub shapes
-    std::vector<Clipper2Lib::Path64> subShapesA;
-    std::vector<Clipper2Lib::Path64> subShapesB;
+    const std::vector<Clipper2Lib::Path64>& subShapesA = variantA.getDecomposedShape();
+    const std::vector<Clipper2Lib::Path64>& subShapesB = variantB.getDecomposedShape();
 
     Clipper2Lib::Paths64 subNFPs;
     subNFPs.reserve(subShapesA.size() * subShapesB.size());
