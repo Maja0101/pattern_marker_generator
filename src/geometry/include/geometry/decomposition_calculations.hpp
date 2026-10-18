@@ -22,6 +22,9 @@ namespace util {
 
 namespace pmg::geometry::calculations {
 
+int crossProductSign(const Point64 &a, const Point64 &b, const Point64 &c);
+bool isConvex(const Point64 &a, const Point64 &b, const Point64 &c);
+
 std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Point64>& polygon);
 
 } // namespace pmg::geometry::calculations

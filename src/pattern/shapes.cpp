@@ -3,6 +3,8 @@
 #include <ranges>
 
 #include "pattern/shapes.hpp"
+#include "geometry/decomposition_calculations.hpp"
+#include "geometry/calculations.hpp"
 
 namespace pmg::pattern {
 
@@ -59,8 +61,39 @@ std::string Shape::toString() const
     return std::format("boundary: ({})", boundaryStr);
 }
 
+bool PieceVariant::checkConvexity()
+{
+    const size_t n = m_boundary.size();
+    if (n < 3) return false;
+    if (n == 3) return true;
+
+    for (size_t i = 0; i < n; ++i) {
+        const geometry::Point64& p1 = m_boundary[i];
+        const geometry::Point64& p2 = m_boundary[(i + 1) % n];
+        const geometry::Point64& p3 = m_boundary[(i + 2) % n];
+
+        if (!geometry::calculations::isConvex(p1, p2, p3)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 PieceVariant::PieceVariant(int id, int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
-    : Shape(initalBoundary), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {}
+    : Shape(initalBoundary), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {
+    m_isConvex = checkConvexity();
+
+    if (m_isConvex) {
+        m_decomposedShape = { m_shape_path };
+    } else {
+        std::vector<std::vector<pmg::geometry::Point64>> subShapes = geometry::calculations::hertelMehlhornAlgorithm(m_boundary);
+
+        for (const auto& subShape : subShapes) {
+            m_decomposedShape.push_back(geometry::calculations::toClipperPath(subShape));
+        }
+    }
+}
 
 std::string PieceVariant::toString() const
 {

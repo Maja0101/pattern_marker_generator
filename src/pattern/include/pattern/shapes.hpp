@@ -42,6 +42,10 @@ private:
     int m_rotationAngle;
     bool m_isMirrored;
     int m_requiredQuantity;
+    bool m_isConvex;
+    std::vector<Clipper2Lib::Path64> m_decomposedShape;
+
+    bool checkConvexity();
 public:
     PieceVariant(int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
 
@@ -49,6 +53,7 @@ public:
     const int getRotationAngle() const { return m_rotationAngle; }
     const bool getIsMirrored() const { return m_isMirrored; }
     const int getRequiredQuantity() const { return m_requiredQuantity; }
+    const int getIsConvex() const { return m_isConvex; }
 
     std::string toString() const override;
 };

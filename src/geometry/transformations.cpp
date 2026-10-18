@@ -11,7 +11,7 @@ namespace pmg::geometry {
     
 constexpr double DEG_TO_RAD = std::numbers::pi / 180.0;
 
-std::vector<Point64> transformPolygon(const std::vector<Point64> polygon, int rotationAngle, bool isMirrored) noexcept {
+std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored) noexcept {
     if (polygon.empty()) return {};
 
     // Normalize rotation angle

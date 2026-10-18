@@ -6,7 +6,7 @@
 #include "geometry/calculations.hpp"
 
 namespace pmg::geometry::calculations {
-Clipper2Lib::Path64 toClipperPath(const std::vector<geometry::Point64> &polygon)
+Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
 {
     Clipper2Lib::Path64 path;
     path.reserve(polygon.size());
@@ -16,9 +16,9 @@ Clipper2Lib::Path64 toClipperPath(const std::vector<geometry::Point64> &polygon)
     return path;
 }
 
-std::vector<geometry::Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
+std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
 {
-    std::vector<geometry::Point64> polygon;
+    std::vector<Point64> polygon;
     polygon.reserve(path.size());
     for (const auto& point : path) {
         polygon.push_back({point.x, point.y});
@@ -26,7 +26,7 @@ std::vector<geometry::Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
     return polygon;
 }
 
-std::vector<geometry::Point64> calculatePolygonWithAllowance(const std::vector<geometry::Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
+std::vector<Point64> calculatePolygonWithAllowance(const std::vector<Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
 {
     Clipper2Lib::Paths64 offsetPaths = Clipper2Lib::InflatePaths(
         { toClipperPath(polygon) },
@@ -194,6 +194,5 @@ Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64 &path)
     }
     return inverted;
 }
-
 
 } // namespace pmg::geometry::calculations
