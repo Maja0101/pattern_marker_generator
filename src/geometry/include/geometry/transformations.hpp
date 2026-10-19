@@ -4,8 +4,8 @@
 
 #include "geometry_types.hpp"
 
-namespace pmg::geometry {
+namespace pmg::geometry::calculations {
 
 std::vector<Point64> transformPolygon(const std::vector<Point64>& polygon, int rotationAngle, bool isMirrored) noexcept;
 
-} // namespace pmg::geometry
+} // namespace pmg::geometry::calculations

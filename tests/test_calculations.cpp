@@ -18,21 +18,21 @@ TEST_CASE("Detecting AABB collision", "[BottomLeft][rect][collision]") {
         Clipper2Lib::Rect64 a(0, 0, 1000, 1000); // left top right bottom
         Clipper2Lib::Rect64 b(2000, 2000, 3000, 3000);
 
-        REQUIRE_FALSE(pmg::geometry::calculations::aabbCollision(a, b));
+        REQUIRE_FALSE(pmg::geometry::calculations::utils::aabbCollision(a, b));
     }
 
     SECTION("Touching edge") {
         Clipper2Lib::Rect64 a(0, 0, 1000, 1000);
         Clipper2Lib::Rect64 b(1000, 0, 2000, 1000);
 
-        REQUIRE(pmg::geometry::calculations::aabbCollision(a, b));
+        REQUIRE(pmg::geometry::calculations::utils::aabbCollision(a, b));
     }
 
     SECTION("Collision") {
         Clipper2Lib::Rect64 a(0, 0, 1000, 1000);
         Clipper2Lib::Rect64 b(500, 500, 1500, 1500);
 
-        REQUIRE(pmg::geometry::calculations::aabbCollision(a, b));
+        REQUIRE(pmg::geometry::calculations::utils::aabbCollision(a, b));
     }
 }
 
@@ -65,19 +65,19 @@ TEST_CASE("Checking whether a piece fits inside the fabric", "[BottomLeft][rect]
     pmg::nesting::NestedItem item(&variant);
 
     SECTION("Bounding box outside fabric's bounding box") {
-        REQUIRE_FALSE(pmg::geometry::calculations::isWithinFabric(view, item, 15000, 15000));
+        REQUIRE_FALSE(pmg::geometry::calculations::utils::isWithinFabric(view, item, 15000, 15000));
     }
 
     SECTION("The piece does not fit inside the fabric") {
-        REQUIRE_FALSE(pmg::geometry::calculations::isWithinFabric(view, item, 5000, 5000));
+        REQUIRE_FALSE(pmg::geometry::calculations::utils::isWithinFabric(view, item, 5000, 5000));
     }
 
     SECTION("Piece is fully inside the fabric") {
-        REQUIRE(pmg::geometry::calculations::isWithinFabric(view, item, 500, 500));
+        REQUIRE(pmg::geometry::calculations::utils::isWithinFabric(view, item, 500, 500));
     }
 
     SECTION("Piece is touching the edge of the fabric") {
-        REQUIRE(pmg::geometry::calculations::isWithinFabric(view, item, 0, 0));
+        REQUIRE(pmg::geometry::calculations::utils::isWithinFabric(view, item, 0, 0));
     }
 }
 
@@ -119,15 +119,15 @@ TEST_CASE("Checking collisions between pieces", "[BottomLeft][rect][collision]")
     pmg::nesting::NestedItem item(&variant);
 
     SECTION("No potential obstacles") {
-        REQUIRE_FALSE(pmg::geometry::calculations::isCollision(view, item, 12500, 2500));
+        REQUIRE_FALSE(pmg::geometry::calculations::utils::isCollision(view, item, 12500, 2500));
     }
 
     SECTION("Potential obstacles but no collision") {
-        REQUIRE_FALSE(pmg::geometry::calculations::isCollision(view, item, 8000, 8000));
+        REQUIRE_FALSE(pmg::geometry::calculations::utils::isCollision(view, item, 8000, 8000));
     }
 
     SECTION("Collision with another piece") {
-        REQUIRE(pmg::geometry::calculations::isCollision(view, item, 7500, 2500));
+        REQUIRE(pmg::geometry::calculations::utils::isCollision(view, item, 7500, 2500));
     }
 }
 

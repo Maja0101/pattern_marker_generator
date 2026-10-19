@@ -7,44 +7,7 @@
 #include "utils/timer.hpp"
 #include "geometry/calculations.hpp"
 
-namespace pmg::geometry::calculations {
-Clipper2Lib::Point64 toClipperPoint(const Point64 &point)
-{
-    return Clipper2Lib::Point64{ point.x, point.y };
-}
-
-Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
-{
-    Clipper2Lib::Path64 path;
-    path.reserve(polygon.size());
-    for (const auto& point : polygon) {
-        path.push_back({point.x, point.y});
-    }
-    return path;
-}
-
-std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
-{
-    std::vector<Point64> polygon;
-    polygon.reserve(path.size());
-    for (const auto& point : path) {
-        polygon.push_back({point.x, point.y});
-    }
-    return polygon;
-}
-
-std::vector<Point64> calculatePolygonWithAllowance(const std::vector<Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
-{
-    Clipper2Lib::Paths64 offsetPaths = Clipper2Lib::InflatePaths(
-        { toClipperPath(polygon) },
-        static_cast<double>(seamAllowance + cuttingAllowance),
-        Clipper2Lib::JoinType::Miter,
-        Clipper2Lib::EndType::Polygon
-    );
-
-    return fromClipperPath(offsetPaths[0]);
-}
-
+namespace pmg::geometry::calculations::utils {
 bool aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
 {
     return (a.left <= b.right && a.right >= b.left) && // (aMinX <= bMaxX && aMaxX >= bMinX) &&
@@ -115,16 +78,91 @@ bool isWithinFabric(const nesting::BLStateView &view, const nesting::NestedItem 
     return overflow.empty();
 }
 
+} // namespace pmg::geometry::calculations::utils
+
+namespace pmg::geometry::calculations {
+Clipper2Lib::Point64 toClipperPoint(const Point64 &point)
+{
+    return Clipper2Lib::Point64{ point.x, point.y };
+}
+
+Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
+{
+    Clipper2Lib::Path64 path;
+    path.reserve(polygon.size());
+    for (const auto& point : polygon) {
+        path.push_back({point.x, point.y});
+    }
+    return path;
+}
+
+std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
+{
+    std::vector<Point64> polygon;
+    polygon.reserve(path.size());
+    for (const auto& point : path) {
+        polygon.push_back({point.x, point.y});
+    }
+    return polygon;
+}
+
+std::vector<Point64> calculatePolygonWithAllowance(const std::vector<Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
+{
+    Clipper2Lib::Paths64 offsetPaths = Clipper2Lib::InflatePaths(
+        { toClipperPath(polygon) },
+        static_cast<double>(seamAllowance + cuttingAllowance),
+        Clipper2Lib::JoinType::Miter,
+        Clipper2Lib::EndType::Polygon
+    );
+
+    return fromClipperPath(offsetPaths[0]);
+}
+
+Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64 &paths, const Clipper2Lib::Point64 &point)
+{
+    Clipper2Lib::Paths64 result = paths;
+    for (auto& path : result) {
+        for (auto& p : path) {
+            p.x += point.x;
+            p.y += point.y;
+        }
+    }
+    return result;
+}
+
+Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64 &ifpPaths, const std::vector<Clipper2Lib::Paths64> &originalNfps, int64_t epsilon)
+{
+    // Snap to IFP 
+    for (const auto& path : ifpPaths) {
+        for (const auto& ref : path) {
+            if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
+            if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
+        }
+    }
+
+    // Snap to original NFP
+    for (const auto& nfp : originalNfps) {
+        for (const auto& path : nfp) {
+            for (const auto& ref : path) {
+                if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
+                if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
+            }
+        }
+    }
+
+    return point;
+}
+
 bool canPlaceAt(const nesting::BLStateView &view, const nesting::NestedItem &item, int64_t x, int64_t y)
 {
-    if (!isWithinFabric(view, item, x, y)) {
+    if (!utils::isWithinFabric(view, item, x, y)) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Item not wihin fabric");
         }
         return false;
     }
 
-    if (isCollision(view, item, x, y)) {
+    if (utils::isCollision(view, item, x, y)) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Item has collision");
         }
@@ -206,69 +244,6 @@ bool evaluate(const std::vector<nesting::NestedItem> &items)
     // TODO evaluation function for layout 
     
     return false;
-}
-
-bool isAARectangle(const Clipper2Lib::Path64 &path, const Clipper2Lib::Rect64& boundingBox)
-{
-    if (path.size() != 4) {
-        return false;
-    }
-
-    for (const auto& point : path) {
-        bool isCorner = 
-            (point.x == boundingBox.left || point.x == boundingBox.right) &&
-            (point.y == boundingBox.bottom || point.y == boundingBox.top);
-        if (!isCorner) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64 &path)
-{
-    Clipper2Lib::Path64 inverted;
-    inverted.reserve(path.size());
-    for (const auto& point : path) {
-        inverted.push_back(Clipper2Lib::Point64(-point.x, -point.y));
-    }
-    return inverted;
-}
-
-Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64 &paths, const Clipper2Lib::Point64 &point)
-{
-    Clipper2Lib::Paths64 result = paths;
-    for (auto& path : result) {
-        for (auto& p : path) {
-            p.x += point.x;
-            p.y += point.y;
-        }
-    }
-    return result;
-}
-
-Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64 &ifpPaths, const std::vector<Clipper2Lib::Paths64> &originalNfps, int64_t epsilon)
-{
-    // Snap to IFP 
-    for (const auto& path : ifpPaths) {
-        for (const auto& ref : path) {
-            if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
-            if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
-        }
-    }
-
-    // Snap to original NFP
-    for (const auto& nfp : originalNfps) {
-        for (const auto& path : nfp) {
-            for (const auto& ref : path) {
-                if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
-                if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
-            }
-        }
-    }
-
-    return point;
 }
 
 } // namespace pmg::geometry::calculations

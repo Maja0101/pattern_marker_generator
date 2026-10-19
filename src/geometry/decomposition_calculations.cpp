@@ -9,6 +9,20 @@
 #include "geometry/calculations.hpp"
 #include "utils/config.hpp"
 
+namespace mapbox {
+namespace util {
+    template <>
+    struct nth<0, pmg::geometry::Point64> {
+        inline static auto get(const pmg::geometry::Point64& p) { return p.x; }
+    };
+    
+    template <>
+    struct nth<1, pmg::geometry::Point64> {
+        inline static auto get(const pmg::geometry::Point64& p) { return p.y; }
+    };
+}
+}
+
 namespace pmg::geometry::calculations::utils {
 
 struct Edge {
@@ -28,6 +42,16 @@ struct HalfEdge {
     bool active = true;
 };
 
+int crossProductSign(const Point64 &a, const Point64 &b, const Point64 &c)
+{
+    int64_t crossProduct = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+    return (crossProduct > 0) ? 1 : ((crossProduct < 0) ? -1 : 0);
+}
+
+bool isConvex(const Point64 &a, const Point64 &b, const Point64 &c)
+{
+    return crossProductSign(a, b, c) >= 0;
+}
 } // namespace pmg::geometry::calculations::utils
 
 template<>
@@ -40,16 +64,23 @@ struct std::hash<pmg::geometry::calculations::utils::Edge> {
 };
 
 namespace pmg::geometry::calculations {
-
-int crossProductSign(const Point64 &a, const Point64 &b, const Point64 &c)
+bool checkConvexity(const pattern::Shape &shape)
 {
-    int64_t crossProduct = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
-    return (crossProduct > 0) ? 1 : ((crossProduct < 0) ? -1 : 0);
-}
+    const size_t n = shape.getBoundary().size();
+    if (n < 3) return false;
+    if (n == 3) return true;
 
-bool isConvex(const Point64 &a, const Point64 &b, const Point64 &c)
-{
-    return crossProductSign(a, b, c) >= 0;
+    for (size_t i = 0; i < n; ++i) {
+        const geometry::Point64& p1 = shape.getBoundary()[i];
+        const geometry::Point64& p2 = shape.getBoundary()[(i + 1) % n];
+        const geometry::Point64& p3 = shape.getBoundary()[(i + 2) % n];
+
+        if (!geometry::calculations::utils::isConvex(p1, p2, p3)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Point64> &polygon)
@@ -84,7 +115,7 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
         int idx2 = static_cast<int>(indexes[t * 3 + 2]);
 
         // Make sure the vertixes are counterclockwise
-        if (crossProductSign(polygon[idx0], polygon[idx1], polygon[idx2]) < 0) {
+        if (utils::crossProductSign(polygon[idx0], polygon[idx1], polygon[idx2]) < 0) {
             std::swap(idx1, idx2);
         }
 
@@ -150,8 +181,8 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
             SPDLOG_INFO(std::format("diagonal to check: {} {} {} {}", toA, fromA, toB, fromB));
         }
 
-        if (isConvex(polygon[C], polygon[A], polygon[D]) &&
-            isConvex(polygon[D], polygon[B], polygon[C])) {
+        if (utils::isConvex(polygon[C], polygon[A], polygon[D]) &&
+            utils::isConvex(polygon[D], polygon[B], polygon[C])) {
                 halfEdges[toA].next = fromA;
                 halfEdges[fromA].prev = toA;
 

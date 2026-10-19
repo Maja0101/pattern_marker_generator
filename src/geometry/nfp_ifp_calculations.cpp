@@ -4,50 +4,36 @@
 #include "geometry/calculations.hpp"
 #include "utils/config.hpp"
 
-namespace pmg::geometry::calculations {
-
-std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, const std::vector<pattern::PieceVariant> &variants)
+namespace pmg::geometry::calculations::utils {
+bool isAARectangle(const Clipper2Lib::Path64 &path, const Clipper2Lib::Rect64& boundingBox)
 {
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
+    if (path.size() != 4) {
+        return false;
     }
 
-    std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache;
-    for (const auto& variant : variants) {
-        if (variant.getRequiredQuantity() > 0) {
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("Variant no. {}", variant.getGlobalId()));
-            }
-            ifpCache[variant.getGlobalId()] = buildIFPfor(fabric, variant);
+    for (const auto& point : path) {
+        bool isCorner = 
+            (point.x == boundingBox.left || point.x == boundingBox.right) &&
+            (point.y == boundingBox.bottom || point.y == boundingBox.top);
+        if (!isCorner) {
+            return false;
         }
     }
-    return ifpCache;
+
+    return true;
 }
 
-std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::vector<pattern::PieceVariant> &variants)
+Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64 &path)
 {
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
+    Clipper2Lib::Path64 inverted;
+    inverted.reserve(path.size());
+    for (const auto& point : path) {
+        inverted.push_back(Clipper2Lib::Point64(-point.x, -point.y));
     }
-
-    std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
-    for (const auto& variantA : variants) {
-        if (variantA.getRequiredQuantity() > 0) {
-            for (const auto& variantB : variants) {
-                if (variantB.getRequiredQuantity() > 0) {
-                    if constexpr (config::DEBUG_MODE_DETAILED) {
-                        SPDLOG_INFO(std::format("Variants no. {} {}", variantA.getGlobalId(), variantB.getGlobalId()));
-                    }
-                    NFPKey key{ variantA.getGlobalId(), variantB.getGlobalId() };
-                    nfpCache[key] = buildNFPfor(variantA, variantB);
-                }
-            }
-        }
-    }
-    return nfpCache;
+    return inverted;
 }
 
-Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, int64_t margin)
+Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, int64_t margin = 100000)
 {
     const Clipper2Lib::Rect64& fabricBounds = fabric.getBoundingBox();
     const Clipper2Lib::Path64& fabricPath = fabric.getPath();
@@ -294,5 +280,51 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
 
     return Clipper2Lib::SimplifyPaths(nfp, 0.0);
 }
+
+} // namespace pmg::geometry::calculations::utils
+
+namespace pmg::geometry::calculations {
+
+std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, const std::vector<pattern::PieceVariant> &variants)
+{
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
+    }
+
+    std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache;
+    for (const auto& variant : variants) {
+        if (variant.getRequiredQuantity() > 0) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("Variant no. {}", variant.getGlobalId()));
+            }
+            ifpCache[variant.getGlobalId()] = utils::buildIFPfor(fabric, variant);
+        }
+    }
+    return ifpCache;
+}
+
+std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::vector<pattern::PieceVariant> &variants)
+{
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
+    }
+
+    std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
+    for (const auto& variantA : variants) {
+        if (variantA.getRequiredQuantity() > 0) {
+            for (const auto& variantB : variants) {
+                if (variantB.getRequiredQuantity() > 0) {
+                    if constexpr (config::DEBUG_MODE_DETAILED) {
+                        SPDLOG_INFO(std::format("Variants no. {} {}", variantA.getGlobalId(), variantB.getGlobalId()));
+                    }
+                    NFPKey key{ variantA.getGlobalId(), variantB.getGlobalId() };
+                    nfpCache[key] = utils::buildNFPfor(variantA, variantB);
+                }
+            }
+        }
+    }
+    return nfpCache;
+}
+
 
 } // namespace pmg::geometry::calculations

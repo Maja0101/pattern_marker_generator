@@ -30,7 +30,7 @@ PatternPiece::PatternPiece(int64_t pieceId,
             std::vector<pmg::geometry::Point64> transformedBoundary;
             transformedBoundary.reserve(offsetPath.size());
 
-            transformedBoundary = geometry::transformPolygon(offsetPath, req.rotationAngle, req.isMirrored);
+            transformedBoundary = geometry::calculations::transformPolygon(offsetPath, req.rotationAngle, req.isMirrored);
 
             int64_t globalId = (m_id << 32) | (static_cast<int64_t>(variantId) & 0xFFFFFFFFLL);
             PieceVariant variant(globalId, variantId, req.rotationAngle, req.isMirrored, req.requiredQuantity, transformedBoundary);

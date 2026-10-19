@@ -7,7 +7,7 @@
 
 #include "geometry/transformations.hpp"
 
-namespace pmg::geometry {
+namespace pmg::geometry::calculations {
     
 constexpr double DEG_TO_RAD = std::numbers::pi / 180.0;
 
@@ -80,4 +80,4 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
     return transformed;
 }
 
-} // namespace pmg::geometry
+} // namespace pmg::geometry::calculations

@@ -45,8 +45,6 @@ private:
     int m_requiredQuantity;
     bool m_isConvex;
     std::vector<Clipper2Lib::Path64> m_decomposedShape;
-
-    bool checkConvexity();
 public:
     PieceVariant(int64_t globalId, int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
 
