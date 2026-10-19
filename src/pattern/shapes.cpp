@@ -2,9 +2,12 @@
 #include <numeric>
 #include <ranges>
 
+#include <spdlog/spdlog.h>
+
 #include "pattern/shapes.hpp"
 #include "geometry/decomposition_calculations.hpp"
 #include "geometry/calculations.hpp"
+#include "utils/config.hpp"
 
 namespace pmg::pattern {
 
@@ -87,6 +90,9 @@ PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isM
     if (m_isConvex) {
         m_decomposedShape = { m_shape_path };
     } else {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("decomposing {}", this->toString()));
+        }
         std::vector<std::vector<pmg::geometry::Point64>> subShapes = geometry::calculations::hertelMehlhornAlgorithm(m_boundary);
 
         for (const auto& subShape : subShapes) {

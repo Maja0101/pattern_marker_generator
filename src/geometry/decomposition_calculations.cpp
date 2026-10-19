@@ -3,8 +3,11 @@
 #include <unordered_map>
 #include <utility>
 
+#include <spdlog/spdlog.h>
+
 #include "geometry/decomposition_calculations.hpp"
 #include "geometry/calculations.hpp"
+#include "utils/config.hpp"
 
 namespace pmg::geometry::calculations::utils {
 
@@ -12,7 +15,7 @@ struct Edge {
     int u, v;
     
     constexpr Edge(int a, int b) noexcept
-        : u(std::min(a, b)), v(std::max(u, v)) {}
+        : u(std::min(a, b)), v(std::max(a, b)) {}
 
     auto operator<=>(const Edge&) const = default;
 };
@@ -30,7 +33,9 @@ struct HalfEdge {
 template<>
 struct std::hash<pmg::geometry::calculations::utils::Edge> {
     std::size_t operator()(const pmg::geometry::calculations::utils::Edge& e) const noexcept {
-        return (static_cast<size_t>(e.u) << 32 | static_cast<uint32_t>(e.v)); // formula for creating 64-bit hash from two 32-bit integer indexes 
+        const auto u64 = (static_cast<std::uint64_t>(static_cast<std::uint32_t>(e.u)) << 32) 
+                       | static_cast<std::uint32_t>(e.v);
+        return std::hash<std::uint64_t>{}(u64); // formula for creating 64-bit hash from two 32-bit integer indexes 
     }
 };
 
@@ -59,6 +64,10 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
     const size_t trianglesCount = indexes.size() / 3;
 
     if (trianglesCount == 0) return {};
+
+    if constexpr (config::DEBUG_MODE_DETAILED){
+        SPDLOG_INFO(std::format("trianglesCount: {}", trianglesCount));
+    }
 
     // Create DCEL (doubly connected edge list) for fast diagonal checking
     std::vector<utils::HalfEdge> halfEdges;
@@ -98,7 +107,7 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
         };
 
         for (int i = 0; i < 3; ++i) {
-            int edgeIdx = baseIdx + 1;
+            int edgeIdx = baseIdx + i;
             utils::Edge eKey(vertexPairs[i][0], vertexPairs[i][1]);
 
             auto [it, inserted] = edgeMap.try_emplace(eKey, edgeIdx);
@@ -110,6 +119,11 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
                 diagonals.push_back(edgeIdx);
             }
         }
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("diagonals size: {}", diagonals.size()));
+        SPDLOG_INFO(std::format("halfEdges size: {}", halfEdges.size()));
     }
 
     // Remove non-essential diagonals 
@@ -131,6 +145,11 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
         int C = halfEdges[fromB].v;
         int D = halfEdges[fromA].v;
 
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("diagonal to check: {} {} {} {}", A, B, C, D));
+            SPDLOG_INFO(std::format("diagonal to check: {} {} {} {}", toA, fromA, toB, fromB));
+        }
+
         if (isConvex(polygon[C], polygon[A], polygon[D]) &&
             isConvex(polygon[D], polygon[B], polygon[C])) {
                 halfEdges[toA].next = fromA;
@@ -141,6 +160,10 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
 
                 e1.active = false;
                 e2.active = false;
+
+                if constexpr (config::DEBUG_MODE_DETAILED) {
+                    SPDLOG_INFO(std::format("non essential: {} {} {} {}", halfEdges[toA].next, halfEdges[fromA].prev, halfEdges[toB].next, halfEdges[fromB].prev));
+                }
         }
     }
 
@@ -164,6 +187,15 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
 
         if (poly.size() >= 3) {
             result.push_back(std::move(poly));
+        }
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& poly : result) {
+            SPDLOG_WARN("poly");
+            for (const auto& p : poly) {
+                SPDLOG_WARN(std::format("decomposed: ({}, {})", p.x, p.y));
+            }
         }
     }
 

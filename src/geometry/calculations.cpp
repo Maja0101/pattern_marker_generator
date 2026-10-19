@@ -169,12 +169,24 @@ std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::Pattern
 
 std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::PatternPiece> &patternPieces)
 {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("Number of pattern pieces: {}", patternPieces.size()));
+    }
+
     std::unordered_map<int64_t, pattern::PieceVariant> variantMap;
 
     for (const auto& piece : patternPieces) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Pattern pieces no. {}", piece.getId()));
+            SPDLOG_INFO(std::format("Number of variants: {}", piece.getVariants().size()));
+        }
         for (const auto& variant : piece.getVariants()) {
             variantMap.emplace(variant.getGlobalId(), variant);
         }
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("Processed variants: {}", variantMap.size()));
     }
 
     std::vector<pattern::PieceVariant> allVariants;
@@ -182,6 +194,10 @@ std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::Pat
 
     for (auto& [id, variant] : variantMap) {
         allVariants.push_back(variant);
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("Number of all variants: {}", allVariants.size()));
     }
 
     return allVariants;

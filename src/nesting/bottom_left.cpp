@@ -13,27 +13,75 @@ BLStateView BottomLeft::makeCurrStateView() const
 
 bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 {
-    timing::Timer timer;
+    // timing::Timer timer;
 
     int64_t varId = item.getVariant()->getGlobalId();
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(varId);
+    }
 
     // Fetch IFP for shape
     auto ifpIt = m_ifpCache.find(varId);
     if (ifpIt == m_ifpCache.end() || ifpIt->second.empty()) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO("No IFP");
+        }
         return false;
     }
 
     Clipper2Lib::Paths64 validRegion = ifpIt->second;
 
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& path : validRegion) {
+            SPDLOG_INFO("path in ifp");
+            for (const auto& p : path) {
+                SPDLOG_INFO(std::format("IFP: ({}, {})", p.x, p.y));
+            }
+        }
+    }
+
     // Subtract NFPs of all placed items
     for (const auto& piece : items) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Checking {} {}", piece.getVariant()->getGlobalId(), piece.isLocked()));
+        }
         if (piece.isLocked()) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO("Processing");
+            }
             geometry::NFPKey key{ piece.getVariant()->getGlobalId(), varId };
 
             auto nfpIt = m_nfpCache.find(key);
-            if (nfpIt != m_nfpCache.end() && !nfpIt->second.empty()) {
-                Clipper2Lib::Paths64 translatedPaths = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(piece.getPosition()));
 
+            if (nfpIt != m_nfpCache.end() && !nfpIt->second.empty()) {
+                if constexpr (config::DEBUG_MODE_DETAILED) {
+                    SPDLOG_INFO("Valid nfp");
+                }
+                
+                if constexpr (config::DEBUG_MODE_DETAILED) {
+                    const Clipper2Lib::Paths64& nfpPaths = nfpIt->second;
+                    for (const auto& path : nfpPaths) {
+                        SPDLOG_INFO("path in nfp");
+                        for (const auto& p : path) {
+                            SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
+                        }
+                    }
+                }
+
+                if constexpr (config::DEBUG_MODE_DETAILED) {
+                    SPDLOG_INFO(std::format("position: ({}, {})", piece.getPosition().x, piece.getPosition().y));
+                }
+                Clipper2Lib::Paths64 translatedPaths = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(piece.getPosition()));
+                if constexpr (config::DEBUG_MODE_DETAILED) {
+                    for (const auto& path : translatedPaths) {
+                        SPDLOG_INFO("path in translated nfp");
+                        for (const auto& p : path) {
+                            SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
+                        }
+                    }
+                }
+                
                 validRegion = Clipper2Lib::Difference(
                     validRegion,
                     translatedPaths,
@@ -41,6 +89,9 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
                 );
 
                 if (validRegion.empty()) {
+                    if constexpr (config::DEBUG_MODE_DETAILED) {
+                        SPDLOG_INFO("No valid region");
+                    }
                     return false;
                 }
             }
@@ -50,6 +101,15 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     }
 
     validRegion = Clipper2Lib::SimplifyPaths(validRegion, 0.0);
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& path : validRegion) {
+            SPDLOG_INFO("path in valid region");
+            for (const auto& p : path) {
+                SPDLOG_INFO(std::format("validRegion: ({}, {})", p.x, p.y));
+            }
+        }
+    }
 
     // Extract vertices
     std::vector<Clipper2Lib::Point64> candidatePoints;
@@ -70,8 +130,18 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
             return a.y < b.y;
         });
 
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& p : candidatePoints) {
+            SPDLOG_INFO(std::format("candidatePoints: ({}, {})", p.x, p.y));
+        }
+    }
+
     // Lock item into place
     Clipper2Lib::Point64 bestPosition = candidatePoints.front();
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("bestPosition: ({}, {})", bestPosition.x, bestPosition.y));
+    }
 
     m_placed_pieces_polygons.push_back(item.getItemPathAtPosition(bestPosition.x, bestPosition.y));
     m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAtPosition(bestPosition.x, bestPosition.y));
@@ -97,7 +167,7 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
     int i = 0;
     for (auto& item : items) {
         ++i;
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Nesting item no. {}", i));
         }
         if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -106,7 +176,7 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
         }
 
         if (!findPosition(item, items)) {
-            if constexpr (config::DEBUG_MODE) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Could not find position");
             }
             return false;
