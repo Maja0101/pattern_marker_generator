@@ -66,7 +66,7 @@ std::string Shape::toString() const
 
 PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
     : Shape(initalBoundary), m_globalId(globalId), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {
-    m_isConvex = geometry::calculations::checkConvexity(*this);
+    m_isConvex = geometry::calculations::checkConvexity(m_boundary);
 
     if (m_isConvex) {
         m_decomposedShape = { m_shape_path };

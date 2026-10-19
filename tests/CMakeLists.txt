@@ -22,6 +22,7 @@ if(TEST_FILES)
     test_calculations.cpp
     test_bottom_left.cpp
     test_transformations.cpp
+    test_decomposition.cpp
   )
 
   # Specify include directories to use when compiling 

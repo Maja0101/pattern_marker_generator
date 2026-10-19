@@ -9,7 +9,7 @@
 
 namespace pmg::geometry::calculations {
 
-bool checkConvexity(const pattern::Shape &shape);
+bool checkConvexity(const std::vector<Point64>& polygon);
 std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Point64>& polygon);
 
 } // namespace pmg::geometry::calculations

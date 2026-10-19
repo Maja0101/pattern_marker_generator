@@ -64,16 +64,16 @@ struct std::hash<pmg::geometry::calculations::utils::Edge> {
 };
 
 namespace pmg::geometry::calculations {
-bool checkConvexity(const pattern::Shape &shape)
+bool checkConvexity(const std::vector<Point64> &polygon)
 {
-    const size_t n = shape.getBoundary().size();
+    const size_t n = polygon.size();
     if (n < 3) return false;
     if (n == 3) return true;
 
     for (size_t i = 0; i < n; ++i) {
-        const geometry::Point64& p1 = shape.getBoundary()[i];
-        const geometry::Point64& p2 = shape.getBoundary()[(i + 1) % n];
-        const geometry::Point64& p3 = shape.getBoundary()[(i + 2) % n];
+        const geometry::Point64& p1 = polygon[i];
+        const geometry::Point64& p2 = polygon[(i + 1) % n];
+        const geometry::Point64& p3 = polygon[(i + 2) % n];
 
         if (!geometry::calculations::utils::isConvex(p1, p2, p3)) {
             return false;
@@ -87,7 +87,8 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
 {
     const size_t n = polygon.size();
     if (n < 3) return {};
-    if (n == 3) return { polygon }; 
+    if (n == 3) return { polygon };
+    if (checkConvexity(polygon)) return { polygon };
 
     // Triangulate the polygon
     std::vector<std::vector<Point64>> input = { polygon };
