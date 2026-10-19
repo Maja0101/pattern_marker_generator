@@ -58,8 +58,7 @@ bool BasicAlgorithm::runAlgorithm()
 
         bool exportResult = pmg::geometry::SvgExporter::exportLayout(
             "debug_output.svg", 
-            (m_fabric.getBoundingBox().Width()) / 1000, 
-            (m_fabric.getBoundingBox().Height()) / 1000, 
+            m_fabric,
             sorted_items
         );
     }

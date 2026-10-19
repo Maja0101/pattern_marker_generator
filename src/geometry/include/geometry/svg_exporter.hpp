@@ -8,13 +8,16 @@ namespace pmg::nesting {
     class NestedItem;
 }
 
+namespace pmg::pattern {
+    class Fabric;
+}
+
 namespace pmg::geometry {
 
 class SvgExporter {
 public:
     static bool exportLayout(const std::string& filepath, 
-                             int64_t fabricWidth,
-                             int64_t fabricHeight,
+                             const pattern::Fabric& fabric,
                              const std::vector<nesting::NestedItem>& items); 
 };
 
