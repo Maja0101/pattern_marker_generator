@@ -250,4 +250,27 @@ Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64 &paths, const Cli
     return result;
 }
 
+Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64 &ifpPaths, const std::vector<Clipper2Lib::Paths64> &originalNfps, int64_t epsilon)
+{
+    // Snap to IFP 
+    for (const auto& path : ifpPaths) {
+        for (const auto& ref : path) {
+            if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
+            if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
+        }
+    }
+
+    // Snap to original NFP
+    for (const auto& nfp : originalNfps) {
+        for (const auto& path : nfp) {
+            for (const auto& ref : path) {
+                if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
+                if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
+            }
+        }
+    }
+
+    return point;
+}
+
 } // namespace pmg::geometry::calculations

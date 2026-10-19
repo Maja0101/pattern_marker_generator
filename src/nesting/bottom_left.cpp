@@ -41,25 +41,28 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
         }
     }
 
+    std::vector<Clipper2Lib::Paths64> originalNFPs;
+    originalNFPs.reserve(items.size());
+
     // Subtract NFPs of all placed items
-    for (const auto& piece : items) {
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Checking {} {}", piece.getVariant()->getGlobalId(), piece.isLocked()));
+    for (const auto& placedPiece : items) {
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO(std::format("Checking {} {}", placedPiece.getVariant()->getGlobalId(), placedPiece.isLocked()));
         }
-        if (piece.isLocked()) {
-            if constexpr (config::DEBUG_MODE_DETAILED) {
+        if (placedPiece.isLocked()) {
+            if constexpr (config::DEBUG_MODE) {
                 SPDLOG_INFO("Processing");
             }
-            geometry::NFPKey key{ piece.getVariant()->getGlobalId(), varId };
+            geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(), varId };
 
             auto nfpIt = m_nfpCache.find(key);
 
             if (nfpIt != m_nfpCache.end() && !nfpIt->second.empty()) {
-                if constexpr (config::DEBUG_MODE_DETAILED) {
+                if constexpr (config::DEBUG_MODE) {
                     SPDLOG_INFO("Valid nfp");
                 }
                 
-                if constexpr (config::DEBUG_MODE_DETAILED) {
+                if constexpr (config::DEBUG_MODE) {
                     const Clipper2Lib::Paths64& nfpPaths = nfpIt->second;
                     for (const auto& path : nfpPaths) {
                         SPDLOG_INFO("path in nfp");
@@ -69,12 +72,21 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
                     }
                 }
 
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    SPDLOG_INFO(std::format("position: ({}, {})", piece.getPosition().x, piece.getPosition().y));
+                if constexpr (config::DEBUG_MODE) {
+                    SPDLOG_INFO(std::format("position: ({}, {})", placedPiece.getPosition().x, placedPiece.getPosition().y));
                 }
-                Clipper2Lib::Paths64 translatedPaths = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(piece.getPosition()));
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    for (const auto& path : translatedPaths) {
+
+                Clipper2Lib::Paths64 translatedNFP = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(placedPiece.getPosition()));
+                originalNFPs.push_back(translatedNFP);
+                translatedNFP = Clipper2Lib::InflatePaths(
+                    translatedNFP,
+                    -1.0,
+                    Clipper2Lib::JoinType::Miter,
+                    Clipper2Lib::EndType::Polygon
+                );
+
+                if constexpr (config::DEBUG_MODE) {
+                    for (const auto& path : translatedNFP) {
                         SPDLOG_INFO("path in translated nfp");
                         for (const auto& p : path) {
                             SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
@@ -84,12 +96,12 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
                 
                 validRegion = Clipper2Lib::Difference(
                     validRegion,
-                    translatedPaths,
+                    translatedNFP,
                     Clipper2Lib::FillRule::NonZero
                 );
 
                 if (validRegion.empty()) {
-                    if constexpr (config::DEBUG_MODE_DETAILED) {
+                    if constexpr (config::DEBUG_MODE) {
                         SPDLOG_INFO("No valid region");
                     }
                     return false;
@@ -102,7 +114,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 
     validRegion = Clipper2Lib::SimplifyPaths(validRegion, 0.0);
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         for (const auto& path : validRegion) {
             SPDLOG_INFO("path in valid region");
             for (const auto& p : path) {
@@ -130,7 +142,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
             return a.y < b.y;
         });
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         for (const auto& p : candidatePoints) {
             SPDLOG_INFO(std::format("candidatePoints: ({}, {})", p.x, p.y));
         }
@@ -139,7 +151,9 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     // Lock item into place
     Clipper2Lib::Point64 bestPosition = candidatePoints.front();
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    bestPosition = geometry::calculations::snapToBoundaries(bestPosition, ifpIt->second, originalNFPs);
+
+    if constexpr (config::DEBUG_MODE) {
         SPDLOG_INFO(std::format("bestPosition: ({}, {})", bestPosition.x, bestPosition.y));
     }
 
@@ -147,7 +161,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAtPosition(bestPosition.x, bestPosition.y));
     item.lockInPosition(bestPosition.x, bestPosition.y);
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         SPDLOG_INFO("Item locked");
         SPDLOG_INFO(item.toString());
     }

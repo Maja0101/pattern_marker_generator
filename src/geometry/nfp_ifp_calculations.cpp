@@ -52,12 +52,12 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     const Clipper2Lib::Rect64& fabricBounds = fabric.getBoundingBox();
     const Clipper2Lib::Path64& fabricPath = fabric.getPath();
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Variants no. {} {}", variant.getId(), variant.getGlobalId()));
     }
 
     if (isAARectangle(fabricPath, fabricBounds)) {
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Rectangle fabric");
         }
 
@@ -69,13 +69,13 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         int64_t minY = fabricBounds.top - variantBounds.top; // top - min in clipper
         int64_t maxY = fabricBounds.bottom - variantBounds.bottom;
 
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("x: {} - {} y: {} - {}", minX, maxX, minY, maxY));
         }
 
         // IFP empty when variant bigger than fabric
         if (minX > maxX || minY > maxY) {
-            if constexpr (config::DEBUG_MODE) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("IFP empty, variant to big");
             }
             return Clipper2Lib::Paths64{};
@@ -88,7 +88,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
             {minX, maxY}
         };
 
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             for (const auto& p : ifp) {
                 SPDLOG_INFO(std::format("IFP: ({}, {})", p.x, p.y));
             }
@@ -97,7 +97,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         return Clipper2Lib::Paths64{ ifp };
     } 
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Irregular  fabric");
     }
 
@@ -113,7 +113,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         {fabricBounds.left - margin, fabricBounds.bottom + margin}, // minX - margin, maxY + margin
     };
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : outerBox) {
             SPDLOG_INFO(std::format("outerBox: ({}, {})", p.x, p.y));
         }
@@ -125,7 +125,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         Clipper2Lib::FillRule::NonZero
     );
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& path : fabricComplement) {
             SPDLOG_INFO("path in fabricComplement");
             for (const auto& p : path) {
@@ -152,7 +152,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         }
     }
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of sub nfps: {}", subNFPs.size()));
     }
 
@@ -161,7 +161,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         Clipper2Lib::FillRule::NonZero
     );
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& path : subNFPs) {
             SPDLOG_INFO("path in subNFPs");
             for (const auto& p : path) {
@@ -177,7 +177,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         Clipper2Lib::FillRule::NonZero
     );
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& path : ifp) {
             SPDLOG_INFO("path in ifp");
             for (const auto& p : path) {

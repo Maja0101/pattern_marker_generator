@@ -30,4 +30,6 @@ Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64& path);
 
 Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64& paths, const Clipper2Lib::Point64& point);
 
+Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64& ifpPaths, const std::vector<Clipper2Lib::Paths64>& originalNfps, int64_t epsilon = 1);
+
 } // namespace pmg::geometry::calculations
