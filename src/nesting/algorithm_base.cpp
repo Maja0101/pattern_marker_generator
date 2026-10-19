@@ -1,6 +1,7 @@
 #include <spdlog/spdlog.h>
 
 #include "utils/config.hpp"
+#include "utils/timer.hpp"
 #include "nesting/algorithm_base.hpp"
 #include "nesting/bottom_left.hpp"
 #include "geometry/calculations.hpp"
@@ -24,20 +25,30 @@ bool AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPie
 {
     // TODO should return the layout and the statistics data
 
-    m_originalItems = geometry::calculations::prepareItems(patternPieces);
+    {
+        SPDLOG_INFO("Preparing the geometry...");
+        timing::Timer timer;
 
-    std::vector<pmg::pattern::PieceVariant> allPossibleVariants = geometry::calculations::getAllVariants(patternPieces);
+        m_originalItems = geometry::calculations::prepareItems(patternPieces);
 
-    m_ifpCache = geometry::calculations::calculateIFPCache(m_fabric, allPossibleVariants);
-    m_nfpCache = geometry::calculations::calculateNFPCache(allPossibleVariants);
+        std::vector<pmg::pattern::PieceVariant> allPossibleVariants = geometry::calculations::getAllVariants(patternPieces);
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        for (const auto& item : m_originalItems) {
-            SPDLOG_INFO(item.toString());
+        m_ifpCache = geometry::calculations::calculateIFPCache(m_fabric, allPossibleVariants);
+        m_nfpCache = geometry::calculations::calculateNFPCache(allPossibleVariants);
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            for (const auto& item : m_originalItems) {
+                SPDLOG_INFO(item.toString());
+            }
         }
     }
 
-    runAlgorithm();
+    {
+        SPDLOG_INFO("Nesting...");
+        timing::Timer timer;
+        runAlgorithm();
+    }
+
 
     return false;
 }

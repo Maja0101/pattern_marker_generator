@@ -11,15 +11,12 @@ bool BasicAlgorithm::runAlgorithm()
 {
     std::vector<NestedItem> sorted_items = m_originalItems;
 
-    {
-        timing::Timer timer;
 
-        std::sort(sorted_items.begin(), sorted_items.end(), [](const NestedItem&a, const NestedItem& b) {
-            auto a_bounds = a.getItemBoundingBoxAtPosition();
-            auto b_bounds = b.getItemBoundingBoxAtPosition();
-            return (a_bounds.bottom - a_bounds.top) > (b_bounds.bottom - b_bounds.top);
-        });
-    }
+    std::sort(sorted_items.begin(), sorted_items.end(), [](const NestedItem&a, const NestedItem& b) {
+        auto a_bounds = a.getItemBoundingBoxAtPosition();
+        auto b_bounds = b.getItemBoundingBoxAtPosition();
+        return (a_bounds.bottom - a_bounds.top) > (b_bounds.bottom - b_bounds.top);
+    });
 
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -33,8 +30,8 @@ bool BasicAlgorithm::runAlgorithm()
     bool result;
 
     {
+        SPDLOG_INFO("Running single Bottom Left Fill...");
         timing::Timer timer;
-
         result = runSingleBottomLeft(sorted_items);
     }
 
@@ -53,15 +50,11 @@ bool BasicAlgorithm::runAlgorithm()
         );
     }
 
-    {
-        timing::Timer timer;
-
-        bool exportResult = pmg::geometry::SvgExporter::exportLayout(
-            "debug_output.svg", 
-            m_fabric,
-            sorted_items
-        );
-    }
+    bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+        "debug_output.svg", 
+        m_fabric,
+        sorted_items
+    );
 
     return result;
 }

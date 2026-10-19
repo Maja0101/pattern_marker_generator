@@ -136,8 +136,6 @@ bool canPlaceAt(const nesting::BLStateView &view, const nesting::NestedItem &ite
 
 std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece> &patternPieces)
 {
-    timing::Timer timer;
-
     std::vector<nesting::NestedItem> items;
 
     for (const auto& piece : patternPieces) {
