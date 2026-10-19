@@ -38,6 +38,7 @@ public:
 class PieceVariant : public Shape {
 private:
     // TODO piece variant will need update - two-way pattern pieces
+    int64_t m_globalId;
     int m_id;
     int m_rotationAngle;
     bool m_isMirrored;
@@ -47,10 +48,11 @@ private:
 
     bool checkConvexity();
 public:
-    PieceVariant(int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
+    PieceVariant(int64_t globalId, int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
 
     const std::vector<Clipper2Lib::Path64>& getDecomposedShape() const { return m_decomposedShape; }
 
+    const int64_t getGlobalId() const { return m_globalId; }
     const int getId() const { return m_id; }
     const int getRotationAngle() const { return m_rotationAngle; }
     const bool getIsMirrored() const { return m_isMirrored; }

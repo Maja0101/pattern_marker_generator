@@ -11,71 +11,71 @@ BLStateView BottomLeft::makeCurrStateView() const
     return BLStateView{ m_fabric, m_placed_pieces_polygons, m_placed_pieces_boxes };
 }
 
-bool BottomLeft::findPosition(NestedItem &item)
+bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 {
     timing::Timer timer;
 
-    // Calculate width and height of item's bounding box and determine the starting position
-    Clipper2Lib::Rect64 fabricBounds = m_fabric.getBoundingBox();
-    Clipper2Lib::Rect64 item_bounding_box = item.getVariant()->getBoundingBox();
+    int64_t varId = item.getVariant()->getGlobalId();
 
-    int64_t item_width = item_bounding_box.Width();
-    int64_t item_height = item_bounding_box.Height();
-
-    int64_t current_x = fabricBounds.left;
-    int64_t current_y = fabricBounds.bottom - item_height; // In Clipper2 bottom = maxY, top = minY
-
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("Item w={}, h={}", item_width, item_height));
-        SPDLOG_INFO(std::format("Curr x={}, y={}", current_x, current_y));
+    // Fetch IFP for shape
+    auto ifpIt = m_ifpCache.find(varId);
+    if (ifpIt == m_ifpCache.end() || ifpIt->second.empty()) {
+        return false;
     }
 
-    // Verify starting position and move right if blocked
-    while (!geometry::calculations::canPlaceAt(makeCurrStateView(), item, current_x, current_y)) {
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO("Starting point not valid, moving to the right");
-        }
-        current_x += m_step_size;
-        if (current_x + item_width > fabricBounds.right) {
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("Starting point {} is out of bounds, no possible position", current_x));
+    Clipper2Lib::Paths64 validRegion = ifpIt->second;
+
+    // Subtract NFPs of all placed items
+    for (const auto& piece : items) {
+        if (piece.isLocked()) {
+            geometry::NFPKey key{ piece.getVariant()->getGlobalId(), varId };
+
+            auto nfpIt = m_nfpCache.find(key);
+            if (nfpIt != m_nfpCache.end() && !nfpIt->second.empty()) {
+                Clipper2Lib::Paths64 translatedPaths = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(piece.getPosition()));
+
+                validRegion = Clipper2Lib::Difference(
+                    validRegion,
+                    translatedPaths,
+                    Clipper2Lib::FillRule::NonZero
+                );
+
+                if (validRegion.empty()) {
+                    return false;
+                }
             }
-            return false;
+        } else {
+            break;
         }
     }
 
-    // Down-Left loop
-    bool wasMoved = true;
-    while (wasMoved) {
-        wasMoved = false;
+    validRegion = Clipper2Lib::SimplifyPaths(validRegion, 0.0);
 
-        // Slide down 
-        while (geometry::calculations::canPlaceAt(makeCurrStateView(), item, current_x, current_y - m_step_size)) {
-            current_y -= m_step_size;
-            wasMoved = true;
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("Slide down, curr x={}, y={}", current_x, current_y));
-            }
-        }
-
-        // Slide left
-        while (geometry::calculations::canPlaceAt(makeCurrStateView(), item, current_x - m_step_size, current_y)) {
-            current_x -= m_step_size;
-            wasMoved = true;
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("Slide left, curr x={}, y={}", current_x, current_y));
-            }
+    // Extract vertices
+    std::vector<Clipper2Lib::Point64> candidatePoints;
+    for (const auto& path : validRegion) {
+        for (const auto& point : path) {
+            candidatePoints.push_back(point);
         }
     }
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("curr x={}, y={}", current_x, current_y));
+    if (candidatePoints.empty()) {
+        return false;
     }
+
+    // Sort first by x and then by y
+    std::sort(candidatePoints.begin(), candidatePoints.end(),  
+        [](const Clipper2Lib::Point64& a, const Clipper2Lib::Point64& b) {
+            if (a.x != b.x) return a.x < b.x;
+            return a.y < b.y;
+        });
 
     // Lock item into place
-    m_placed_pieces_polygons.push_back(item.getItemPathAtPosition(current_x, current_y));
-    m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAtPosition(current_x, current_y));
-    item.lockInPosition(current_x, current_y);
+    Clipper2Lib::Point64 bestPosition = candidatePoints.front();
+
+    m_placed_pieces_polygons.push_back(item.getItemPathAtPosition(bestPosition.x, bestPosition.y));
+    m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAtPosition(bestPosition.x, bestPosition.y));
+    item.lockInPosition(bestPosition.x, bestPosition.y);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Item locked");
@@ -85,8 +85,8 @@ bool BottomLeft::findPosition(NestedItem &item)
     return true;
 }
 
-BottomLeft::BottomLeft(pattern::Fabric fabric, int64_t step_size)
-    : m_fabric(std::move(fabric)), m_step_size(step_size) {}
+BottomLeft::BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache)
+    : m_fabric(std::move(fabric)), m_ifpCache(ifpCache), m_nfpCache(nfpCache) {}
 
 bool BottomLeft::performNesting(std::vector<NestedItem> &items)
 {
@@ -105,7 +105,7 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
             SPDLOG_INFO(std::format("Nesting for {}", item.toString()));
         }
 
-        if (!findPosition(item)) {
+        if (!findPosition(item, items)) {
             if constexpr (config::DEBUG_MODE) {
                 SPDLOG_INFO("Could not find position");
             }

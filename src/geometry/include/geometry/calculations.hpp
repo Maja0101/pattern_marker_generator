@@ -10,6 +10,7 @@
 #include "nesting/nested_item.hpp"
 
 namespace pmg::geometry::calculations {
+Clipper2Lib::Point64 toClipperPoint(const Point64& point);
 Clipper2Lib::Path64 toClipperPath(const std::vector<Point64>& polygon);
 std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64& path);
 
@@ -21,9 +22,12 @@ bool isWithinFabric(const nesting::BLStateView& view, const nesting::NestedItem&
 bool canPlaceAt(const nesting::BLStateView& view, const nesting::NestedItem& item, int64_t x, int64_t y);
 
 std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece>& patternPieces);
+std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::PatternPiece>& patternPieces);
 bool evaluate(const std::vector<nesting::NestedItem>& items);
 
 bool isAARectangle(const Clipper2Lib::Path64& path, const Clipper2Lib::Rect64& boundingBox);
 Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64& path);
+
+Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64& paths, const Clipper2Lib::Point64& point);
 
 } // namespace pmg::geometry::calculations

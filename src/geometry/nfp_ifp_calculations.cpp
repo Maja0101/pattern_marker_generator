@@ -3,9 +3,9 @@
 
 namespace pmg::geometry::calculations {
 
-std::unordered_map<int, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, const std::vector<pattern::PieceVariant> &variants)
+std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, const std::vector<pattern::PieceVariant> &variants)
 {
-    std::unordered_map<int, Clipper2Lib::Paths64> ifpCache;
+    std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache;
     for (const auto& variant : variants) {
         if (variant.getRequiredQuantity() > 0) {
             ifpCache[variant.getId()] = buildIFPfor(fabric, variant);

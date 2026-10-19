@@ -16,7 +16,7 @@ class AlgorithmBase {
 protected:
     pattern::Fabric m_fabric;
     std::vector<nesting::NestedItem> m_originalItems;
-    std::unordered_map<int, Clipper2Lib::Paths64> m_ifpCache; 
+    std::unordered_map<int64_t, Clipper2Lib::Paths64> m_ifpCache; 
     std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64> m_nfpCache; 
 
     virtual bool runAlgorithm() = 0;
@@ -25,6 +25,9 @@ protected:
 public:
     AlgorithmBase(pattern::Fabric fabric);
     virtual ~AlgorithmBase() = default;
+
+    const std::unordered_map<int64_t, Clipper2Lib::Paths64>& getIFPCache() const { return m_ifpCache; };
+    const std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& getNFPCache() const { return m_nfpCache; };
 
     bool execute(const std::vector<pattern::PatternPiece>& patternPieces);
 };

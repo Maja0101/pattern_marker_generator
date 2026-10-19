@@ -4,6 +4,7 @@
 #include "nesting/algorithm_base.hpp"
 #include "nesting/bottom_left.hpp"
 #include "geometry/calculations.hpp"
+#include "geometry/nfp_ifp_calculations.hpp"
 
 namespace pmg::nesting {
 
@@ -11,7 +12,7 @@ bool AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
 {
     // TODO should return the layout and the statistics data
 
-    BottomLeft bottomLeft(m_fabric);
+    BottomLeft bottomLeft(m_fabric, m_ifpCache, m_nfpCache);
 
     return bottomLeft.performNesting(items);
 }
@@ -26,6 +27,11 @@ bool AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPie
     m_originalItems = geometry::calculations::prepareItems(patternPieces);
 
     // TODO based on variants in pattern pieces prepare cache for nfp and ifp
+
+    std::vector<pmg::pattern::PieceVariant> allPossibleVariants = geometry::calculations::getAllVariants(patternPieces);
+
+    m_ifpCache = geometry::calculations::calculateIFPCache(m_fabric, allPossibleVariants);
+    m_nfpCache = geometry::calculations::calculateNFPCache(allPossibleVariants);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& item : m_originalItems) {

@@ -2,6 +2,8 @@
 
 #include "nesting/bottom_left.hpp"
 #include "pattern/shapes.hpp"
+#include "geometry/nfp_ifp_calculations.hpp"
+#include "geometry/nfp_key.hpp"
 
 TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
     struct ExpectedItem {
@@ -24,11 +26,14 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
             {    0, 20000}
         };
         pmg::pattern::Fabric fabric(fabricPts);
-
-        pmg::nesting::BottomLeft bottomLeft(fabric);
-
+        
         SECTION("No pieces to place") {
+            std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpEmptyCache;
+            std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> nfpEmptyCache;
+            pmg::nesting::BottomLeft bottomLeft(fabric, ifpEmptyCache, nfpEmptyCache);
+
             std::vector<pmg::nesting::NestedItem> items;
+
             REQUIRE(bottomLeft.performNesting(items));
             REQUIRE(items.empty());
         }
@@ -43,9 +48,13 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                 {2500, 2500}
             };
 
-            pmg::pattern::PieceVariant variant(1, 0, false, 1, variantPts);
+            pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, variantPts);
 
             std::vector<pmg::nesting::NestedItem> items = { pmg::nesting::NestedItem(&variant) };
+
+            std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache = pmg::geometry::calculations::calculateIFPCache(fabric, { variant });;
+            std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> nfpCache = pmg::geometry::calculations::calculateNFPCache({ variant });;
+            pmg::nesting::BottomLeft bottomLeft(fabric, ifpCache, nfpCache);
 
             REQUIRE(items.size() == 1);
             checkNestedItem(items[0], {0, 0, false});
@@ -76,15 +85,19 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     {   0, 1000}  
                 };
 
-                pmg::pattern::PieceVariant variant1(1, 0, false, 1, rectanglePts);
-                pmg::pattern::PieceVariant variant2(2, 0, false, 1, tallRectPts);
-                pmg::pattern::PieceVariant variant3(3, 0, false, 1, smallRectPts);
+                pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, rectanglePts);
+                pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, tallRectPts);
+                pmg::pattern::PieceVariant variant3(3, 3, 0, false, 1, smallRectPts);
 
                 std::vector<pmg::nesting::NestedItem> items = { 
                     pmg::nesting::NestedItem(&variant1), 
                     pmg::nesting::NestedItem(&variant2),
                     pmg::nesting::NestedItem(&variant3)
                 };
+
+                std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache = pmg::geometry::calculations::calculateIFPCache(fabric, { variant1, variant2, variant3 });;
+                std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> nfpCache = pmg::geometry::calculations::calculateNFPCache({ variant1, variant2, variant3 });;
+                pmg::nesting::BottomLeft bottomLeft(fabric, ifpCache, nfpCache);
 
                 REQUIRE(items.size() == 3);
                 for (size_t i = 0; i < items.size(); ++i) {
@@ -119,13 +132,17 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     {    0, 5000}
                 };
 
-                pmg::pattern::PieceVariant variant1(1, 0, false, 1, firstTrainglePts);
-                pmg::pattern::PieceVariant variant2(2, 0, false, 1, secondTrainglePts);
+                pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, firstTrainglePts);
+                pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, secondTrainglePts);
 
                 std::vector<pmg::nesting::NestedItem> items = { 
                     pmg::nesting::NestedItem(&variant1), 
                     pmg::nesting::NestedItem(&variant2)
                 };
+
+                std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache = pmg::geometry::calculations::calculateIFPCache(fabric, { variant1, variant2 });;
+                std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> nfpCache = pmg::geometry::calculations::calculateNFPCache({ variant1, variant2 });;
+                pmg::nesting::BottomLeft bottomLeft(fabric, ifpCache, nfpCache);
 
                 REQUIRE(items.size() == 2);
                 for (size_t i = 0; i < items.size(); ++i) {
@@ -157,15 +174,19 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                 {    0,  9000}  
             };
 
-            pmg::pattern::PieceVariant variantSquare(1, 0, false, 1, squarePts);
-            pmg::pattern::PieceVariant variant2Rect(2, 0, false, 1, rectanglePts);
+            pmg::pattern::PieceVariant variantSquare(1, 1, 0, false, 1, squarePts);
+            pmg::pattern::PieceVariant variantRect(2, 2, 0, false, 1, rectanglePts);
 
             std::vector<pmg::nesting::NestedItem> items = { 
                 pmg::nesting::NestedItem(&variantSquare), 
                 pmg::nesting::NestedItem(&variantSquare), 
                 pmg::nesting::NestedItem(&variantSquare), 
-                pmg::nesting::NestedItem(&variant2Rect)
+                pmg::nesting::NestedItem(&variantRect)
             };
+
+            std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache = pmg::geometry::calculations::calculateIFPCache(fabric, { variantSquare, variantRect });;
+            std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> nfpCache = pmg::geometry::calculations::calculateNFPCache({ variantSquare, variantRect });;
+            pmg::nesting::BottomLeft bottomLeft(fabric, ifpCache, nfpCache);
 
             for (size_t i = 0; i < items.size(); ++i) {
                 CAPTURE(i);

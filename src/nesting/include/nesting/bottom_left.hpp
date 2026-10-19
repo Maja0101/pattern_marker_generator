@@ -7,12 +7,16 @@
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
 #include "nesting/bl_state.hpp"
+#include "geometry/nfp_key.hpp"
 
 namespace pmg::nesting {
 
 class BottomLeft {
 private:
     pattern::Fabric m_fabric;
+
+    std::unordered_map<int64_t, Clipper2Lib::Paths64>& m_ifpCache;
+    std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& m_nfpCache;
 
     int64_t m_step_size;
 
@@ -21,9 +25,9 @@ private:
 
     BLStateView makeCurrStateView() const;
 
-    bool findPosition(NestedItem& item);
+    bool findPosition(NestedItem& item, std::vector<NestedItem>& items);
 public:
-    BottomLeft(pattern::Fabric fabric, int64_t step_size = 1000);
+    BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache);
 
     bool performNesting(std::vector<NestedItem>& items);
 };

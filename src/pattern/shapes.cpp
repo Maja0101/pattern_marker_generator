@@ -80,8 +80,8 @@ bool PieceVariant::checkConvexity()
     return true;
 }
 
-PieceVariant::PieceVariant(int id, int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
-    : Shape(initalBoundary), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {
+PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
+    : Shape(initalBoundary), m_globalId(globalId), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {
     m_isConvex = checkConvexity();
 
     if (m_isConvex) {

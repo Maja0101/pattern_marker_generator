@@ -60,7 +60,7 @@ TEST_CASE("Checking whether a piece fits inside the fabric", "[BottomLeft][rect]
         {   0, 9000}
     };
 
-    pmg::pattern::PieceVariant variant(1, 0, false, 1, variantPts);
+    pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, variantPts);
 
     pmg::nesting::NestedItem item(&variant);
 
@@ -114,7 +114,7 @@ TEST_CASE("Checking collisions between pieces", "[BottomLeft][rect][collision]")
         {2500, 2500}
     };
 
-    pmg::pattern::PieceVariant variant(1, 0, false, 1, variantPts);
+    pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, variantPts);
 
     pmg::nesting::NestedItem item(&variant);
 
@@ -164,7 +164,7 @@ TEST_CASE("Checking if piece can be placed in position", "[BottomLeft][collision
         {2500, 2500}
     };
 
-    pmg::pattern::PieceVariant variant(1, 0, false, 1, variantPts);
+    pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, variantPts);
 
     pmg::nesting::NestedItem item(&variant);
 

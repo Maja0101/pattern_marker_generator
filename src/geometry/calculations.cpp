@@ -1,3 +1,5 @@
+#include <unordered_map>
+
 #include <spdlog/spdlog.h>
 
 #include "nesting/bottom_left.hpp"
@@ -6,6 +8,11 @@
 #include "geometry/calculations.hpp"
 
 namespace pmg::geometry::calculations {
+Clipper2Lib::Point64 toClipperPoint(const Point64 &point)
+{
+    return Clipper2Lib::Point64{ point.x, point.y };
+}
+
 Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
 {
     Clipper2Lib::Path64 path;
@@ -160,6 +167,26 @@ std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::Pattern
     return items;
 }
 
+std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::PatternPiece> &patternPieces)
+{
+    std::unordered_map<int64_t, pattern::PieceVariant> variantMap;
+
+    for (const auto& piece : patternPieces) {
+        for (const auto& variant : piece.getVariants()) {
+            variantMap.emplace(variant.getGlobalId(), variant);
+        }
+    }
+
+    std::vector<pattern::PieceVariant> allVariants;
+    allVariants.reserve(variantMap.size());
+
+    for (auto& [id, variant] : variantMap) {
+        allVariants.push_back(variant);
+    }
+
+    return allVariants;
+}
+
 bool evaluate(const std::vector<nesting::NestedItem> &items)
 {
     // TODO evaluation function for layout 
@@ -193,6 +220,18 @@ Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64 &path)
         inverted.push_back(Clipper2Lib::Point64(-point.x, -point.y));
     }
     return inverted;
+}
+
+Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64 &paths, const Clipper2Lib::Point64 &point)
+{
+    Clipper2Lib::Paths64 result = paths;
+    for (auto& path : result) {
+        for (auto& p : path) {
+            p.x += point.x;
+            p.y += point.y;
+        }
+    }
+    return result;
 }
 
 } // namespace pmg::geometry::calculations
