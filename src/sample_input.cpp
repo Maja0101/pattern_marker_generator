@@ -79,7 +79,7 @@ namespace pmg::samples {
             };
 
             std::vector<pattern::VariantConstraint> smallSquareConstraints = {
-                { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 50 }
+                { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 100 }
             };
 
             // L shape
@@ -106,8 +106,8 @@ namespace pmg::samples {
 
             std::vector<pattern::VariantConstraint> otherConstraints;
             for (auto& c : defaultConstraints) {
-                pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 2 };
-                pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 180, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 2 };
+                pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 3 };
+                pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 180, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 3 };
                 otherConstraints.push_back(constraint1);
                 otherConstraints.push_back(constraint2);
             }
@@ -115,11 +115,11 @@ namespace pmg::samples {
             // Add them to vector of pattern pieces
             std::vector<pattern::PatternPiece> patternPieces;
             patternPieces.reserve(8);
-            // patternPieces.emplace_back(1, trapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(1, trapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
             patternPieces.emplace_back(2, squarePts, defaultConstraints, seamAllowance, cuttingAllowance);
-            // patternPieces.emplace_back(3, rectPts, defaultConstraints, seamAllowance, cuttingAllowance);
-            // patternPieces.emplace_back(4, octagonPts, defaultConstraints, seamAllowance, cuttingAllowance);
-            // patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(3, rectPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(4, octagonPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
             patternPieces.emplace_back(6, smallSquarePts, smallSquareConstraints, seamAllowance, cuttingAllowance);
             patternPieces.emplace_back(7, lShapePts, otherConstraints, seamAllowance, cuttingAllowance);
             patternPieces.emplace_back(8, cShapePts, otherConstraints, seamAllowance, cuttingAllowance);

@@ -22,7 +22,7 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
     const size_t size = polygon.size();
     std::vector<Point64> transformed(size);
 
-    // set minX, minY values (
+    // set minX, minY values 
     // in order to anchor the transformed points back 
     // to 0,0 at bottom left
     int64_t minX = std::numeric_limits<int64_t>::max();

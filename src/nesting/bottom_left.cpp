@@ -75,6 +75,8 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
                 }
 
                 Clipper2Lib::Paths64 translatedNFP = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(placedPiece.getPosition()));
+
+                // Create small space between NFP and IFP for cases of 1D degenerated lines being valid positions
                 originalNFPs.push_back(translatedNFP);
                 translatedNFP = Clipper2Lib::InflatePaths(
                     translatedNFP,
@@ -149,6 +151,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     // Lock item into place
     Clipper2Lib::Point64 bestPosition = candidatePoints.front();
 
+    // snap to boundaries so the inflated NFP won't affect coordinates values
     bestPosition = geometry::calculations::snapToBoundaries(bestPosition, ifpIt->second, originalNFPs);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {

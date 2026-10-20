@@ -180,5 +180,3 @@ TEST_CASE("Checking if piece can be placed in position", "[BottomLeft][collision
         REQUIRE_FALSE(pmg::geometry::calculations::canPlaceAt(view, item, 7500, 2500));
     }
 }
-
-// TODO tests for nested items preparation

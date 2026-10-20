@@ -37,7 +37,7 @@ public:
 
 class PieceVariant : public Shape {
 private:
-    // TODO piece variant will need update - two-way pattern pieces
+    // TODO two-way pattern pieces
     int64_t m_globalId;
     int m_id;
     int m_rotationAngle;

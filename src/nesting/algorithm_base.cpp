@@ -11,7 +11,7 @@ namespace pmg::nesting {
 
 bool AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
 {
-    // TODO should return the layout and the statistics data
+    // TODO layout and the statistics data
 
     BottomLeft bottomLeft(m_fabric, m_ifpCache, m_nfpCache);
 
@@ -23,7 +23,7 @@ AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
 
 bool AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPieces)
 {
-    // TODO should return the layout and the statistics data
+    // TODO layout and the statistics data
 
     {
         SPDLOG_INFO("Preparing the geometry...");

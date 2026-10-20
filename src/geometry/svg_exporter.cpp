@@ -46,7 +46,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
 
     size_t idCounter = 0;
     for (const auto& item : items) {
-        // if (item.isLocked()) {
+        if (item.isLocked()) {
             const auto* variant = item.getVariant();
             if (!variant) continue;
 
@@ -72,7 +72,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
             out << "  <polygon points=\"" << points << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" "
                 << "stroke=\"" << borderColor << "\" stroke-width=\"" << (borderWidth * 2.0) << "\" "
                 << "clip-path=\"url(#" << clipId << ")\" />\n";
-        // }
+        }
     }
 
     out << "</svg>\n";
