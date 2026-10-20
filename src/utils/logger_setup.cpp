@@ -1,7 +1,7 @@
-#include "logger_setup.hpp"
-
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+
+#include "utils/logger_setup.hpp"
 
 namespace pmg::logging {
 

@@ -2,9 +2,10 @@
 
 #include <chrono>
 #include <source_location>
+
 #include <spdlog/spdlog.h>
 
-namespace pmg {
+namespace pmg::timing {
 
 struct Timer
 {
@@ -19,4 +20,4 @@ struct Timer
         std::shared_ptr<spdlog::logger> m_logger;
 };
     
-} // namespace pmg
+} // namespace pmg::timing

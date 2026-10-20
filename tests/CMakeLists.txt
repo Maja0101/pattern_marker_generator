@@ -15,12 +15,28 @@ file(GLOB TEST_FILES CONFIGURE_DEPENDS "test_*.cpp")
 if(TEST_FILES)
   # Create test executable
   add_executable(unit_tests
-    ${TEST_FILES}
     ${CATCH2_SOURCE_DIR}/catch2/catch_amalgamated.cpp
+    test_main.cpp 
+    test_example.cpp
+    test_nested_item.cpp
+    test_calculations.cpp
+    test_bottom_left.cpp
+    test_transformations.cpp
+    test_decomposition.cpp
+    test_nfp_ifp.cpp
   )
 
   # Specify include directories to use when compiling 
   target_include_directories(unit_tests PRIVATE ${CATCH2_SOURCE_DIR})
+  
+  # Link libraries needed for testing
+  target_link_libraries(unit_tests PRIVATE 
+    nesting 
+    pattern
+    geometry
+    Clipper2
+  )
+  
   # Add a test to the project
   add_test(NAME unit_tests COMMAND unit_tests)
 endif()
