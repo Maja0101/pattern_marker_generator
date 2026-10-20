@@ -158,6 +158,56 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     checkNestedItem(items[i], {0, 0, true});
                 }
             }
+
+            SECTION("Hole filling") {
+                std::vector<pmg::geometry::Point64> invVShape = {
+                    {    0,    0},  
+                    { 4000,    0},  
+                    { 4000, 6000},
+                    {    0, 6000},
+                    {    0, 4000},
+                    { 2000, 4000},
+                    { 2000, 2000},
+                    {    0, 2000}
+                };
+                std::vector<pmg::geometry::Point64> rectShape = {
+                    {   0,    0},  
+                    {2000,    0},  
+                    {2000, 1000}, 
+                    {   0, 1000}  
+                };
+
+                pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, invVShape);
+                pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, rectShape);
+
+                std::vector<pmg::nesting::NestedItem> items = { 
+                    pmg::nesting::NestedItem(&variant1), 
+                    pmg::nesting::NestedItem(&variant2)
+                };
+
+                std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache = pmg::geometry::calculations::calculateIFPCache(fabric, { variant1, variant2 });;
+                std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> nfpCache = pmg::geometry::calculations::calculateNFPCache({ variant1, variant2 });;
+                pmg::nesting::BottomLeft bottomLeft(fabric, ifpCache, nfpCache);
+
+                REQUIRE(items.size() == 2);
+                for (size_t i = 0; i < items.size(); ++i) {
+                    CAPTURE(i);
+                    checkNestedItem(items[i], {0, 0, false});
+                }
+
+                REQUIRE(bottomLeft.performNesting(items));
+                
+                const std::vector<ExpectedItem> expected = {
+                    {0, 0, true},
+                    {0, 2000, true}
+                };
+                
+                REQUIRE(items.size() == 2);
+                for (size_t i = 0; i < items.size(); ++i) {
+                    CAPTURE(i);
+                    checkNestedItem(items[i], expected[i]);
+                }
+            }
         }
 
         SECTION("Impossible to find placement") {
