@@ -23,6 +23,7 @@ if(TEST_FILES)
     test_bottom_left.cpp
     test_transformations.cpp
     test_decomposition.cpp
+    test_nfp_ifp.cpp
   )
 
   # Specify include directories to use when compiling 
