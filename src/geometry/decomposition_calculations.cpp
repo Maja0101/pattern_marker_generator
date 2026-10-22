@@ -42,15 +42,9 @@ struct HalfEdge {
     bool active = true;
 };
 
-int crossProductSign(const Point64 &a, const Point64 &b, const Point64 &c)
-{
-    int64_t crossProduct = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
-    return (crossProduct > 0) ? 1 : ((crossProduct < 0) ? -1 : 0);
-}
-
 bool isConvex(const Point64 &a, const Point64 &b, const Point64 &c)
 {
-    return crossProductSign(a, b, c) >= 0;
+    return crossProduct(a, b, c) >= 0;
 }
 } // namespace pmg::geometry::calculations::utils
 
@@ -116,7 +110,7 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
         int idx2 = static_cast<int>(indexes[t * 3 + 2]);
 
         // Make sure the vertixes are counterclockwise
-        if (utils::crossProductSign(polygon[idx0], polygon[idx1], polygon[idx2]) < 0) {
+        if (utils::crossProduct(polygon[idx0], polygon[idx1], polygon[idx2]) < 0) {
             std::swap(idx1, idx2);
         }
 

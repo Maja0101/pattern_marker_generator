@@ -89,6 +89,22 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
 
     // Detailed calculation for irregular fabric
 
+    // calculate fabric hull
+    // calculate item hull
+
+    // calculate base ifp
+
+    // extract pockets
+
+    // combine all forbidden regions
+
+    // get the final ifp by subtraction
+
+    // simply paths and return
+
+
+
+
     // IFP can be calculated as subtracting the complement of the fabric and the Minkowski sum with the inverted shape from the fabric
 
     // Construction of the finite complement of the fabric

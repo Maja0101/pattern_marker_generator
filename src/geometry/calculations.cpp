@@ -78,6 +78,11 @@ bool isWithinFabric(const nesting::BLStateView &view, const nesting::NestedItem 
     return overflow.empty();
 }
 
+int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
+{
+    return (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+}
+
 } // namespace pmg::geometry::calculations::utils
 
 namespace pmg::geometry::calculations {

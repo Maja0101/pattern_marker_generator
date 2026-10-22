@@ -16,6 +16,8 @@ bool aabbCollision(const Clipper2Lib::Rect64& a, const Clipper2Lib::Rect64& b);
 bool isCollision(const nesting::BLStateView& view, const nesting::NestedItem& item, int64_t x, int64_t y);
 bool isWithinFabric(const nesting::BLStateView& view, const nesting::NestedItem& item, int64_t x, int64_t y);
 
+int64_t crossProduct(const Point64& a, const Point64& b, const Point64& c);
+
 } // namespace pmg::geometry::calculations::utils
 
 namespace pmg::geometry::calculations {

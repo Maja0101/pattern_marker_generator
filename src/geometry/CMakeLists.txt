@@ -4,6 +4,7 @@ add_library(geometry
     calculations.cpp
     nfp_ifp_calculations.cpp
     decomposition_calculations.cpp
+    ifp_pocket_calculations.cpp
 )
 
 target_include_directories(geometry PUBLIC
