@@ -8,6 +8,7 @@
 
 namespace pmg::geometry::calculations::utils {
 
+std::vector<Point64> calculateConvexIFP(const std::vector<Point64>& fabricHull, const std::vector<Point64>& variantHull);
 std::vector<Point64> calculateConvexHull(const std::vector<Point64>& polygon);
 
 } // namespace pmg::geometry::calculations::utils

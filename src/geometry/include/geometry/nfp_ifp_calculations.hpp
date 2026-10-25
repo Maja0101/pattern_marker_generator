@@ -11,8 +11,8 @@
 
 namespace pmg::geometry::calculations::utils {
 
-Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric& fabric, const pattern::PieceVariant& variant, int64_t margin = 10000000);
 Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant& variantA, const pattern::PieceVariant& variantB);
+Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric& fabric, const pattern::PieceVariant& variant, int64_t margin = 10000000);
 
 } // namespace pmg::geometry::calculations::utils
 

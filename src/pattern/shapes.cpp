@@ -13,18 +13,15 @@ namespace pmg::pattern {
 
 Shape::Shape(std::vector<geometry::Point64> initalBoundary)
     : m_boundary(std::move(initalBoundary)) {
-        m_shape_path = toClipperPath();
+        m_shape_path = geometry::calculations::toClipperPath(m_boundary);
         m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
     }
 
-Clipper2Lib::Path64 Shape::toClipperPath() const
+Shape::Shape(Clipper2Lib::Path64 initalPath)
+    : m_shape_path(std::move(initalPath))
 {
-    Clipper2Lib::Path64 path;
-    path.reserve(m_boundary.size());
-    for (const auto& point : m_boundary) {
-        path.push_back({point.x, point.y});
-    }
-    return path;
+    m_boundary = geometry::calculations::fromClipperPath(m_shape_path);
+    m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
 }
 
 const Clipper2Lib::Path64 Shape::getPathAt(int64_t x, int64_t y) const
@@ -64,8 +61,8 @@ std::string Shape::toString() const
     return std::format("boundary: ({})", boundaryStr);
 }
 
-PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
-    : Shape(initalBoundary), m_globalId(globalId), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity) {
+void PieceVariant::initializeVariantGeometry()
+{
     m_isConvex = geometry::calculations::checkConvexity(m_boundary);
 
     if (m_isConvex) {
@@ -80,6 +77,18 @@ PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isM
             m_decomposedShape.push_back(geometry::calculations::toClipperPath(subShape));
         }
     }
+}
+
+PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isMirrored, int requiredQuantity, std::vector<geometry::Point64> initalBoundary)
+    : Shape(initalBoundary), m_globalId(globalId), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity)
+{
+    initializeVariantGeometry();
+}
+
+PieceVariant::PieceVariant(Clipper2Lib::Path64 initalPath)
+    : Shape(initalPath)
+{
+    initializeVariantGeometry();
 }
 
 std::string PieceVariant::toString() const

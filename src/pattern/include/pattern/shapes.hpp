@@ -10,14 +10,13 @@
 namespace pmg::pattern {
 
 class Shape {
-private:
-    Clipper2Lib::Path64 toClipperPath() const;
 protected:
     std::vector<geometry::Point64> m_boundary;
     Clipper2Lib::Path64 m_shape_path;
     Clipper2Lib::Rect64 m_shape_bounding_box;
 public:
     Shape(std::vector<geometry::Point64> initalBoundary = {});
+    Shape(Clipper2Lib::Path64 initalPath = {});
     virtual ~Shape() = default;
     
     const std::vector<geometry::Point64>& getBoundary() const { return m_boundary; }
@@ -45,8 +44,11 @@ private:
     int m_requiredQuantity;
     bool m_isConvex;
     std::vector<Clipper2Lib::Path64> m_decomposedShape;
+
+    void initializeVariantGeometry();
 public:
     PieceVariant(int64_t globalId, int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, std::vector<geometry::Point64> initalBoundary = {});
+    PieceVariant(Clipper2Lib::Path64 initalPath = {});
 
     const std::vector<Clipper2Lib::Path64>& getDecomposedShape() const { return m_decomposedShape; }
 
