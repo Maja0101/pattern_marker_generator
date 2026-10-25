@@ -38,7 +38,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         REQUIRE(result == expected);
     }
 
-    SECTION("Piece do not fit inside fabric") {
+    SECTION("Piece does not fit inside fabric") {
         std::vector<pmg::geometry::Point64> fabricPts = {
             {   0,    0},  
             {6000,    0},  
@@ -62,7 +62,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         REQUIRE(result == expected);
     }
 
-    SECTION("Irregular fabric shape") {
+    SECTION("Irregular convex fabric shape") {
         std::vector<pmg::geometry::Point64> fabricPts = {
             {   0,     0},  
             {9000,     0},  
@@ -82,11 +82,125 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, 10000);
 
         Clipper2Lib::Paths64 expected = {{
-            {6000,    0},  
+            {6000,    0},
             {4000, 4000},  
             {   0, 4000}, 
             {   0,    0} 
         }};
+
+        REQUIRE(result == expected);
+    }
+
+    SECTION("Irregular convex fabric shape and piece") {
+        std::vector<pmg::geometry::Point64> fabricPts = {
+            {3000,     0},  
+            {6000,     0},  
+            {6000,  6000}, 
+            {   0,  6000},
+            {   0,  3000}
+        };
+        pmg::pattern::Fabric fabric(fabricPts);
+
+        std::vector<pmg::geometry::Point64> polygon = {
+            {2000,     0},  
+            {4000,     0},  
+            {4000,  4000}, 
+            {   0,  4000},
+            {   0,  2000}
+        };
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, polygon);
+
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+
+        Clipper2Lib::Paths64 expected = {{
+            {1000,    0}, 
+            {2000,    0}, 
+            {2000, 2000},  
+            {   0, 2000},  
+            {   0, 1000}
+        }};
+
+        REQUIRE(result == expected);
+    }
+
+    SECTION("Irregular concave fabric shape (one pocket) and piece") {
+        std::vector<pmg::geometry::Point64> fabricPts = {
+            {3000,     0},  
+            {6000,     0},  
+            {6000,  6000}, 
+            {   0,  6000},
+            {   0,  3000},
+            {3000,  3000}
+        };
+        pmg::pattern::Fabric fabric(fabricPts);
+
+        std::vector<pmg::geometry::Point64> polygon = {
+            {2000,     0},  
+            {4000,     0},  
+            {4000,  4000}, 
+            {   0,  4000},
+            {   0,  2000},
+            {2000,  2000}
+        };
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, polygon);
+
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+
+        Clipper2Lib::Paths64 expected = {{
+            {2000, 2000}, 
+            {1000, 2000},  
+            {1000, 1000},  
+            {2000, 1000}
+        }};
+
+        REQUIRE(result == expected);
+    }
+
+    SECTION("Irregular concave fabric shape (multiple pockets) and piece") {
+        std::vector<pmg::geometry::Point64> fabricPts = {
+            {3000,     0},  
+            {6000,     0},  
+            {6000,  5000}, 
+            {7000,  5000}, 
+            {7000,  6000}, 
+            {5000,  6000}, 
+            {5000,  5000}, 
+            {3000,  5000}, 
+            {3000,  6000}, 
+            {   0,  6000},
+            {   0,  3000},
+            {3000,  3000}
+        };
+        pmg::pattern::Fabric fabric(fabricPts);
+
+        std::vector<pmg::geometry::Point64> polygon = {
+            {1000,     0},  
+            {2000,     0},  
+            {2000,  2000}, 
+            {   0,  2000},
+            {   0,  1000},
+            {1000,  1000}
+        };
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, polygon);
+
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+
+        Clipper2Lib::Paths64 expected = {
+            {
+                {1000, 3000}, 
+                {1000, 4000},  
+                {   0, 4000},  
+                {   0, 3000}
+            },
+            {
+                {2000, 2000}, 
+                {3000, 2000},  
+                {3000,    0},  
+                {4000,    0},  
+                {4000, 3000},
+                {2000, 3000}
+            },
+        };
 
         REQUIRE(result == expected);
     }
