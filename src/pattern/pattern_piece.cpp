@@ -11,15 +11,15 @@ PatternPiece::PatternPiece(int64_t pieceId,
         std::vector<geometry::Point64> originalPoints, 
         const std::vector<VariantConstraint>& constraints,
         int64_t seamAllowance, int64_t cuttingAllowance)
-    : m_id(pieceId), m_originalPolygon(std::move(originalPoints)) 
+    : m_id(pieceId), m_originalPolygon(std::move(originalPoints)) , m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance)
 {
     m_allowedVariants.reserve(constraints.size());
 
     std::vector<geometry::Point64> offsetPath = 
         geometry::calculations::calculatePolygonWithAllowance(
             m_originalPolygon, 
-            seamAllowance, 
-            cuttingAllowance
+            m_seamAllowance, 
+            m_cuttingAllowance
     );
 
     int variantId = 0;
@@ -33,7 +33,7 @@ PatternPiece::PatternPiece(int64_t pieceId,
             transformedBoundary = geometry::calculations::transformPolygon(offsetPath, req.rotationAngle, req.isMirrored);
 
             int64_t globalId = (m_id << 32) | (static_cast<int64_t>(variantId) & 0xFFFFFFFFLL);
-            PieceVariant variant(globalId, variantId, req.rotationAngle, req.isMirrored, req.requiredQuantity, transformedBoundary);
+            PieceVariant variant(globalId, variantId, req.rotationAngle, req.isMirrored, req.requiredQuantity, m_seamAllowance, m_cuttingAllowance, transformedBoundary);
 
             m_allowedVariants.push_back(std::move(variant));
         }

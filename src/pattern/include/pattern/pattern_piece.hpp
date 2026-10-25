@@ -16,6 +16,7 @@ private:
     int64_t m_id;
     std::vector<geometry::Point64> m_originalPolygon;
     std::vector<PieceVariant> m_allowedVariants;
+    int64_t m_seamAllowance, m_cuttingAllowance;
 public:
     PatternPiece(int64_t pieceId, 
                 std::vector<geometry::Point64> originalPoints, 

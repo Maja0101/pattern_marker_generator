@@ -9,19 +9,19 @@ namespace pmg::nesting {
 
 NestingResult BasicAlgorithm::runAlgorithm()
 {
-    std::vector<NestedItem> sorted_items = m_originalItems;
+    std::vector<NestedItem> sortedItems = m_originalItems;
 
 
-    std::sort(sorted_items.begin(), sorted_items.end(), [](const NestedItem&a, const NestedItem& b) {
-        auto a_bounds = a.getItemBoundingBoxAtPosition();
-        auto b_bounds = b.getItemBoundingBoxAtPosition();
-        return (a_bounds.bottom - a_bounds.top) > (b_bounds.bottom - b_bounds.top);
+    std::sort(sortedItems.begin(), sortedItems.end(), [](const NestedItem&a, const NestedItem& b) {
+        auto aBounds = a.getItemBoundingBoxAtPosition();
+        auto bBounds = b.getItemBoundingBoxAtPosition();
+        return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);
     });
 
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Items in queue");
-        for (const auto& item : sorted_items) {
+        for (const auto& item : sortedItems) {
             SPDLOG_INFO(item.toString());
         }
         SPDLOG_INFO("End of queue");
@@ -32,12 +32,12 @@ NestingResult BasicAlgorithm::runAlgorithm()
     {
         SPDLOG_INFO("Running single Bottom Left Fill...");
         timing::Timer timer;
-        result = runSingleBottomLeft(sorted_items);
+        result = runSingleBottomLeft(sortedItems);
     }
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Items after single BL");
-        for (const auto& item : sorted_items) {
+        for (const auto& item : sortedItems) {
             SPDLOG_INFO(item.toString());
         }
         SPDLOG_INFO("End of items");
@@ -53,7 +53,9 @@ NestingResult BasicAlgorithm::runAlgorithm()
     bool exportResult = pmg::geometry::SvgExporter::exportLayout(
         "debug_output.svg", 
         m_fabric,
-        sorted_items
+        sortedItems,
+        sortedItems[0].getVariant()->getSeamAllowance(),
+        sortedItems[0].getVariant()->getCuttingAllowance()
     );
 
     return result;
