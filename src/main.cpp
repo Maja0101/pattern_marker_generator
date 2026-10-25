@@ -11,7 +11,6 @@
 
 #include "utils/logger_setup.hpp"
 #include "utils/timer.hpp"
-#include "geometry/svg_exporter.hpp"
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
@@ -40,19 +39,19 @@ int main()
         pmg::samples::getSimpleSamplePieces(defaultConstraints, sa, ca);
 
     std::vector<geometry::Point64> fabricPts = {
-        {       0,        0},  
-        {35000000,        0},  
-        {35000000, 15000000}, 
-        {       0, 15000000}  
+        {      0,       0},  
+        {4500000,       0},  
+        {4500000, 1500000}, 
+        {      0, 1500000}  
     };
 
     const std::vector<pmg::geometry::Point64> lShapePts = {
-        {       0,        0},
-        {40000000,        0},
-        {40000000, 10000000},
-        {10000000, 10000000},
-        {10000000, 15000000},
-        {       0, 15000000}
+        {      0,       0},
+        {4000000,       0},
+        {4000000, 1000000},
+        {1000000, 1000000},
+        {1000000, 1500000},
+        {      0, 1500000}
     };
 
     pattern::Fabric fabric(fabricPts);
