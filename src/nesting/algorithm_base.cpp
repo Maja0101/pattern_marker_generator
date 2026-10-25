@@ -9,7 +9,7 @@
 
 namespace pmg::nesting {
 
-bool AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
+NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
 {
     // TODO layout and the statistics data
 
@@ -21,7 +21,7 @@ bool AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
 AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
     : m_fabric(std::move(fabric)) {}
 
-bool AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPieces)
+NestingResult AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPieces)
 {
     // TODO layout and the statistics data
 
@@ -43,14 +43,15 @@ bool AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPie
         }
     }
 
+    NestingResult result;
     {
         SPDLOG_INFO("Nesting...");
         timing::Timer timer;
-        runAlgorithm();
+        result = runAlgorithm();
     }
 
 
-    return false;
+    return result;
 }
 
 } // namespace pmg::nesting

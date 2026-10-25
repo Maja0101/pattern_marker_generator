@@ -173,15 +173,16 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 BottomLeft::BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache)
     : m_fabric(std::move(fabric)), m_ifpCache(ifpCache), m_nfpCache(nfpCache) {}
 
-bool BottomLeft::performNesting(std::vector<NestedItem> &items)
+NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Starting nesting");
     }
 
-    int i = 0;
-    for (auto& item : items) {
-        ++i;
+    NestingResult result;
+
+    for (size_t i = 0; i < items.size(); ++i) {
+        NestedItem& item = items[i];
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Nesting item no. {}", i));
         }
@@ -194,11 +195,21 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Could not find position");
             }
-            return false;
+            return { .wasSuccessful = false };
         }
+
+        result.positions.push_back({ 
+            .id = item.getVariant()->getId(), 
+            .rotationAngle = item.getVariant()->getRotationAngle(),
+            .isMirrored = item.getVariant()->getIsMirrored(),
+            .x = item.getPosition().x,
+            .y = item.getPosition().y
+        });
     }
 
-    return true;
+    result.wasSuccessful = true;
+
+    return result;
 }
 
 } // namespace pmg::nesting

@@ -8,7 +8,7 @@ namespace pmg::nesting {
 
 class BasicAlgorithm : public AlgorithmBase {
 protected:
-    bool runAlgorithm() override;
+    NestingResult runAlgorithm() override;
 public:
     using AlgorithmBase::AlgorithmBase;
 };

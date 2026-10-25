@@ -34,7 +34,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
 
             std::vector<pmg::nesting::NestedItem> items;
 
-            REQUIRE(bottomLeft.performNesting(items));
+            REQUIRE(bottomLeft.performNesting(items).wasSuccessful);
             REQUIRE(items.empty());
         }
 
@@ -59,7 +59,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
             REQUIRE(items.size() == 1);
             checkNestedItem(items[0], {0, 0, false});
 
-            REQUIRE(bottomLeft.performNesting(items));
+            REQUIRE(bottomLeft.performNesting(items).wasSuccessful);
             REQUIRE(items.size() == 1);
             checkNestedItem(items[0], {0, 0, true});
         }
@@ -105,7 +105,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     checkNestedItem(items[i], {0, 0, false});
                 }
 
-                REQUIRE(bottomLeft.performNesting(items));
+                REQUIRE(bottomLeft.performNesting(items).wasSuccessful);
                 
                 const std::vector<ExpectedItem> expected = {
                     {0, 0, true},
@@ -150,7 +150,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     checkNestedItem(items[i], {0, 0, false});
                 }
 
-                REQUIRE(bottomLeft.performNesting(items));
+                REQUIRE(bottomLeft.performNesting(items).wasSuccessful);
                 
                 REQUIRE(items.size() == 2);
                 for (size_t i = 0; i < items.size(); ++i) {
@@ -195,7 +195,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     checkNestedItem(items[i], {0, 0, false});
                 }
 
-                REQUIRE(bottomLeft.performNesting(items));
+                REQUIRE(bottomLeft.performNesting(items).wasSuccessful);
                 
                 const std::vector<ExpectedItem> expected = {
                     {0, 0, true},
@@ -244,7 +244,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
             }
 
             REQUIRE(items.size() == 4);
-            REQUIRE_FALSE(bottomLeft.performNesting(items));
+            REQUIRE_FALSE(bottomLeft.performNesting(items).wasSuccessful);
 
             const std::vector<ExpectedItem> expected = {
                 {0, 0, true},

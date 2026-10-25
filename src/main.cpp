@@ -17,6 +17,7 @@
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
 #include "nesting/basic_algorithm.hpp"
+#include "nesting/nesting_result.hpp"
 #include "sample_input.hpp"
 
 using namespace pmg;
@@ -54,13 +55,13 @@ int main()
         {       0, 15000000}
     };
 
-    pattern::Fabric fabric(lShapePts);
+    pattern::Fabric fabric(fabricPts);
 
     nesting::BasicAlgorithm alg(fabric);
 
-    std::vector<pattern::PatternPiece> emptyPieces;
+    nesting::NestingResult result =  alg.execute(samplePieces);
 
-    alg.execute(samplePieces);
+    SPDLOG_INFO(result.wasSuccessful);
 
     return 0;
 }

@@ -7,7 +7,7 @@
 
 namespace pmg::nesting {
 
-bool BasicAlgorithm::runAlgorithm()
+NestingResult BasicAlgorithm::runAlgorithm()
 {
     std::vector<NestedItem> sorted_items = m_originalItems;
 
@@ -27,7 +27,7 @@ bool BasicAlgorithm::runAlgorithm()
         SPDLOG_INFO("End of queue");
     }
 
-    bool result;
+    NestingResult result;
 
     {
         SPDLOG_INFO("Running single Bottom Left Fill...");
