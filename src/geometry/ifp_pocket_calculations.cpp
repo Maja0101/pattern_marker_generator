@@ -1,5 +1,7 @@
 #include <spdlog/spdlog.h>
 
+#include <deque>
+
 #include "geometry/ifp_pocket_calculations.hpp"
 #include "geometry/calculations.hpp"
 #include "utils/config.hpp"
@@ -28,7 +30,7 @@ Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
     __int128_t x = static_cast<__int128_t>(h1.b) * h2.c - static_cast<__int128_t>(h2.b) * h1.c;
     __int128_t y = static_cast<__int128_t>(h2.a) * h1.c - static_cast<__int128_t>(h1.a) * h2.c;
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         SPDLOG_INFO(std::format("det {} x {} y {} intersection {} {}", det, x, y, divToNearest(x, det), divToNearest(y, det)));
     }
 
@@ -56,18 +58,18 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
 
         Point64 point = variantHull[0];
 
-        if constexpr (config::DEBUG_MODE_DETAILED) {
+        if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO(std::format("i {} A {} {} B {} {} d {} {} n {} {} c {} point {} {}", i, A.x, A.y, B.x, B.y, dx, dy, nx, ny, c, point.x, point.y));
         }
 
         int64_t minProjection = dot(nx, ny, point);
-        if constexpr (config::DEBUG_MODE_DETAILED) {
+        if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO(std::format("proj {} ", minProjection));
         }
         for (size_t j = 1; j < variantHull.size(); ++j) {
             point = variantHull[j];
             int64_t proj = dot(nx, ny, point);
-            if constexpr (config::DEBUG_MODE_DETAILED) {
+            if constexpr (config::DEBUG_MODE) {
                 SPDLOG_INFO(std::format("j {} point {} {} proj {}", j, point.x, point.y, proj));
             }
             if (proj < minProjection) {
@@ -78,19 +80,58 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         int64_t cShifted = c + minProjection;
         halfPlanes.push_back({nx, ny, cShifted});
 
-        if constexpr (config::DEBUG_MODE_DETAILED) {
+        if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO(std::format("half plane {} {} {}", nx, ny, cShifted));
         }
     }
 
-    std::vector<Point64> ifpVertices;
+    std::deque<HalfPlane> activePlanes;
     for (size_t i = 0; i < n; ++i) {
-        const auto& h1 = halfPlanes[i];
-        const auto& h2 = halfPlanes[(i + 1) % n];
-        if constexpr (config::DEBUG_MODE_DETAILED) {
+        const auto& currPlane = halfPlanes[i];
+
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO(std::format("i {} curr plane {} {} {}", i, currPlane.a, currPlane.b, currPlane.c));
+        }
+
+        while(activePlanes.size() >= 2) {
+            Point64 prevIntersection = intersect(activePlanes[activePlanes.size() - 2], activePlanes.back());
+            if constexpr (config::DEBUG_MODE) {
+                SPDLOG_INFO(std::format("prevIntersection {} {}", prevIntersection.x, prevIntersection.y));
+            }
+
+            __int128_t val = static_cast<__int128_t>(currPlane.a) * prevIntersection.x +
+                         static_cast<__int128_t>(currPlane.b) * prevIntersection.y +
+                         static_cast<__int128_t>(currPlane.c);
+
+            if constexpr (config::DEBUG_MODE) {
+                SPDLOG_INFO(std::format("val {}", val));
+            }
+            if (val < 0) {
+                activePlanes.pop_back();
+            } else {
+                break;
+            }
+        }
+        activePlanes.push_back(currPlane);
+    }
+
+    std::vector<Point64> ifpVertices;
+    size_t activeN = activePlanes.size();
+
+    for (size_t i = 0; i < activeN; ++i) {
+        const auto& h1 = activePlanes[i];
+        const auto& h2 = activePlanes[(i + 1) % activeN];
+        Point64 intersection = intersect(h1, h2);
+
+        if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO(std::format("i {} h1 {} {} {} h2 {} {} {}", i, h1.a, h1.b, h1.c, h2.a, h2.b, h2.c));
         }
-        ifpVertices.push_back(intersect(h1, h2));
+
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO(std::format("vertex {} {}", intersection.x, intersection.y));
+        }
+        ifpVertices.push_back(intersection);
+
     }
 
     return ifpVertices;

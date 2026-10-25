@@ -198,7 +198,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     std::vector<Point64> fabricHull = utils::calculateConvexHull(fabric.getBoundary());
     std::vector<Point64> variantHull = utils::calculateConvexHull(variant.getBoundary());
     
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         for (const auto& p : fabricHull) {
             SPDLOG_INFO(std::format("fabricHull: ({}, {})", p.x, p.y));
         }
@@ -214,7 +214,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     
     Clipper2Lib::Paths64 convexIFP = { toClipperPath(calculateConvexIFP(fabricHull, variantHull)) };
     
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         for (const auto& path : convexIFP){
             SPDLOG_INFO("basic convexIFP path");
             for (const auto& p : path) {
@@ -231,7 +231,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         Clipper2Lib::FillRule::NonZero
     );
     
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         for (const auto& path : pockets){
             SPDLOG_INFO("pockets path");
             for (const auto& p : path) {
@@ -248,7 +248,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     
     for (const auto& pocket : pockets) {
         Clipper2Lib::Paths64 pocketNFP = buildNFPfor(pattern::PieceVariant(pocket), variant);
-        if constexpr (config::DEBUG_MODE_DETAILED) {
+        if constexpr (config::DEBUG_MODE) {
             for (const auto& path : pocketNFP){
                 SPDLOG_INFO("pocketNFP path");
                 for (const auto& p : path) {
@@ -268,7 +268,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         Clipper2Lib::FillRule::NonZero
     );
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         for (const auto& path : ifp){
             SPDLOG_INFO("IFP path");
             for (const auto& p : path) {
