@@ -56,11 +56,16 @@ int main()
 
     pattern::Fabric fabric(fabricPts);
 
-    nesting::BasicAlgorithm alg(fabric);
+    nesting::BasicAlgorithm alg(1500000, 4500000);
 
     nesting::NestingResult result =  alg.execute(samplePieces);
 
-    SPDLOG_INFO(result.wasSuccessful);
+    SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
+    SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", (std::ceil(static_cast<double>(result.minLength) / 10000) / 100.0)));
+
+    // for (const auto& ip : result.positions) {
+    //     SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.x, ip.y));
+    // }
 
     return 0;
 }

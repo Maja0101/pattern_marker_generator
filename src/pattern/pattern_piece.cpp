@@ -33,7 +33,7 @@ PatternPiece::PatternPiece(int64_t pieceId,
             transformedBoundary = geometry::calculations::transformPolygon(offsetPath, req.rotationAngle, req.isMirrored);
 
             int64_t globalId = (m_id << 32) | (static_cast<int64_t>(variantId) & 0xFFFFFFFFLL);
-            PieceVariant variant(globalId, variantId, req.rotationAngle, req.isMirrored, req.requiredQuantity, m_seamAllowance, m_cuttingAllowance, transformedBoundary);
+            PieceVariant variant(globalId, m_id, req.rotationAngle, req.isMirrored, req.requiredQuantity, m_seamAllowance, m_cuttingAllowance, transformedBoundary);
 
             m_allowedVariants.push_back(std::move(variant));
         }
