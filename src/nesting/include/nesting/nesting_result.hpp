@@ -15,6 +15,8 @@ struct ItemPlacement {
 struct NestingResult {
     bool wasSuccessful;
 
+    int64_t minLength;
+
     double executionTime;
     double remainingFabric;
     int usableScraps;

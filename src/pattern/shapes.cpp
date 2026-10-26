@@ -17,6 +17,21 @@ Shape::Shape(std::vector<geometry::Point64> initalBoundary)
         m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
     }
 
+Shape::Shape(int64_t width, int64_t length)
+{
+    constexpr int64_t maxValue = 100000000;
+    width = (width < 0) ? 0 : (width % maxValue);
+    length = (length < 0) ? 0 : (length % maxValue);
+    m_boundary = {
+        {0, 0},
+        {length, 0},
+        {length, width},
+        {0, width}
+    };
+    m_shape_path = geometry::calculations::toClipperPath(m_boundary);
+    m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
+}
+
 Shape::Shape(Clipper2Lib::Path64 initalPath)
     : m_shape_path(std::move(initalPath))
 {

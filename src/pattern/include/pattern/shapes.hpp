@@ -16,7 +16,8 @@ protected:
     Clipper2Lib::Rect64 m_shape_bounding_box;
 public:
     Shape(std::vector<geometry::Point64> initalBoundary = {});
-    Shape(Clipper2Lib::Path64 initalPath = {});
+    Shape(int64_t width, int64_t length);
+    Shape(Clipper2Lib::Path64 initalPath);
     virtual ~Shape() = default;
     
     const std::vector<geometry::Point64>& getBoundary() const { return m_boundary; }

@@ -181,6 +181,8 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 
     NestingResult result;
 
+    int64_t minLen = 0;
+
     for (size_t i = 0; i < items.size(); ++i) {
         NestedItem& item = items[i];
         if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -198,6 +200,10 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             return { .wasSuccessful = false };
         }
 
+        if (item.getItemBoundingBoxAtPosition().right > minLen) {
+            minLen = item.getItemBoundingBoxAtPosition().right;
+        }
+
         result.positions.push_back({ 
             .id = item.getVariant()->getId(), 
             .rotationAngle = item.getVariant()->getRotationAngle(),
@@ -208,6 +214,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
     }
 
     result.wasSuccessful = true;
+    result.minLength = minLen;
 
     return result;
 }

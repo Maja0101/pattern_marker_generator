@@ -18,6 +18,11 @@ NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem
     return bottomLeft.performNesting(items);
 }
 
+AlgorithmBase::AlgorithmBase(int64_t width, int64_t length)
+{
+    m_fabric = pattern::Fabric(width, length);
+}
+
 AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
     : m_fabric(std::move(fabric)) {}
 
