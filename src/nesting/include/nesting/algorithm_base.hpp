@@ -24,7 +24,7 @@ protected:
 
     NestingResult runSingleBottomLeft(std::vector<nesting::NestedItem>& items);
 public:
-    AlgorithmBase(int64_t width = 150000, int64_t length = 100000000);
+    AlgorithmBase(int64_t width = 1400000, int64_t length = 100000000);
     AlgorithmBase(pattern::Fabric fabric);
     virtual ~AlgorithmBase() = default;
 

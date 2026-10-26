@@ -56,7 +56,8 @@ int main()
 
     pattern::Fabric fabric(fabricPts);
 
-    nesting::BasicAlgorithm alg(1500000, 4500000);
+    // nesting::BasicAlgorithm alg(1500000, 4500000);
+    nesting::BasicAlgorithm alg;
 
     nesting::NestingResult result =  alg.execute(samplePieces);
 

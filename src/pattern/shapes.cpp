@@ -19,7 +19,7 @@ Shape::Shape(std::vector<geometry::Point64> initalBoundary)
 
 Shape::Shape(int64_t width, int64_t length)
 {
-    constexpr int64_t maxValue = 100000000;
+    constexpr int64_t maxValue = 100000001;
     width = (width < 0) ? 0 : (width % maxValue);
     length = (length < 0) ? 0 : (length % maxValue);
     m_boundary = {
