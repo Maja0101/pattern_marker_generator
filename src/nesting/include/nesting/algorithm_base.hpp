@@ -31,7 +31,7 @@ public:
     const std::unordered_map<int64_t, Clipper2Lib::Paths64>& getIFPCache() const { return m_ifpCache; };
     const std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& getNFPCache() const { return m_nfpCache; };
 
-    NestingResult execute(const std::vector<pattern::PatternPiece>& patternPieces);
+    NestingResult execute(std::vector<pattern::PatternPiece>& patternPieces);
 };
 
 } // namespace pmg::nesting

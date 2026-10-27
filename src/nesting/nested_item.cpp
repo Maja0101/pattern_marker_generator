@@ -6,7 +6,7 @@
 
 namespace pmg::nesting {
 
-NestedItem::NestedItem(const pattern::PieceVariant* variant) noexcept
+NestedItem::NestedItem(pattern::PieceVariant* variant) noexcept
     : m_position(geometry::Point64()), m_variantRef(variant), m_isLocked(false) {}
 
 Clipper2Lib::Path64 NestedItem::getItemPathAtPosition(int64_t x, int64_t y) const
@@ -42,7 +42,9 @@ bool NestedItem::flip180()
 {
     if ((!m_isLocked) && (m_variantRef->getIsTwoWay())) {
         m_isFlipped != m_isFlipped;
+        return true;
     }
+    return false;
 }
 
 std::string NestedItem::toString() const

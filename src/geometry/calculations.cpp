@@ -177,15 +177,15 @@ bool canPlaceAt(const nesting::BLStateView &view, const nesting::NestedItem &ite
     return true;
 }
 
-std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece> &patternPieces)
+std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece> &patternPieces)
 {
     std::vector<nesting::NestedItem> items;
 
-    for (const auto& piece : patternPieces) {
+    for (auto& piece : patternPieces) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(piece.toString());
         }
-        for (const auto& variant : piece.getVariants()) {
+        for (auto& variant : piece.getVariants()) {
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(variant.toString());
             }
@@ -208,7 +208,7 @@ std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::Pattern
     return items;
 }
 
-std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::PatternPiece> &patternPieces)
+std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPiece> &patternPieces)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of pattern pieces: {}", patternPieces.size()));
@@ -216,12 +216,12 @@ std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::Pat
 
     std::unordered_map<int64_t, pattern::PieceVariant> variantMap;
 
-    for (const auto& piece : patternPieces) {
+    for (auto& piece : patternPieces) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Pattern pieces no. {}", piece.getId()));
             SPDLOG_INFO(std::format("Number of variants: {}", piece.getVariants().size()));
         }
-        for (const auto& variant : piece.getVariants()) {
+        for (auto& variant : piece.getVariants()) {
             variantMap.emplace(variant.getGlobalId(), variant);
         }
     }

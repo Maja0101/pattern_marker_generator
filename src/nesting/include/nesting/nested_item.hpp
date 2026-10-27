@@ -8,11 +8,11 @@ namespace pmg::nesting {
 class NestedItem {
 private:
     geometry::Point64 m_position;
-    const pattern::PieceVariant* m_variantRef;
+    pattern::PieceVariant* m_variantRef;
     bool m_isLocked;
     bool m_isFlipped;
 public:
-    NestedItem(const pattern::PieceVariant* variant) noexcept;
+    NestedItem(pattern::PieceVariant* variant) noexcept;
     
     geometry::Point64 getPosition() const noexcept { return m_position; }
     const pattern::PieceVariant* getVariant() const noexcept { return m_variantRef; }

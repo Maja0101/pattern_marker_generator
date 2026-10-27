@@ -24,7 +24,7 @@ AlgorithmBase::AlgorithmBase(int64_t width, int64_t length)
 AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
     : m_fabric(std::move(fabric)) {}
 
-NestingResult AlgorithmBase::execute(const std::vector<pattern::PatternPiece> &patternPieces)
+NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces)
 {
     // TODO layout and the statistics data
 

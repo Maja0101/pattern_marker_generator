@@ -30,8 +30,8 @@ Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64& paths, const Cli
 Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64& ifpPaths, const std::vector<Clipper2Lib::Paths64>& originalNfps, int64_t epsilon = 1);
 
 bool canPlaceAt(const nesting::BLStateView& view, const nesting::NestedItem& item, int64_t x, int64_t y);
-std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece>& patternPieces);
-std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::PatternPiece>& patternPieces);
+std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece>& patternPieces);
+std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPiece>& patternPieces);
 bool evaluate(const std::vector<nesting::NestedItem>& items);
 
 } // namespace pmg::geometry::calculations
