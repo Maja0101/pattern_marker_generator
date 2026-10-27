@@ -95,7 +95,7 @@ void PieceVariant::initializeVariantGeometry()
 }
 
 PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, int64_t seamAllowance, int64_t cuttingAllowance, std::vector<geometry::Point64> initalBoundary)
-    : Shape(initalBoundary), m_globalId(globalId), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity), isTwoWay(twoWayAllowed), m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance)
+    : Shape(initalBoundary), m_globalId(globalId), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed), m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance)
 {
     initializeVariantGeometry();
 }
@@ -108,11 +108,10 @@ PieceVariant::PieceVariant(Clipper2Lib::Path64 initalPath)
 
 bool PieceVariant::flip180()
 {
-    if (isTwoWay) {
+    if (m_isTwoWay) {
         m_boundary = geometry::calculations::rotateBy180(m_boundary);
         m_decomposedShape = geometry::calculations::rotatePathsBy180(m_decomposedShape, m_shape_bounding_box.right, m_shape_bounding_box.bottom);
         m_shape_path = geometry::calculations::toClipperPath(m_boundary);
-        m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
 
         return true;
     }

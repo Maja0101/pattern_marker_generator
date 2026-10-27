@@ -11,13 +11,11 @@ NestingResult BasicAlgorithm::runAlgorithm()
 {
     std::vector<NestedItem> sortedItems = m_originalItems;
 
-
     std::sort(sortedItems.begin(), sortedItems.end(), [](const NestedItem&a, const NestedItem& b) {
         auto aBounds = a.getItemBoundingBoxAtPosition();
         auto bBounds = b.getItemBoundingBoxAtPosition();
         return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);
     });
-
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Items in queue");

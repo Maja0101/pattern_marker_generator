@@ -43,7 +43,7 @@ private:
     int m_rotationAngle;
     bool m_isMirrored;
     int m_requiredQuantity;
-    bool isTwoWay;
+    bool m_isTwoWay;
     int64_t m_seamAllowance;
     int64_t m_cuttingAllowance;
     bool m_isConvex;
@@ -61,6 +61,7 @@ public:
     const int getRotationAngle() const { return m_rotationAngle; }
     const bool getIsMirrored() const { return m_isMirrored; }
     const int getRequiredQuantity() const { return m_requiredQuantity; }
+    const int getIsTwoWay() const { return m_isTwoWay; }
     const int64_t getSeamAllowance() const { return m_seamAllowance; }
     const int64_t getCuttingAllowance() const { return m_cuttingAllowance; }
     const int getIsConvex() const { return m_isConvex; }

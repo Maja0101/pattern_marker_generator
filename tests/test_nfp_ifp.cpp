@@ -24,7 +24,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {   0, 2000}, 
             {2000, 2000}
         };
-        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, 0, 0, polygon);
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
 
@@ -53,7 +53,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {7000, 6000}, 
             {   0, 6000} 
         };
-        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, 0, 0, polygon);
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
 
@@ -77,7 +77,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {2000, 2000}, 
             {   0, 2000} 
         };
-        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, 0, 0, polygon);
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, 10000);
 
@@ -108,7 +108,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {   0,  4000},
             {   0,  2000}
         };
-        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, 0, 0, polygon);
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
 
@@ -142,7 +142,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {   0,  2000},
             {2000,  2000}
         };
-        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, 0, 0, polygon);
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
 
@@ -181,7 +181,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {   0,  1000},
             {1000,  1000}
         };
-        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, 0, 0, polygon);
+        pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
 
@@ -214,7 +214,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
             {4000, 4000}, 
             {   0, 4000} 
         };
-        pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, 0, 0, polygon1);
+        pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, false, 0, 0, polygon1);
 
         std::vector<pmg::geometry::Point64> polygon2 = {
             {   0,    0},  
@@ -222,7 +222,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
             {2000, 2000}, 
             {   0, 2000} 
         };
-        pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, 0, 0, polygon2);
+        pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, false, 0, 0, polygon2);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildNFPfor(variant1, variant2);
 
@@ -245,7 +245,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
             {2000, 4000}, 
             {   0, 4000}
         };
-        pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, 0, 0, polygon1);
+        pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, false, 0, 0, polygon1);
 
         std::vector<pmg::geometry::Point64> polygon2 = {
             {1000,    0},  
@@ -255,7 +255,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
             {   0, 1000}, 
             {1000, 1000}
         };
-        pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, 0, 0, polygon2);
+        pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, false, 0, 0, polygon2);
 
         Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildNFPfor(variant1, variant2);
 
