@@ -18,26 +18,25 @@ Shape::Shape(std::vector<geometry::Point64> initalBoundary)
     }
 
 Shape::Shape(int64_t width, int64_t length)
-{
-    constexpr int64_t maxValue = 100000001;
-    width = (width < 0) ? 0 : (width % maxValue);
-    length = (length < 0) ? 0 : (length % maxValue);
-    m_boundary = {
-        {0, 0},
-        {length, 0},
-        {length, width},
-        {0, width}
-    };
-    m_shape_path = geometry::calculations::toClipperPath(m_boundary);
-    m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
-}
+    : m_boundary([width, length]() {
+        constexpr int64_t maxValue = 100000001;
+        int64_t w = (width < 0) ? 0 : (width % maxValue);
+        int64_t l = (length < 0) ? 0 : (length % maxValue);
+        std::vector<pmg::geometry::Point64> temp = {
+            {0, 0},
+            {l, 0},
+            {l, w},
+            {0, w}
+        };
+        return temp;
+      }()),
+      m_shape_path(geometry::calculations::toClipperPath(m_boundary)),
+      m_shape_bounding_box(Clipper2Lib::GetBounds(m_shape_path)) {}
 
 Shape::Shape(Clipper2Lib::Path64 initalPath)
-    : m_shape_path(std::move(initalPath))
-{
-    m_boundary = geometry::calculations::fromClipperPath(m_shape_path);
-    m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
-}
+    : m_boundary(geometry::calculations::fromClipperPath(initalPath)),
+      m_shape_path(std::move(initalPath)),
+      m_shape_bounding_box(Clipper2Lib::GetBounds(m_shape_path)) {}
 
 const Clipper2Lib::Path64 Shape::getPathAt(int64_t x, int64_t y) const
 {
