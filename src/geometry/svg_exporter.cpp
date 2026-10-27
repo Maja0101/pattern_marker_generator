@@ -85,10 +85,6 @@ bool SvgExporter::exportLayout(const std::string& filepath,
             << "    <polygon points=\"" << points << "\" fill=\"none\" stroke=\"" << backgroundColor << "\" stroke-width=\"" << strokeGap << "\" />\n"
             << "    <polygon points=\"" << points << "\" fill=\"none\" stroke=\"" << borderColor << "\" stroke-width=\"" << strokeOuterBorder << "\" />\n"
             << "  </g>\n";
-
-            // out << "  <polygon points=\"" << points << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" "
-            //     << "stroke=\"" << borderColor << "\" stroke-width=\"" << (borderWidth * 2.0) << "\" "
-            //     << "clip-path=\"url(#" << clipId << ")\" />\n";
         }
     }
 
