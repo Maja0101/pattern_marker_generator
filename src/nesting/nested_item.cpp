@@ -29,11 +29,20 @@ Clipper2Lib::Rect64 NestedItem::getItemBoundingBoxAtPosition() const
     return getItemBoundingBoxAtPosition(m_position.x, m_position.y);
 }
 
-void NestedItem::lockInPosition(int64_t x, int64_t y)
+bool NestedItem::lockInPosition(int64_t x, int64_t y)
 {
     m_isLocked = true;
     m_position.x += x;
     m_position.y += y;
+
+    return true;
+}
+
+bool NestedItem::flip180()
+{
+    if ((!m_isLocked) && (m_variantRef->getIsTwoWay())) {
+        m_isFlipped != m_isFlipped;
+    }
 }
 
 std::string NestedItem::toString() const

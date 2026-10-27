@@ -10,6 +10,7 @@ private:
     geometry::Point64 m_position;
     const pattern::PieceVariant* m_variantRef;
     bool m_isLocked;
+    bool m_isFlipped;
 public:
     NestedItem(const pattern::PieceVariant* variant) noexcept;
     
@@ -22,7 +23,8 @@ public:
     Clipper2Lib::Rect64 getItemBoundingBoxAtPosition(int64_t x, int64_t y) const;
     Clipper2Lib::Rect64 getItemBoundingBoxAtPosition() const;
 
-    void lockInPosition(int64_t x, int64_t y);
+    bool lockInPosition(int64_t x, int64_t y);
+    bool flip180();
 
     std::string toString() const;
 };
