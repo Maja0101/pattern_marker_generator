@@ -110,6 +110,7 @@ bool PieceVariant::flip180()
 {
     if (isTwoWay) {
         m_boundary = geometry::calculations::rotateBy180(m_boundary);
+        m_decomposedShape = geometry::calculations::rotatePathsBy180(m_decomposedShape, m_shape_bounding_box.right, m_shape_bounding_box.bottom);
         m_shape_path = geometry::calculations::toClipperPath(m_boundary);
         m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
 

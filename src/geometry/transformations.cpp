@@ -86,4 +86,26 @@ std::vector<Point64> rotateBy180(const std::vector<Point64> &polygon) noexcept
     return transformPolygon(polygon, 180, false);
 }
 
+std::vector<Clipper2Lib::Path64> rotatePathsBy180(const std::vector<Clipper2Lib::Path64> &paths, int64_t offsetX, int64_t offsetY) noexcept
+{
+    std::vector<Clipper2Lib::Path64> rotated;
+    rotated.reserve(paths.size());
+
+    for (const auto& path : paths) {
+        Clipper2Lib::Path64 rotatedPath;
+        rotatedPath.reserve(path.size());
+
+        for (const auto& point : path) {
+            rotatedPath.push_back(Clipper2Lib::Point64(
+                (-point.x + offsetX),
+                (-point.y + offsetY)
+            ));
+        }
+
+        rotated.push_back(rotatedPath);
+    }
+
+    return rotated;
+}
+
 } // namespace pmg::geometry::calculations
