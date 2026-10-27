@@ -43,6 +43,7 @@ private:
     int m_rotationAngle;
     bool m_isMirrored;
     int m_requiredQuantity;
+    bool isTwoWay;
     int64_t m_seamAllowance;
     int64_t m_cuttingAllowance;
     bool m_isConvex;
@@ -50,7 +51,7 @@ private:
 
     void initializeVariantGeometry();
 public:
-    PieceVariant(int64_t globalId, int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, std::vector<geometry::Point64> initalBoundary = {});
+    PieceVariant(int64_t globalId, int id, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, bool twoWayAllowed = false, int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, std::vector<geometry::Point64> initalBoundary = {});
     PieceVariant(Clipper2Lib::Path64 initalPath = {});
 
     const std::vector<Clipper2Lib::Path64>& getDecomposedShape() const { return m_decomposedShape; }
@@ -63,6 +64,8 @@ public:
     const int64_t getSeamAllowance() const { return m_seamAllowance; }
     const int64_t getCuttingAllowance() const { return m_cuttingAllowance; }
     const int getIsConvex() const { return m_isConvex; }
+
+    bool flip180();
 
     std::string toString() const override;
 };
