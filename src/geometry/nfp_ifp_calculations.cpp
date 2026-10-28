@@ -40,7 +40,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
 
     if (variantA.getIsConvex() && variantB.getIsConvex()) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Both convex: {} {}, {} {}", variantA.getId(), variantA.getGlobalId(), variantB.getId(), variantB.getGlobalId()));
+            SPDLOG_INFO(std::format("Both convex: {} {}, {} {}", variantA.getPieceId(), variantA.getGlobalId(), variantB.getPieceId(), variantB.getGlobalId()));
         }
         // Fast NFP calculation for convex shapes
         Clipper2Lib::Path64 invertedB = invertPath(variantB.getPath());
@@ -72,7 +72,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
     } 
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("concave: {} {} {}, {} {} {}", variantA.getId(), variantA.getGlobalId(), variantA.getIsConvex(), variantB.getId(), variantB.getGlobalId(), variantB.getIsConvex()));
+        SPDLOG_INFO(std::format("concave: {} {} {}, {} {} {}", variantA.getPieceId(), variantA.getGlobalId(), variantA.getIsConvex(), variantB.getPieceId(), variantB.getGlobalId(), variantB.getIsConvex()));
     }
     
     // Detailed calculation for concave shapes
@@ -145,7 +145,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     const Clipper2Lib::Path64& fabricPath = fabric.getPath();
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("Variants no. {} {}", variant.getId(), variant.getGlobalId()));
+        SPDLOG_INFO(std::format("Variants no. {} {}", variant.getPieceId(), variant.getGlobalId()));
     }
 
     if (isAARectangle(fabricPath, fabricBounds)) {

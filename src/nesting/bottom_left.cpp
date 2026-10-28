@@ -205,7 +205,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
         }
 
         result.positions.push_back({ 
-            .id = item.getVariant()->getId(), 
+            .id = item.getVariant()->getPieceId(), 
             .rotationAngle = item.getVariant()->getRotationAngle(),
             .isMirrored = item.getVariant()->getIsMirrored(),
             .x = item.getPosition().x,

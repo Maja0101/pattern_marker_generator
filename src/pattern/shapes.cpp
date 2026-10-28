@@ -80,8 +80,16 @@ void PieceVariant::initializeVariantGeometry()
 {
     m_isConvex = geometry::calculations::checkConvexity(m_boundary);
 
+    if (m_isTwoWay) {
+        m_flippedBoundary = geometry::calculations::rotateBy180(m_boundary);
+        m_flippedShapePath = geometry::calculations::toClipperPath(m_flippedBoundary);
+    }
+
     if (m_isConvex) {
         m_decomposedShape = { m_shape_path };
+        if (m_isTwoWay) {
+            m_decomposedFlippedShape = { m_flippedShapePath };
+        }
     } else {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("decomposing {}", this->toString()));
@@ -91,28 +99,75 @@ void PieceVariant::initializeVariantGeometry()
         for (const auto& subShape : subShapes) {
             m_decomposedShape.push_back(geometry::calculations::toClipperPath(subShape));
         }
+
+        if (m_isTwoWay) {
+            m_decomposedFlippedShape = geometry::calculations::rotatePathsBy180(m_decomposedShape, m_shape_bounding_box.right, m_shape_bounding_box.bottom);
+        }
     }
 }
 
-PieceVariant::PieceVariant(int64_t globalId, int id, int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, int64_t seamAllowance, int64_t cuttingAllowance, std::vector<geometry::Point64> initalBoundary)
-    : Shape(initalBoundary), m_globalId(globalId), m_id(id), m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed), m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance)
+PieceVariant::PieceVariant(int variantId, int64_t pieceId, int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, int64_t seamAllowance, int64_t cuttingAllowance, std::vector<geometry::Point64> initalBoundary)
+    : Shape(initalBoundary), m_variantId(variantId), m_pieceId(pieceId), 
+      m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), 
+      m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed), m_isFlipped180(false),
+      m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance)
 {
     initializeVariantGeometry();
 }
 
 PieceVariant::PieceVariant(Clipper2Lib::Path64 initalPath)
-    : Shape(initalPath)
+    : Shape(initalPath), m_isFlipped180(false)
 {
     initializeVariantGeometry();
+}
+
+const int64_t PieceVariant::getGlobalId() const
+{
+    return static_cast<int64_t>(
+        (static_cast<uint64_t>(m_isFlipped180) << 63) |
+        ((m_pieceId & 0x7FFFFFFFFFFFFULL) << 12) |
+        (m_variantId & 0xFFFULL)
+    );
+}
+
+const std::vector<geometry::Point64> &PieceVariant::getBoundary() const
+{
+    if (m_isFlipped180) {
+        return m_flippedBoundary;
+    }
+    return m_boundary;
+}
+
+const Clipper2Lib::Path64 &PieceVariant::getPath() const
+{
+    if (m_isFlipped180) {
+        return m_flippedShapePath;
+    }
+    return m_shape_path;
+}
+
+const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y) const
+{
+    Clipper2Lib::Path64 tranlated_path;
+
+    tranlated_path.reserve(m_shape_path.size());
+
+    if (m_isFlipped180) {
+        for (const auto& point : m_flippedShapePath) {
+            tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
+        }
+    } else {
+        for (const auto& point : m_shape_path) {
+            tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
+        }
+    }
+    return tranlated_path;
 }
 
 bool PieceVariant::flip180()
 {
     if (m_isTwoWay) {
-        m_boundary = geometry::calculations::rotateBy180(m_boundary);
-        m_decomposedShape = geometry::calculations::rotatePathsBy180(m_decomposedShape, m_shape_bounding_box.right, m_shape_bounding_box.bottom);
-        m_shape_path = geometry::calculations::toClipperPath(m_boundary);
-
+        m_isFlipped180 != m_isFlipped180;
         return true;
     }
 
