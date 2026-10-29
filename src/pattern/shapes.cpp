@@ -180,6 +180,14 @@ const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isF
     return tranlated_path;
 }
 
+const std::vector<Clipper2Lib::Path64> &PieceVariant::getDecomposedShape(bool isFlipped) const
+{
+    if (isFlipped) {
+        return m_decomposedFlippedShape;
+    }
+    return m_decomposedShape;
+}
+
 // bool PieceVariant::flip180()
 // {
 //     if constexpr (config::DEBUG_MODE) {

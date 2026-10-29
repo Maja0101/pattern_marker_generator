@@ -76,8 +76,8 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
     }
     
     // Detailed calculation for concave shapes
-    const std::vector<Clipper2Lib::Path64>& subShapesA = variantA.getDecomposedShape();
-    const std::vector<Clipper2Lib::Path64>& subShapesB = variantB.getDecomposedShape();
+    const std::vector<Clipper2Lib::Path64>& subShapesA = variantA.getDecomposedShape(isFlippedA);
+    const std::vector<Clipper2Lib::Path64>& subShapesB = variantB.getDecomposedShape(isFlippedB);
 
     Clipper2Lib::Paths64 subNFPs;
     subNFPs.reserve(subShapesA.size() * subShapesB.size());

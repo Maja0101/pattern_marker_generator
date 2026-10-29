@@ -59,8 +59,7 @@ public:
     PieceVariant(int variantId, int64_t pieceId, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, bool twoWayAllowed = false, int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, std::vector<geometry::Point64> initalBoundary = {});
     PieceVariant(Clipper2Lib::Path64 initalPath = {});
 
-    const std::vector<Clipper2Lib::Path64>& getDecomposedShape() const { return m_decomposedShape; }
-
+    
     const int64_t getGlobalId(bool isFlipped) const;
     
     const int getPieceId() const { return m_pieceId; }
@@ -76,6 +75,7 @@ public:
     const std::vector<geometry::Point64>& getBoundary(bool isFlipped) const;
     const Clipper2Lib::Path64& getPath(bool isFlipped) const;
     const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y, bool isFlipped) const;
+    const std::vector<Clipper2Lib::Path64>& getDecomposedShape(bool isFlipped) const;
 
     std::string toString() const override;
 };

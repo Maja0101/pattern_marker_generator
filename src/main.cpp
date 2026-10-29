@@ -29,7 +29,7 @@ int main()
 
     std::vector<pattern::VariantConstraint> defaultConstraints = {
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = true },
-        // { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1, .twoWay = true }
+        { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1, .twoWay = true }
     };
 
     int64_t sa = 10000; 
