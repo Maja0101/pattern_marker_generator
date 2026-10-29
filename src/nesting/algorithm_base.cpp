@@ -11,7 +11,7 @@ namespace pmg::nesting {
 
 NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
 {
-    // TODO layout and the statistics data
+    // TODO statistics data
 
     BottomLeft bottomLeft(m_fabric, m_ifpCache, m_nfpCache);
 
@@ -26,7 +26,7 @@ AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
 
 NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces)
 {
-    // TODO layout and the statistics data
+    // TODO statistics data
 
     {
         SPDLOG_INFO("Preparing the geometry...");
@@ -36,20 +36,20 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
 
         if constexpr (config::DEBUG_MODE) {
             for (auto& item : m_originalItems) {
-                SPDLOG_WARN(std::format("item {} {} {} {}", 
-                        item.getVariant()->getPieceId(), 
-                        item.getVariant()->getVariantId(), 
-                        item.isFlipped(), 
-                        item.getVariant()->getGlobalId(item.isFlipped())
-                ));
+                // SPDLOG_WARN(std::format("item {} {} {} {}", 
+                //         item.getVariant()->getPieceId(), 
+                //         item.getVariant()->getVariantId(), 
+                //         item.isFlipped(), 
+                //         item.getVariant()->getGlobalId(item.isFlipped())
+                // ));
                 if (item.getVariant()->getIsTwoWay()) {
                     item.flip180();
-                    SPDLOG_WARN(std::format("item {} {} {} {}", 
-                        item.getVariant()->getPieceId(), 
-                        item.getVariant()->getVariantId(), 
-                        item.isFlipped(), 
-                        item.getVariant()->getGlobalId(item.isFlipped())
-                    ));
+                    // SPDLOG_WARN(std::format("item {} {} {} {}", 
+                    //     item.getVariant()->getPieceId(), 
+                    //     item.getVariant()->getVariantId(), 
+                    //     item.isFlipped(), 
+                    //     item.getVariant()->getGlobalId(item.isFlipped())
+                    // ));
                 }
             }
         }

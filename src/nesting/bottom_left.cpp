@@ -15,7 +15,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 {
     int64_t varId = item.getVariant()->getGlobalId(item.isFlipped());
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("findPosition {} {} {} {}", item.getVariant()->getIsTwoWay(), item.isFlipped(), item.isLocked(), varId));
     }
 
@@ -48,13 +48,13 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Processing");
             }
-            if constexpr (config::DEBUG_MODE) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
             }
             geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), varId };
 
-            if constexpr (config::DEBUG_MODE) {
-                SPDLOG_WARN(std::format("key {} {}", key.variantIdA, key.variantIdB));
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("key {} {}", key.variantIdA, key.variantIdB));
             }
 
             auto nfpIt = m_nfpCache.find(key);
@@ -155,7 +155,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     // Lock item into place
     Clipper2Lib::Point64 bestPosition = candidatePoints.front();
 
-    // snap to boundaries so the inflated NFP won't affect coordinates values
+    // Snap to boundaries so the inflated NFP won't affect coordinates values
     bestPosition = geometry::calculations::snapToBoundaries(bestPosition, ifpIt->second, originalNFPs);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -208,6 +208,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             minLen = item.getItemBoundingBoxAtPosition().right;
         }
 
+        // TODO return if shapes is flipped or not
         result.positions.push_back({ 
             .id = item.getVariant()->getPieceId(), 
             .rotationAngle = item.getVariant()->getRotationAngle(),

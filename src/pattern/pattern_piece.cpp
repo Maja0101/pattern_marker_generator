@@ -48,17 +48,6 @@ const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored)
     return nullptr;
 }
 
-// Clipper2Lib::Paths64 PatternPiece::variantsToClipperPaths() const {
-//     Clipper2Lib::Paths64 paths;
-//     paths.reserve(m_allowedVariants.size());
-
-//     for (const auto& variant : m_allowedVariants) {
-//         paths.push_back(variant.getPath());
-//     }
-
-//     return paths;
-// }
-
 std::string PatternPiece::toString() const
 {
     std::string boundaryStr = std::accumulate(

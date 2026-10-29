@@ -41,6 +41,8 @@ Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
 }
 
 std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, const std::vector<Point64> &variantHull) {
+    // Calculate half planes for two convex hulls and find points of intersection to get IFP for convex hulls
+    
     size_t n = fabricHull.size();
     std::vector<HalfPlane> halfPlanes;
 

@@ -188,23 +188,6 @@ const std::vector<Clipper2Lib::Path64> &PieceVariant::getDecomposedShape(bool is
     return m_decomposedShape;
 }
 
-// bool PieceVariant::flip180()
-// {
-//     if constexpr (config::DEBUG_MODE) {
-//         SPDLOG_WARN(std::format("isTwoWay: {} isFlipped {}", m_isTwoWay, m_isFlipped180));
-//     }
-
-//     if (m_isTwoWay) {
-//         m_isFlipped180 = !m_isFlipped180;
-//         if constexpr (config::DEBUG_MODE) {
-//             SPDLOG_WARN(std::format("after flipping isFlipped {}", m_isFlipped180));
-//         }
-//         return true;
-//     }
-
-//     return false;
-// }
-
 std::string PieceVariant::toString() const
 {
     std::string boundaryStr = std::accumulate(

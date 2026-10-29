@@ -141,6 +141,8 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
 
 Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, bool isFlipped, int64_t margin)
 {
+    // IFP can be calculated as calculating IFP for convex hulls of fabric and variant and subtracting the nfp of the pockets
+
     const Clipper2Lib::Rect64& fabricBounds = fabric.getBoundingBox();
     const Clipper2Lib::Path64& fabricPath = fabric.getPath();
 
