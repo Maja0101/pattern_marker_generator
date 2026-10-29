@@ -208,11 +208,11 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             minLen = item.getItemBoundingBoxAtPosition().right;
         }
 
-        // TODO return if shapes is flipped or not
         result.positions.push_back({ 
             .id = item.getVariant()->getPieceId(), 
             .rotationAngle = item.getVariant()->getRotationAngle(),
             .isMirrored = item.getVariant()->getIsMirrored(),
+            .isFlipped180 = item.isFlipped(),
             .x = item.getPosition().x,
             .y = item.getPosition().y
         });

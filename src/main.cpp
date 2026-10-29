@@ -65,7 +65,7 @@ int main()
     SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", (std::ceil(static_cast<double>(result.minLength) / 10000) / 100.0)));
 
     // for (const auto& ip : result.positions) {
-    //     SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.x, ip.y));
+    //     SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}, flipped 180: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.isFlipped180, ip.x, ip.y));
     // }
 
     return 0;

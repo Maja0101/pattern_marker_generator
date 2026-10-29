@@ -9,6 +9,7 @@ struct ItemPlacement {
     int64_t id;
     int rotationAngle;
     bool isMirrored;
+    bool isFlipped180;
     int64_t x, y;
 };
 
