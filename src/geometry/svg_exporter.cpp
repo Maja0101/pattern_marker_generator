@@ -58,7 +58,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
             const auto pos = item.getPosition();
 
             std::ostringstream pointsStream;
-            for (const auto& pt : variant->getBoundary()) {
+            for (const auto& pt : variant->getBoundary(item.isFlipped())) {
                 double worldX = static_cast<double>(pos.x + pt.x) / 1000.0;
                 double worldY = static_cast<double>(pos.y + pt.y) / 1000.0;
                 double svgY = static_cast<double>(fabric.getBoundingBox().Height() / 1000) - worldY;
@@ -69,9 +69,9 @@ bool SvgExporter::exportLayout(const std::string& filepath,
             std::string clipId = "clip_" + std::to_string(idCounter++);
 
             // Calculate total strokes width
-            double strokeStripe = 2.0 * (borderWidth + gapWidth + stripeWidth);
+            double strokeStripe      = 2.0 * (borderWidth + gapWidth + stripeWidth);
             double strokeGap         = 2.0 * (borderWidth + gapWidth);
-            double strokeOuterBorder      = 2.0 * borderWidth;
+            double strokeOuterBorder = 2.0 * borderWidth;
 
             // Output clipPath definition
             out << "  <clipPath id=\"" << clipId << "\">\n"

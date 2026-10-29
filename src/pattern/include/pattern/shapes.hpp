@@ -38,14 +38,13 @@ public:
 class PieceVariant : public Shape {
 private:
     // TODO two-way pattern pieces
-    int64_t m_globalId;
+    // int64_t m_globalId;
     int64_t m_pieceId;
     int m_variantId;
     int m_rotationAngle;
     bool m_isMirrored;
     int m_requiredQuantity;
     bool m_isTwoWay;
-    bool m_isFlipped180;
     int64_t m_seamAllowance;
     int64_t m_cuttingAllowance;
     bool m_isConvex;
@@ -62,23 +61,21 @@ public:
 
     const std::vector<Clipper2Lib::Path64>& getDecomposedShape() const { return m_decomposedShape; }
 
-    const int64_t getGlobalId() const;
+    const int64_t getGlobalId(bool isFlipped) const;
     
     const int getPieceId() const { return m_pieceId; }
+    const int getVariantId() const { return m_variantId; }
     const int getRotationAngle() const { return m_rotationAngle; }
     const bool getIsMirrored() const { return m_isMirrored; }
     const int getRequiredQuantity() const { return m_requiredQuantity; }
     const int getIsTwoWay() const { return m_isTwoWay; }
-    const int getIsFlipped() const { return m_isFlipped180; }
     const int64_t getSeamAllowance() const { return m_seamAllowance; }
     const int64_t getCuttingAllowance() const { return m_cuttingAllowance; }
     const int getIsConvex() const { return m_isConvex; }
     
-    const std::vector<geometry::Point64>& getBoundary() const override;
-    const Clipper2Lib::Path64& getPath() const override;
-    const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y) const override;
-
-    bool flip180();
+    const std::vector<geometry::Point64>& getBoundary(bool isFlipped) const;
+    const Clipper2Lib::Path64& getPath(bool isFlipped) const;
+    const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y, bool isFlipped) const;
 
     std::string toString() const override;
 };

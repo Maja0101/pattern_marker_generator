@@ -218,9 +218,9 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& poly : result) {
-            SPDLOG_WARN("poly");
+            SPDLOG_INFO("poly");
             for (const auto& p : poly) {
-                SPDLOG_WARN(std::format("decomposed: ({}, {})", p.x, p.y));
+                SPDLOG_INFO(std::format("decomposed: ({}, {})", p.x, p.y));
             }
         }
     }

@@ -24,7 +24,7 @@ public:
                 int64_t seamAllowance = 0, int64_t cuttingAllowance = 0);
 
     const PieceVariant* getVariant(int rotationAngle, bool isMirrored) const noexcept;
-    Clipper2Lib::Paths64 variantsToClipperPaths() const;
+    // Clipper2Lib::Paths64 variantsToClipperPaths() const;
 
     std::vector<PieceVariant>& getVariants() noexcept { return m_allowedVariants; }
     int64_t getId() const noexcept { return m_id; }

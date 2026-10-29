@@ -109,50 +109,66 @@ void PieceVariant::initializeVariantGeometry()
 PieceVariant::PieceVariant(int variantId, int64_t pieceId, int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, int64_t seamAllowance, int64_t cuttingAllowance, std::vector<geometry::Point64> initalBoundary)
     : Shape(initalBoundary), m_variantId(variantId), m_pieceId(pieceId), 
       m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), 
-      m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed), m_isFlipped180(false),
+      m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed),
       m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance)
 {
     initializeVariantGeometry();
 }
 
 PieceVariant::PieceVariant(Clipper2Lib::Path64 initalPath)
-    : Shape(initalPath), m_isFlipped180(false)
+    : Shape(initalPath)
 {
     initializeVariantGeometry();
 }
 
-const int64_t PieceVariant::getGlobalId() const
+const int64_t PieceVariant::getGlobalId(bool isFlipped) const
 {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_WARN(std::format("isFlipped {} m_pieceId: {} m_variantId {} result {} {} {} {}", 
+            isFlipped,
+            m_pieceId,
+            m_variantId,
+            (static_cast<uint64_t>(isFlipped) << 63),
+            ((m_pieceId & 0x7FFFFFFFFFFFFULL) << 12),
+            (m_variantId & 0xFFFULL),
+            static_cast<int64_t>(
+                (static_cast<uint64_t>(isFlipped) << 63) |
+                ((m_pieceId & 0x7FFFFFFFFFFFFULL) << 12) |
+                (m_variantId & 0xFFFULL)
+            )
+        ));
+    }
+
     return static_cast<int64_t>(
-        (static_cast<uint64_t>(m_isFlipped180) << 63) |
+        (static_cast<uint64_t>(isFlipped) << 63) |
         ((m_pieceId & 0x7FFFFFFFFFFFFULL) << 12) |
         (m_variantId & 0xFFFULL)
     );
 }
 
-const std::vector<geometry::Point64> &PieceVariant::getBoundary() const
+const std::vector<geometry::Point64> &PieceVariant::getBoundary(bool isFlipped) const
 {
-    if (m_isFlipped180) {
+    if (isFlipped) {
         return m_flippedBoundary;
     }
     return m_boundary;
 }
 
-const Clipper2Lib::Path64 &PieceVariant::getPath() const
+const Clipper2Lib::Path64 &PieceVariant::getPath(bool isFlipped) const
 {
-    if (m_isFlipped180) {
+    if (isFlipped) {
         return m_flippedShapePath;
     }
     return m_shape_path;
 }
 
-const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y) const
+const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isFlipped) const
 {
     Clipper2Lib::Path64 tranlated_path;
 
     tranlated_path.reserve(m_shape_path.size());
 
-    if (m_isFlipped180) {
+    if (isFlipped) {
         for (const auto& point : m_flippedShapePath) {
             tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
         }
@@ -164,15 +180,22 @@ const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y) const
     return tranlated_path;
 }
 
-bool PieceVariant::flip180()
-{
-    if (m_isTwoWay) {
-        m_isFlipped180 != m_isFlipped180;
-        return true;
-    }
+// bool PieceVariant::flip180()
+// {
+//     if constexpr (config::DEBUG_MODE) {
+//         SPDLOG_WARN(std::format("isTwoWay: {} isFlipped {}", m_isTwoWay, m_isFlipped180));
+//     }
 
-    return false;
-}
+//     if (m_isTwoWay) {
+//         m_isFlipped180 = !m_isFlipped180;
+//         if constexpr (config::DEBUG_MODE) {
+//             SPDLOG_WARN(std::format("after flipping isFlipped {}", m_isFlipped180));
+//         }
+//         return true;
+//     }
+
+//     return false;
+// }
 
 std::string PieceVariant::toString() const
 {

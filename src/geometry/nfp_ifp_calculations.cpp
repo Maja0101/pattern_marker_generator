@@ -34,19 +34,19 @@ Clipper2Lib::Path64 invertPath(const Clipper2Lib::Path64 &path)
     return inverted;
 }
 
-Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pattern::PieceVariant &variantB)
+Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pattern::PieceVariant &variantB, bool isFlippedA, bool isFlippedB)
 {
     // NFP can be calculated as adding the inverted shape B to the shape A 
 
     if (variantA.getIsConvex() && variantB.getIsConvex()) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Both convex: {} {}, {} {}", variantA.getPieceId(), variantA.getGlobalId(), variantB.getPieceId(), variantB.getGlobalId()));
+            SPDLOG_INFO(std::format("Both convex: {} {}, {} {}", variantA.getPieceId(), variantA.getGlobalId(isFlippedA), variantB.getPieceId(), variantB.getGlobalId(isFlippedB)));
         }
         // Fast NFP calculation for convex shapes
-        Clipper2Lib::Path64 invertedB = invertPath(variantB.getPath());
+        Clipper2Lib::Path64 invertedB = invertPath(variantB.getPath(isFlippedB));
 
         Clipper2Lib::Paths64 rawNfp = Clipper2Lib::MinkowskiSum(
-            variantA.getPath(),
+            variantA.getPath(isFlippedA),
             invertedB,
             true
         );
@@ -62,7 +62,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
             for (const auto& path : Clipper2Lib::SimplifyPaths(nfp, 0.0)) {
                 SPDLOG_INFO("path in nfp");
                 for (const auto& p : path) {
-                    SPDLOG_WARN(std::format("NFP: ({}, {})", p.x, p.y));
+                    SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
                 }
             }
         }
@@ -72,7 +72,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
     } 
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("concave: {} {} {}, {} {} {}", variantA.getPieceId(), variantA.getGlobalId(), variantA.getIsConvex(), variantB.getPieceId(), variantB.getGlobalId(), variantB.getIsConvex()));
+        SPDLOG_INFO(std::format("concave: {} {} {}, {} {} {}", variantA.getPieceId(), variantA.getGlobalId(isFlippedA), variantA.getIsConvex(), variantB.getPieceId(), variantB.getGlobalId(isFlippedB), variantB.getIsConvex()));
     }
     
     // Detailed calculation for concave shapes
@@ -102,7 +102,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
                 for (const auto& path : pairNfp) {
                     SPDLOG_INFO("path in nfp");
                     for (const auto& p : path) {
-                        SPDLOG_WARN(std::format("NFP: ({}, {})", p.x, p.y));
+                        SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
                     }
                 }
             }
@@ -131,7 +131,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
         for (const auto& path : Clipper2Lib::SimplifyPaths(nfp, 0.0)) {
             SPDLOG_INFO("path in nfp");
             for (const auto& p : path) {
-                SPDLOG_WARN(std::format("NFP: ({}, {})", p.x, p.y));
+                SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
             }
         }
     }
@@ -139,13 +139,13 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
     return Clipper2Lib::SimplifyPaths(nfp, 0.0);
 }
 
-Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, int64_t margin)
+Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, bool isFlipped, int64_t margin)
 {
     const Clipper2Lib::Rect64& fabricBounds = fabric.getBoundingBox();
     const Clipper2Lib::Path64& fabricPath = fabric.getPath();
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("Variants no. {} {}", variant.getPieceId(), variant.getGlobalId()));
+        SPDLOG_INFO(std::format("Variants no. {} {}", variant.getPieceId(), variant.getGlobalId(isFlipped)));
     }
 
     if (isAARectangle(fabricPath, fabricBounds)) {
@@ -196,7 +196,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     // Detailed calculation for irregular fabric
     
     std::vector<Point64> fabricHull = utils::calculateConvexHull(fabric.getBoundary());
-    std::vector<Point64> variantHull = utils::calculateConvexHull(variant.getBoundary());
+    std::vector<Point64> variantHull = utils::calculateConvexHull(variant.getBoundary(isFlipped));
     
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : fabricHull) {
@@ -247,7 +247,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     Clipper2Lib::Paths64 pocketNFPs;
     
     for (const auto& pocket : pockets) {
-        Clipper2Lib::Paths64 pocketNFP = buildNFPfor(pattern::PieceVariant(pocket), variant);
+        Clipper2Lib::Paths64 pocketNFP = buildNFPfor(pattern::PieceVariant(pocket), variant, false, isFlipped);
         if constexpr (config::DEBUG_MODE_DETAILED) {
             for (const auto& path : pocketNFP){
                 SPDLOG_INFO("pocketNFP path");
@@ -284,40 +284,74 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
 
 namespace pmg::geometry::calculations {
 
-std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, const std::vector<pattern::PieceVariant> &variants)
+std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, std::vector<pattern::PieceVariant> &variants)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
     }
 
     std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache;
-    for (const auto& variant : variants) {
+    for (auto& variant : variants) {
         if (variant.getRequiredQuantity() > 0) {
+            bool isFlipped = false;
             if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("Variant no. {}", variant.getGlobalId()));
+                SPDLOG_INFO(std::format("Variant no. {}", variant.getGlobalId(isFlipped)));
             }
-            ifpCache[variant.getGlobalId()] = utils::buildIFPfor(fabric, variant);
+
+            ifpCache[variant.getGlobalId(isFlipped)] = utils::buildIFPfor(fabric, variant, isFlipped);
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("globalId: {} isTwoWay: {}", variant.getGlobalId(isFlipped), variant.getIsTwoWay()));
+            }
+            if (variant.getIsTwoWay()) {
+                isFlipped = !isFlipped;
+                if constexpr (config::DEBUG_MODE_DETAILED) {
+                    SPDLOG_INFO(std::format("globalId: {} isFlipped {}", variant.getGlobalId(isFlipped), isFlipped));
+
+                }
+                ifpCache[variant.getGlobalId(isFlipped)] = utils::buildIFPfor(fabric, variant, isFlipped);
+            }
         }
     }
     return ifpCache;
 }
 
-std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::vector<pattern::PieceVariant> &variants)
+std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(std::vector<pattern::PieceVariant> &variants)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
     }
 
     std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
-    for (const auto& variantA : variants) {
+    for (auto& variantA : variants) {
         if (variantA.getRequiredQuantity() > 0) {
-            for (const auto& variantB : variants) {
+            bool isFlippedA = false;
+            for (auto& variantB : variants) {
                 if (variantB.getRequiredQuantity() > 0) {
+                    bool isFlippedB = false;
                     if constexpr (config::DEBUG_MODE_DETAILED) {
-                        SPDLOG_INFO(std::format("Variants no. {} {}", variantA.getGlobalId(), variantB.getGlobalId()));
+                        SPDLOG_INFO(std::format("Variants no. {} {}", variantA.getGlobalId(isFlippedA), variantB.getGlobalId(isFlippedB)));
                     }
-                    NFPKey key{ variantA.getGlobalId(), variantB.getGlobalId() };
-                    nfpCache[key] = utils::buildNFPfor(variantA, variantB);
+                    NFPKey key{ variantA.getGlobalId(isFlippedA), variantB.getGlobalId(isFlippedB) };
+                    nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
+                    
+                    if (variantA.getIsTwoWay()) {
+                        isFlippedA = !isFlippedA;
+                        NFPKey key{ variantA.getGlobalId(isFlippedA), variantB.getGlobalId(isFlippedB) };
+                        nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
+                        if (variantB.getIsTwoWay()) {
+                            isFlippedB = !isFlippedB;
+                            NFPKey key{ variantA.getGlobalId(isFlippedA), variantB.getGlobalId(isFlippedB) };
+                            nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
+                            isFlippedB = !isFlippedB;
+                        }
+                        isFlippedA = !isFlippedA;
+                    }
+
+                    if (variantB.getIsTwoWay()) {
+                        isFlippedB = !isFlippedB;
+                        NFPKey key{ variantA.getGlobalId(isFlippedA), variantB.getGlobalId(isFlippedB) };
+                        nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
+                    }
                 }
             }
         }

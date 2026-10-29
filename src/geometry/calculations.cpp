@@ -30,7 +30,7 @@ bool isCollision(const nesting::BLStateView &view, const nesting::NestedItem &it
         if (aabbCollision(itemBoundsAt, view.placed_pieces_boxes[i])) {
             potential_obstacles.push_back(view.placed_pieces_polygons[i]);
             if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_WARN(std::format("Potential obstacle found", x, y));
+                SPDLOG_INFO(std::format("Potential obstacle found", x, y));
             }   
         }
     }
@@ -222,7 +222,7 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
             SPDLOG_INFO(std::format("Number of variants: {}", piece.getVariants().size()));
         }
         for (auto& variant : piece.getVariants()) {
-            variantMap.emplace(variant.getGlobalId(), variant);
+            variantMap.emplace(variant.getGlobalId(false), variant);
         }
     }
 

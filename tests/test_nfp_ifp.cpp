@@ -26,7 +26,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, false);
 
         Clipper2Lib::Paths64 expected = {{
             {   0,    0},  
@@ -55,7 +55,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, false);
 
         Clipper2Lib::Paths64 expected;
 
@@ -79,7 +79,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, 10000);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, false);
 
         Clipper2Lib::Paths64 expected = {{
             {6000,    0},
@@ -110,7 +110,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, false);
 
         Clipper2Lib::Paths64 expected = {{
             {1000,    0}, 
@@ -144,7 +144,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, false);
 
         Clipper2Lib::Paths64 expected = {{
             {2000, 2000}, 
@@ -183,7 +183,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, polygon);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildIFPfor(fabric, variant, false);
 
         Clipper2Lib::Paths64 expected = {
             {
@@ -224,7 +224,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
         };
         pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, false, 0, 0, polygon2);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildNFPfor(variant1, variant2);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildNFPfor(variant1, variant2, false, false);
 
         Clipper2Lib::Paths64 expected = {{
             { 4000, -2000},  
@@ -257,7 +257,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
         };
         pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, false, 0, 0, polygon2);
 
-        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildNFPfor(variant1, variant2);
+        Clipper2Lib::Paths64 result = pmg::geometry::calculations::utils::buildNFPfor(variant1, variant2, false, false);
 
         Clipper2Lib::Paths64 expected = {{
             { 4000, -2000},  

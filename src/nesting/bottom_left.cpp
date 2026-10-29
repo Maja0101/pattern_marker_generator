@@ -13,10 +13,10 @@ BLStateView BottomLeft::makeCurrStateView() const
 
 bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 {
-    int64_t varId = item.getVariant()->getGlobalId();
+    int64_t varId = item.getVariant()->getGlobalId(item.isFlipped());
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(varId);
+    if constexpr (config::DEBUG_MODE) {
+        SPDLOG_INFO(std::format("findPosition {} {} {} {}", item.getVariant()->getIsTwoWay(), item.isFlipped(), item.isLocked(), varId));
     }
 
     // Fetch IFP for shape
@@ -44,14 +44,18 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 
     // Subtract NFPs of all placed items
     for (const auto& placedPiece : items) {
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Checking {} {}", placedPiece.getVariant()->getGlobalId(), placedPiece.isLocked()));
-        }
         if (placedPiece.isLocked()) {
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Processing");
             }
-            geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(), varId };
+            if constexpr (config::DEBUG_MODE) {
+                SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
+            }
+            geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), varId };
+
+            if constexpr (config::DEBUG_MODE) {
+                SPDLOG_WARN(std::format("key {} {}", key.variantIdA, key.variantIdB));
+            }
 
             auto nfpIt = m_nfpCache.find(key);
 
@@ -186,7 +190,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
     for (size_t i = 0; i < items.size(); ++i) {
         NestedItem& item = items[i];
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Nesting item no. {}", i));
+            SPDLOG_WARN(std::format("Nesting item no. {} {} {}", i, item.getVariant()->getIsTwoWay(), item.isFlipped()));
         }
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Nesting item no. {}", i));
