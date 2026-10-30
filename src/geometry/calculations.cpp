@@ -244,15 +244,40 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
     return allVariants;
 }
 
-nesting::NestingResult evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const Clipper2Lib::Path64 &fabricPath, int64_t maxRightPoint)
+nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const pattern::Fabric &fabric, int64_t maxRightPoint)
 {
-    // union all placed pieces paths
+    nesting::NestingStats result;
 
-    // calculate raw remaining fabric as fabric path - combined placed pieces
+    constexpr double SCALE = 1000000; // converstion from internal units to m
 
-    // construction of bounding box enclosing fabric to the right of max point
+    // Prepare fabric and placed items for calculation
+    Clipper2Lib::Paths64 fabricAsPaths = { fabric.getPath() };
+    Clipper2Lib::Paths64 allItemsCombined = Clipper2Lib::Union(allPlacedItems, Clipper2Lib::FillRule::NonZero);
+
+    // Calculate the paths of all parts of unused fabric
+    Clipper2Lib::Paths64 rawUnusedFabric = Clipper2Lib::Difference(
+        fabricAsPaths,
+        allItemsCombined,
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    // Create bounding box to the right of the max right point
+    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + SCALE; // max size + 1m 
+
+    Clipper2Lib::Path64 rightBoxPath = {
+        {maxRightPoint, fabric.getBoundingBox().top - padding},
+        {fabric.getBoundingBox().right, fabric.getBoundingBox().top - padding},
+        {fabric.getBoundingBox().right, fabric.getBoundingBox().bottom + padding},
+        {maxRightPoint, fabric.getBoundingBox().bottom + padding}
+    };
+    Clipper2Lib::Paths64 rigthBox = { rightBoxPath };
     
-    // calculate remaining fabric: raw remaining fabric intersected with the created bounding box
+    // Get the fabric to the right of the furthest piece
+    Clipper2Lib::Paths64 rawRemainingFabric = Clipper2Lib::Intersect(
+        rawUnusedFabric,
+        rigthBox,
+        Clipper2Lib::FillRule::NonZero
+    );
     
     // calculate scraps: raw remaining fabric - created bounding box
     
@@ -260,13 +285,26 @@ nesting::NestingResult evaluate(const Clipper2Lib::Paths64 &allPlacedItems, cons
     
     // calculate scraps number and sum area
     
-    // calculate unused fabric area
+    // Calculate remaining fabric area
+    result.remainingFabricArea = 0.0;
+    for (const auto& fabricPart : rawRemainingFabric) {
+        double area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
+        if (area > 0.0) {
+            result.remainingFabricArea += area;
+        }
+    }
+    result.remainingFabricArea = std::floor(result.remainingFabricArea * 100.0) / 100.0;
 
-    // fabric lenght = fabric bounding box  right - max right point
+    // Calculate remaining fabric length
+    result.remainingFabricLength = std::floor((static_cast<double>(fabric.getBoundingBox().right - maxRightPoint)) / 10000) / 100.0;
 
     // calculate waste and other percentages
+    // Calculate percentages
+    double fabricArea = Clipper2Lib::Area(fabricAsPaths);
 
-    return nesting::NestingResult();
+    result.remainingFabricPercentage = std::round(result.remainingFabricArea / fabricArea * 100.0) / 100.0;
+
+    return result;
 }
 
 } // namespace pmg::geometry::calculations
