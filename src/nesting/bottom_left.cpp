@@ -219,7 +219,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
     }
 
     result.wasSuccessful = true;
-    result.minLength = minLen;
+    result.minLength = std::ceil(static_cast<double>(minLen) / 10000) / 100.0;
 
     return result;
 }

@@ -13,16 +13,21 @@ struct ItemPlacement {
     int64_t x, y;
 };
 
+struct NestingStats {
+    int usableScrapCount;
+    double usableScrapsArea;
+    double usableScrapsPercentage;
+    double remainingFabricLength;
+    double remainingFabricArea;
+    double remainingFabricPercentage;
+    double wasteArea;
+    double wastePercentage;
+};
+
 struct NestingResult {
     bool wasSuccessful;
-
-    int64_t minLength;
-
-    double executionTime;
-    double remainingFabric;
-    int usableScraps;
-    double waste;
-
+    double minLength;
+    NestingStats stats;
     std::vector<ItemPlacement> positions;
 };
 
