@@ -11,9 +11,9 @@ namespace pmg::pattern {
 
 class Shape {
 protected:
+    Clipper2Lib::Path64 m_shapePath;
     std::vector<geometry::Point64> m_boundary;
-    Clipper2Lib::Path64 m_shape_path;
-    Clipper2Lib::Rect64 m_shape_bounding_box;
+    Clipper2Lib::Rect64 m_shapeBoundingBox;
 public:
     Shape(std::vector<geometry::Point64> initalBoundary = {});
     Shape(int64_t width, int64_t length);
@@ -21,8 +21,8 @@ public:
     virtual ~Shape() = default;
     
     virtual const std::vector<geometry::Point64>& getBoundary() const { return m_boundary; }
-    virtual const Clipper2Lib::Path64& getPath() const { return m_shape_path; }
-    const Clipper2Lib::Rect64& getBoundingBox() const { return m_shape_bounding_box; }
+    virtual const Clipper2Lib::Path64& getPath() const { return m_shapePath; }
+    const Clipper2Lib::Rect64& getBoundingBox() const { return m_shapeBoundingBox; }
     
     virtual const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y) const;
     const Clipper2Lib::Rect64 getBoundingBoxAt(int64_t x, int64_t y) const;

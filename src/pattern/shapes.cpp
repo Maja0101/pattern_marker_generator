@@ -13,39 +13,38 @@
 namespace pmg::pattern {
 
 Shape::Shape(std::vector<geometry::Point64> initalBoundary)
-    : m_boundary(std::move(initalBoundary)) {
-        m_shape_path = geometry::calculations::toClipperPath(m_boundary);
-        m_shape_bounding_box = Clipper2Lib::GetBounds(m_shape_path);
-    }
+    : m_shapePath(Clipper2Lib::SimplifyPath(geometry::calculations::toClipperPath(initalBoundary), 0.0)),
+      m_boundary((m_shapePath.size() == initalBoundary.size()) ? std::move(initalBoundary) : geometry::calculations::fromClipperPath(m_shapePath)),
+      m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
 
 Shape::Shape(int64_t width, int64_t length)
-    : m_boundary([width, length]() {
+    : m_shapePath([width, length]() {
         constexpr int64_t maxValue = 100000001;
         int64_t w = (width < 0) ? 0 : (width % maxValue);
         int64_t l = (length < 0) ? 0 : (length % maxValue);
-        std::vector<pmg::geometry::Point64> temp = {
-            {0, 0},
-            {l, 0},
-            {l, w},
-            {0, w}
-        };
+        Clipper2Lib::Path64 temp;
+        temp.reserve(4);
+        temp.push_back({0L, 0L});
+        temp.push_back({l, 0L});
+        temp.push_back({l, w});
+        temp.push_back({0L, w});
         return temp;
-      }()),
-      m_shape_path(geometry::calculations::toClipperPath(m_boundary)),
-      m_shape_bounding_box(Clipper2Lib::GetBounds(m_shape_path)) {}
+      }()), 
+      m_boundary(geometry::calculations::fromClipperPath(m_shapePath)),
+      m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
 
 Shape::Shape(Clipper2Lib::Path64 initalPath)
-    : m_boundary(geometry::calculations::fromClipperPath(initalPath)),
-      m_shape_path(std::move(initalPath)),
-      m_shape_bounding_box(Clipper2Lib::GetBounds(m_shape_path)) {}
+    : m_shapePath(Clipper2Lib::SimplifyPath(initalPath, 0.0)),
+      m_boundary(geometry::calculations::fromClipperPath(m_shapePath)),
+      m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
 
 const Clipper2Lib::Path64 Shape::getPathAt(int64_t x, int64_t y) const
 {
     Clipper2Lib::Path64 tranlated_path;
 
-    tranlated_path.reserve(m_shape_path.size());
+    tranlated_path.reserve(m_shapePath.size());
 
-    for (const auto& point : m_shape_path) {
+    for (const auto& point : m_shapePath) {
         tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
     }
     return tranlated_path;
@@ -53,7 +52,7 @@ const Clipper2Lib::Path64 Shape::getPathAt(int64_t x, int64_t y) const
 
 const Clipper2Lib::Rect64 Shape::getBoundingBoxAt(int64_t x, int64_t y) const
 {
-    Clipper2Lib::Rect64 tranlated_box = m_shape_bounding_box;
+    Clipper2Lib::Rect64 tranlated_box = m_shapeBoundingBox;
 
     tranlated_box.left   += x;
     tranlated_box.right  += x;
@@ -86,7 +85,7 @@ void PieceVariant::initializeVariantGeometry()
     }
 
     if (m_isConvex) {
-        m_decomposedShape = { m_shape_path };
+        m_decomposedShape = { m_shapePath };
         if (m_isTwoWay) {
             m_decomposedFlippedShape = { m_flippedShapePath };
         }
@@ -101,7 +100,7 @@ void PieceVariant::initializeVariantGeometry()
         }
 
         if (m_isTwoWay) {
-            m_decomposedFlippedShape = geometry::calculations::rotatePathsBy180(m_decomposedShape, m_shape_bounding_box.right, m_shape_bounding_box.bottom);
+            m_decomposedFlippedShape = geometry::calculations::rotatePathsBy180(m_decomposedShape, m_shapeBoundingBox.right, m_shapeBoundingBox.bottom);
         }
     }
 }
@@ -159,21 +158,21 @@ const Clipper2Lib::Path64 &PieceVariant::getPath(bool isFlipped) const
     if (isFlipped) {
         return m_flippedShapePath;
     }
-    return m_shape_path;
+    return m_shapePath;
 }
 
 const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isFlipped) const
 {
     Clipper2Lib::Path64 tranlated_path;
 
-    tranlated_path.reserve(m_shape_path.size());
+    tranlated_path.reserve(m_shapePath.size());
 
     if (isFlipped) {
         for (const auto& point : m_flippedShapePath) {
             tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
         }
     } else {
-        for (const auto& point : m_shape_path) {
+        for (const auto& point : m_shapePath) {
             tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
         }
     }
