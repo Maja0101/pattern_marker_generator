@@ -244,11 +244,29 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
     return allVariants;
 }
 
-bool evaluate(const std::vector<nesting::NestedItem> &items)
+nesting::NestingResult evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const Clipper2Lib::Path64 &fabricPath, int64_t maxRightPoint)
 {
-    // TODO evaluation function for layout 
+    // union all placed pieces paths
+
+    // calculate raw remaining fabric as fabric path - combined placed pieces
+
+    // construction of bounding box enclosing fabric to the right of max point
     
-    return false;
+    // calculate remaining fabric: raw remaining fabric intersected with the created bounding box
+    
+    // calculate scraps: raw remaining fabric - created bounding box
+    
+    // clean up scraps
+    
+    // calculate scraps number and sum area
+    
+    // calculate unused fabric area
+
+    // fabric lenght = fabric bounding box  right - max right point
+
+    // calculate waste and other percentages
+
+    return nesting::NestingResult();
 }
 
 } // namespace pmg::geometry::calculations
