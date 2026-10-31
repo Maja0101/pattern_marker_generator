@@ -250,7 +250,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 
     constexpr int SCALE = 1000; // converstion from internal units to mm
     constexpr int minWidth = 150000; // set min scrap width to 15 cm in internal units
-    constexpr int minScrapArea = 40000; // set min scrap area to 0.04 sm in smm
+    constexpr int64_t minScrapArea = 40000; // set min scrap area to 0.04 sm in smm
 
     // Prepare fabric and placed items for calculation
     Clipper2Lib::Paths64 fabricAsPaths = { fabric.getPath() };
@@ -287,6 +287,14 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
         rightBox,
         Clipper2Lib::FillRule::NonZero
     );
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& path : rawScraps) {
+            for (const auto& point : path) {
+                SPDLOG_INFO(std::format("rawScraps ({}, {})", point.x, point.y));
+            }
+        }
+    }
     
     // Clean up scrap
     // Deflating and Inflating scraps' paths discard the tiny and narrow scraps that are not usable
@@ -297,6 +305,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
         Clipper2Lib::JoinType::Miter, 
         Clipper2Lib::EndType::Polygon
     );
+
     cleanedScraps = Clipper2Lib::InflatePaths(
         cleanedScraps,
         delta,
@@ -304,10 +313,18 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
         Clipper2Lib::EndType::Polygon
     );
 
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& path : cleanedScraps) {
+            for (const auto& point : path) {
+                SPDLOG_INFO(std::format("cleanedScraps ({}, {})", point.x, point.y));
+            }
+        }
+    }
+
     result.usableScrapCount = 0;
-    int usableScrapsArea = 0;
+    int64_t usableScrapsArea = 0;
     for (const auto& scrap : cleanedScraps) {
-        int area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
+        int64_t area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
         if (area >= minScrapArea) {
             ++result.usableScrapCount;
             usableScrapsArea += area;
@@ -316,9 +333,9 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.usableScrapsArea = static_cast<double>(usableScrapsArea) / (SCALE * SCALE);
 
     // Calculate remaining fabric area
-    int remainingFabricArea = 0;
+    int64_t remainingFabricArea = 0;
     for (const auto& fabricPart : rawRemainingFabric) {
-        int area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
+        int64_t area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
         if (area > 0) {
             remainingFabricArea += area;
         }
@@ -329,15 +346,17 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / (SCALE * SCALE);
 
     //Calculate waste
-    int fabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
-    int usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
+    int64_t fabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
+    int64_t usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
 
-    int wastedFabric = fabricArea - usedArea - remainingFabricArea - usableScrapsArea;
-    result.wasteArea = static_cast<double>(wastedFabric) / (SCALE * SCALE);
+    int64_t wasteArea = fabricArea - usedArea - remainingFabricArea - usableScrapsArea;
+    result.wasteArea = static_cast<double>(wasteArea) / (SCALE * SCALE);
     
-    if constexpr (config::DEBUG_MODE) {
-        SPDLOG_WARN(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {} wasteArea {}", fabricArea, usedArea, remainingFabricArea, usableScrapsArea, wastedFabric));
-        SPDLOG_WARN(std::format("result: remainingFabricArea {} usableScrapsArea {} wasteArea {}", result.remainingFabricArea, result.usableScrapsArea, result.wasteArea));
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_WARN(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
+            fabricArea, usedArea, remainingFabricArea, usableScrapsArea, wasteArea));
+        SPDLOG_WARN(std::format("result: remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
+            result.remainingFabricArea, result.usableScrapsArea, result.wasteArea));
     }
 
     // Calculate percentages
@@ -346,10 +365,11 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     int usableScrapsPercentage = usableScrapsArea * SCALE / fabricArea;
     result.remainingFabricPercentage = static_cast<double>(remainingFabricPercentage) / SCALE;
     result.usableScrapsPercentage = static_cast<double>(usableScrapsPercentage) / SCALE;
-    result.wastePercentage = static_cast<double>(SCALE - usedAreaPercentage - remainingFabricPercentage - usableScrapsPercentage) / SCALE;
+    result.wastePercentage = static_cast<double>(wasteArea * SCALE / fabricArea) / SCALE;
 
-    if constexpr (config::DEBUG_MODE) {
-        SPDLOG_WARN(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", usedAreaPercentage, result.remainingFabricPercentage, result.usableScrapsPercentage, result.wastePercentage));
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_WARN(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", 
+            static_cast<double>(usedAreaPercentage) / SCALE, result.remainingFabricPercentage, result.usableScrapsPercentage, result.wastePercentage));
     }
 
     return result;
