@@ -66,11 +66,61 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
     }
 
     SECTION("Straight edge of items") {
+        Clipper2Lib::Paths64 placedItems = {
+            {
+                {      0,      0},  
+                { 400000,      0},  
+                { 400000, 200000}, 
+                {      0, 200000}
+            },
+            {
+                {      0, 200000},  
+                { 400000, 200000},  
+                { 400000, 500000}, 
+                {      0, 500000}
+            }
+        };
+        int64_t maxRightPoint = 400000;
+        
+        pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
+        REQUIRE(result.usableScrapCount == 0);
+        REQUIRE(result.usableScrapsArea == 0.0);
+        REQUIRE(result.usableScrapsPercentage == 0.0);
+        REQUIRE(result.remainingFabricLength == 0.6);
+        REQUIRE(result.remainingFabricArea == 0.3);
+        REQUIRE(result.remainingFabricPercentage == 0.6);
+        REQUIRE(result.wasteArea == 0.0);
+        REQUIRE(result.wastePercentage == 0.0);
     }
 
     SECTION("Uneven edge of items") {
+        Clipper2Lib::Paths64 placedItems = {
+            {
+                {      0,      0},  
+                { 400000,      0},  
+                { 400000, 200000}, 
+                {      0, 200000}
+            },
+            {
+                {      0, 200000},  
+                { 600000, 200000},  
+                { 600000, 500000}, 
+                {      0, 500000}
+            }
+        };
+        int64_t maxRightPoint = 600000;
+        
+        pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
+        REQUIRE(result.usableScrapCount == 1);
+        REQUIRE(result.usableScrapsArea == 0.04);
+        REQUIRE(result.usableScrapsPercentage == 0.08);
+        REQUIRE(result.remainingFabricLength == 0.4);
+        REQUIRE(result.remainingFabricArea == 0.2);
+        REQUIRE(result.remainingFabricPercentage == 0.4);
+        REQUIRE(result.wasteArea == 0.0);
+        REQUIRE(result.wastePercentage == 0.0);
     }
 
     SECTION("Irregular fabric") {
