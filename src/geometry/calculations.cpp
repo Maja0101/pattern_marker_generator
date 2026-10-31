@@ -248,10 +248,9 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 {
     nesting::NestingStats result;
 
-    constexpr double M_SCALE = 1000000.0; // converstion from internal units to m
-    constexpr double MM_SCALE = 1000.0; // converstion from internal units to mm
-    constexpr double minWidth = 0.15 * M_SCALE; // set min scrap width to 15 cm
-    constexpr double minScrapArea = 0.04; // set min scrap area to 0.04 sm
+    constexpr int SCALE = 1000; // converstion from internal units to mm
+    constexpr int minWidth = 150000; // set min scrap width to 15 cm in internal units
+    constexpr int minScrapArea = 40000; // set min scrap area to 0.04 sm in smm
 
     // Prepare fabric and placed items for calculation
     Clipper2Lib::Paths64 fabricAsPaths = { fabric.getPath() };
@@ -265,7 +264,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     );
 
     // Create bounding box to the right of the max right point
-    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + M_SCALE; // max size + 1m 
+    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + 1000000; // max size + 1m 
 
     Clipper2Lib::Path64 rightBoxPath = {
         {maxRightPoint, fabric.getBoundingBox().top - padding},
@@ -306,43 +305,52 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     );
 
     result.usableScrapCount = 0;
-    result.usableScrapsArea = 0.0;
+    int usableScrapsArea = 0;
     for (const auto& scrap : cleanedScraps) {
-        double area = std::abs(Clipper2Lib::Area(scrap)) / (M_SCALE * M_SCALE);
+        int area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
         if (area >= minScrapArea) {
             ++result.usableScrapCount;
-            result.usableScrapsArea += area;
+            usableScrapsArea += area;
         }
     }
+    result.usableScrapsArea = static_cast<double>(usableScrapsArea) / (SCALE * SCALE);
 
     // Calculate remaining fabric area
-    result.remainingFabricArea = 0.0;
+    int remainingFabricArea = 0;
     for (const auto& fabricPart : rawRemainingFabric) {
-        double area = std::abs(Clipper2Lib::Area(fabricPart)) / (M_SCALE * M_SCALE);
-        if (area > 0.0) {
-            result.remainingFabricArea += area;
+        int area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
+        if (area > 0) {
+            remainingFabricArea += area;
         }
     }
-    result.remainingFabricArea = std::floor(result.remainingFabricArea * MM_SCALE) / MM_SCALE;
+    result.remainingFabricArea = static_cast<double>(remainingFabricArea) / (SCALE * SCALE);
 
     // Calculate remaining fabric length
-    result.remainingFabricLength = std::floor((static_cast<double>(fabric.getBoundingBox().right - maxRightPoint)) / MM_SCALE) / MM_SCALE;
+    result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / (SCALE * SCALE);
 
     //Calculate waste
-    double fabricArea = std::ceil((std::abs(Clipper2Lib::Area(fabricAsPaths)) / (M_SCALE * M_SCALE)) * MM_SCALE) / MM_SCALE;
-    double usedArea = std::ceil((std::abs(Clipper2Lib::Area(allItemsCombined)) / (M_SCALE * M_SCALE)) * MM_SCALE) / MM_SCALE;
+    int fabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
+    int usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
 
+    int wastedFabric = fabricArea - usedArea - remainingFabricArea - usableScrapsArea;
+    result.wasteArea = static_cast<double>(wastedFabric) / (SCALE * SCALE);
+    
     if constexpr (config::DEBUG_MODE) {
-        SPDLOG_WARN(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {}", fabricArea, usedArea, result.remainingFabricArea, result.usableScrapsArea));
+        SPDLOG_WARN(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {} wasteArea {}", fabricArea, usedArea, remainingFabricArea, usableScrapsArea, wastedFabric));
+        SPDLOG_WARN(std::format("result: remainingFabricArea {} usableScrapsArea {} wasteArea {}", result.remainingFabricArea, result.usableScrapsArea, result.wasteArea));
     }
 
-    result.wasteArea = fabricArea - usedArea - result.remainingFabricArea - result.usableScrapsArea;
-
     // Calculate percentages
-    double usedAreaPercentage = std::round(usedArea / fabricArea * MM_SCALE) / MM_SCALE;
-    result.remainingFabricPercentage = std::round(result.remainingFabricArea / fabricArea * MM_SCALE) / MM_SCALE;
-    result.usableScrapsPercentage = std::round(result.usableScrapsArea / fabricArea * MM_SCALE) / MM_SCALE;
-    result.wastePercentage = 1.0 - usedAreaPercentage - result.remainingFabricPercentage - result.usableScrapsArea;
+    int usedAreaPercentage = usedArea * SCALE / fabricArea;
+    int remainingFabricPercentage = remainingFabricArea * SCALE / fabricArea;
+    int usableScrapsPercentage = usableScrapsArea * SCALE / fabricArea;
+    result.remainingFabricPercentage = static_cast<double>(remainingFabricPercentage) / SCALE;
+    result.usableScrapsPercentage = static_cast<double>(usableScrapsPercentage) / SCALE;
+    result.wastePercentage = static_cast<double>(SCALE - usedAreaPercentage - remainingFabricPercentage - usableScrapsPercentage) / SCALE;
+
+    if constexpr (config::DEBUG_MODE) {
+        SPDLOG_WARN(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", usedAreaPercentage, result.remainingFabricPercentage, result.usableScrapsPercentage, result.wastePercentage));
+    }
 
     return result;
 }
