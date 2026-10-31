@@ -25,6 +25,7 @@ if(TEST_FILES)
     test_decomposition.cpp
     test_nfp_ifp.cpp
     test_evaluation.cpp
+    test_two_way.cpp
   )
 
   # Specify include directories to use when compiling 

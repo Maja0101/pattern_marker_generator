@@ -54,7 +54,10 @@ private:
 
     void initializeVariantGeometry();
 public:
-    PieceVariant(int variantId, int64_t pieceId, int rotationAngle = 0, bool isMirrored = false, int requiredQuantity = 1, bool twoWayAllowed = false, int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, std::vector<geometry::Point64> initalBoundary = {});
+    PieceVariant(int variantId, int64_t pieceId, int rotationAngle = 0, bool isMirrored = false, 
+        int requiredQuantity = 1, bool twoWayAllowed = false, 
+        int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, 
+        std::vector<geometry::Point64> initalBoundary = {});
     PieceVariant(Clipper2Lib::Path64 initalPath = {});
 
     

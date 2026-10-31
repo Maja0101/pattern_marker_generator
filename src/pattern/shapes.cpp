@@ -138,8 +138,13 @@ const int64_t PieceVariant::getGlobalId(bool isFlipped) const
         ));
     }
 
+    bool flipped = isFlipped;
+    if (!m_isTwoWay) {
+        flipped = false;
+    }
+
     return static_cast<int64_t>(
-        (static_cast<uint64_t>(isFlipped) << 63) |
+        (static_cast<uint64_t>(flipped) << 63) |
         ((m_pieceId & 0x7FFFFFFFFFFFFULL) << 12) |
         (m_variantId & 0xFFFULL)
     );
@@ -147,7 +152,7 @@ const int64_t PieceVariant::getGlobalId(bool isFlipped) const
 
 const std::vector<geometry::Point64> &PieceVariant::getBoundary(bool isFlipped) const
 {
-    if (isFlipped) {
+    if (m_isTwoWay && isFlipped) {
         return m_flippedBoundary;
     }
     return m_boundary;
@@ -155,7 +160,7 @@ const std::vector<geometry::Point64> &PieceVariant::getBoundary(bool isFlipped) 
 
 const Clipper2Lib::Path64 &PieceVariant::getPath(bool isFlipped) const
 {
-    if (isFlipped) {
+    if (m_isTwoWay && isFlipped) {
         return m_flippedShapePath;
     }
     return m_shapePath;
@@ -167,7 +172,7 @@ const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isF
 
     tranlated_path.reserve(m_shapePath.size());
 
-    if (isFlipped) {
+    if (m_isTwoWay && isFlipped) {
         for (const auto& point : m_flippedShapePath) {
             tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
         }
@@ -181,7 +186,7 @@ const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isF
 
 const std::vector<Clipper2Lib::Path64> &PieceVariant::getDecomposedShape(bool isFlipped) const
 {
-    if (isFlipped) {
+    if (m_isTwoWay && isFlipped) {
         return m_decomposedFlippedShape;
     }
     return m_decomposedShape;
