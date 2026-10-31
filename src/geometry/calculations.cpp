@@ -248,9 +248,10 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 {
     nesting::NestingStats result;
 
-    constexpr double SCALE = 1000000; // converstion from internal units to m
-    constexpr double minWidth = 0.15 * SCALE; // set min scrap width to 15 cm
-    constexpr double minScrapArea = 0.04; // set min scrap area to 0.4 sm
+    constexpr double M_SCALE = 1000000.0; // converstion from internal units to m
+    constexpr double MM_SCALE = 1000.0; // converstion from internal units to mm
+    constexpr double minWidth = 0.15 * M_SCALE; // set min scrap width to 15 cm
+    constexpr double minScrapArea = 0.04; // set min scrap area to 0.04 sm
 
     // Prepare fabric and placed items for calculation
     Clipper2Lib::Paths64 fabricAsPaths = { fabric.getPath() };
@@ -264,7 +265,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     );
 
     // Create bounding box to the right of the max right point
-    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + SCALE; // max size + 1m 
+    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + M_SCALE; // max size + 1m 
 
     Clipper2Lib::Path64 rightBoxPath = {
         {maxRightPoint, fabric.getBoundingBox().top - padding},
@@ -307,7 +308,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.usableScrapCount = 0;
     result.usableScrapsArea = 0.0;
     for (const auto& scrap : cleanedScraps) {
-        double area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
+        double area = std::abs(Clipper2Lib::Area(scrap)) / (M_SCALE * M_SCALE);
         if (area >= minScrapArea) {
             ++result.usableScrapCount;
             result.usableScrapsArea += area;
@@ -317,15 +318,15 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     // Calculate remaining fabric area
     result.remainingFabricArea = 0.0;
     for (const auto& fabricPart : rawRemainingFabric) {
-        double area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
+        double area = std::abs(Clipper2Lib::Area(fabricPart)) / (M_SCALE * M_SCALE);
         if (area > 0.0) {
             result.remainingFabricArea += area;
         }
     }
-    result.remainingFabricArea = std::floor(result.remainingFabricArea * 100.0) / 100.0;
+    result.remainingFabricArea = std::floor(result.remainingFabricArea * MM_SCALE) / MM_SCALE;
 
     // Calculate remaining fabric length
-    result.remainingFabricLength = std::floor((static_cast<double>(fabric.getBoundingBox().right - maxRightPoint)) / 10000) / 100.0;
+    result.remainingFabricLength = std::floor((static_cast<double>(fabric.getBoundingBox().right - maxRightPoint)) / MM_SCALE) / MM_SCALE;
 
     //Calculate waste
     double fabricArea = Clipper2Lib::Area(fabricAsPaths);
@@ -333,8 +334,8 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.wasteArea = fabricArea - result.remainingFabricArea - result.usableScrapsArea;
 
     // Calculate percentages
-    result.remainingFabricPercentage = std::round(result.remainingFabricArea / fabricArea * 100.0) / 100.0;
-    result.usableScrapsPercentage = std::round(result.usableScrapsArea / fabricArea * 100.0) / 100.0;
+    result.remainingFabricPercentage = std::round(result.remainingFabricArea / fabricArea * MM_SCALE) / MM_SCALE;
+    result.usableScrapsPercentage = std::round(result.usableScrapsArea / fabricArea * MM_SCALE) / MM_SCALE;
     result.wastePercentage = 1.0 - result.remainingFabricPercentage - result.usableScrapsArea;
 
     return result;
