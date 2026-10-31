@@ -23,6 +23,7 @@ int64_t crossProduct(const Point64& a, const Point64& b, const Point64& c);
 
 namespace pmg::geometry::calculations {
 
+bool isCyclicShift(const std::vector<Point64>& polygonA, const std::vector<Point64>& polygonB);
 Clipper2Lib::Point64 toClipperPoint(const Point64& point);
 Clipper2Lib::Path64 toClipperPath(const std::vector<Point64>& polygon);
 std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64& path);

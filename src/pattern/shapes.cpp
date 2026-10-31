@@ -80,8 +80,21 @@ void PieceVariant::initializeVariantGeometry()
     m_isConvex = geometry::calculations::checkConvexity(m_boundary);
 
     if (m_isTwoWay) {
-        m_flippedBoundary = geometry::calculations::rotateBy180(m_boundary);
-        m_flippedShapePath = geometry::calculations::toClipperPath(m_flippedBoundary);
+        std::vector<pmg::geometry::Point64> rotatedBoundary = geometry::calculations::rotateBy180(m_boundary);
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            for (const auto& point : m_boundary) {
+                SPDLOG_INFO(std::format("m_boundary {}", point.toString()));
+            }
+            for (const auto& point : rotatedBoundary) {
+                SPDLOG_INFO(std::format("rotatedBoundary {}", point.toString()));
+            }
+        }
+        if (geometry::calculations::isCyclicShift(m_boundary, rotatedBoundary)) {
+            m_isTwoWay = false;
+        } else {
+            m_flippedBoundary = geometry::calculations::rotateBy180(m_boundary);
+            m_flippedShapePath = geometry::calculations::toClipperPath(m_flippedBoundary);
+        }
     }
 
     if (m_isConvex) {

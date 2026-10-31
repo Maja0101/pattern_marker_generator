@@ -11,8 +11,6 @@ namespace pmg::nesting {
 
 NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
 {
-    // TODO statistics data
-
     BottomLeft bottomLeft(m_fabric, m_ifpCache, m_nfpCache);
 
     return bottomLeft.performNesting(items);
@@ -26,8 +24,6 @@ AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
 
 NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces)
 {
-    // TODO statistics data
-
     {
         SPDLOG_INFO("Preparing the geometry...");
         timing::Timer timer;

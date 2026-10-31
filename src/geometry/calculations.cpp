@@ -86,6 +86,31 @@ int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
 } // namespace pmg::geometry::calculations::utils
 
 namespace pmg::geometry::calculations {
+bool isCyclicShift(const std::vector<Point64> &polygonA, const std::vector<Point64> &polygonB)
+{
+    size_t n = polygonA.size();
+    if (n != polygonB.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < n; ++i) {
+        if (polygonA[i] == polygonB[0]) {
+            bool match = true;
+            for (size_t j = 1; j < n; ++j) {
+                if (polygonA[(i + j) % n] != polygonB[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 Clipper2Lib::Point64 toClipperPoint(const Point64 &point)
 {
     return Clipper2Lib::Point64{ point.x, point.y };
