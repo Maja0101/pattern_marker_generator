@@ -368,10 +368,13 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.remainingFabricArea = static_cast<double>(remainingFabricArea) / (SCALE * SCALE);
 
     // Calculate remaining fabric length
+    result.totalFabricLength = static_cast<double>(fabric.getBoundingBox().right) / (SCALE * SCALE);
     result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / (SCALE * SCALE);
 
     //Calculate waste
     int64_t fabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
+    result.totalFabricArea = static_cast<double>(fabricArea) / (SCALE * SCALE);
+
     int64_t usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
 
     int64_t wasteArea = fabricArea - usedArea - remainingFabricArea - usableScrapsArea;
@@ -388,9 +391,9 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     int usedAreaPercentage = usedArea * SCALE / fabricArea;
     int remainingFabricPercentage = remainingFabricArea * SCALE / fabricArea;
     int usableScrapsPercentage = usableScrapsArea * SCALE / fabricArea;
-    result.remainingFabricPercentage = static_cast<double>(remainingFabricPercentage) / SCALE;
-    result.usableScrapsPercentage = static_cast<double>(usableScrapsPercentage) / SCALE;
-    result.wastePercentage = static_cast<double>(wasteArea * SCALE / fabricArea) / SCALE;
+    result.remainingFabricPercentage = static_cast<double>(remainingFabricPercentage) / 10.0;
+    result.usableScrapsPercentage = static_cast<double>(usableScrapsPercentage) / 10.0;
+    result.wastePercentage = static_cast<double>(wasteArea * SCALE / fabricArea) / 10.0;
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_WARN(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", 

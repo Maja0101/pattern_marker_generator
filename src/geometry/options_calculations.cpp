@@ -48,4 +48,30 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     return total <= limit;
 }
 
+double calculateNestingScore(const nesting::NestingStats &stats, const utils::ScoringWeights w)
+{
+    // Remaining fabric subscore
+    double lengthRatioPcs = (stats.totalFabricLength > 0) ? (stats.remainingFabricLength / stats.totalFabricLength) * 100.0 : 0.0;
+    double sFabric = w.alphaFabric * stats.remainingFabricPercentage + (1.0 - w.alphaFabric) * lengthRatioPcs;
+
+    // Scraps subscore
+    double sScrap = stats.usableScrapsPercentage;
+
+    // Waste penalty
+    double pWaste = stats.wastePercentage;
+
+    // Fragmentation penalty
+    double pFrag = 0.0;
+    if (stats.usableScrapCount > 1) {
+        pFrag = (1.0 - (1.0 / std::log(stats.usableScrapCount + 1))) * 100.0;
+    }
+
+    double totalScore = (w.wFabric * sFabric) +
+                        (w.wScrap * sScrap) -
+                        (w.wWaste * pWaste) -
+                        (w.wFrag * pFrag);
+
+    return std::max(0.0, std::min(100.0, totalScore));
+}
+
 } // namespace pmg::geometry::calculations 
