@@ -9,3 +9,6 @@
 
 # Debug svg file
 *.svg
+
+# Ignore node modules
+/node_modules/
