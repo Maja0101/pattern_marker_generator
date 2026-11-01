@@ -4,14 +4,23 @@
   "description": "C++ nesting engine responsible for generating pattern marker",
   "main": "index.js",
   "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "CMakeLists.txt",
+    "src",
+    "libs"
+  ],
   "scripts": {
-    "build": "cmake-js compile",
+    "install": "cmake-js compile --CDBUILD_TESTING=OFF",
+    "build": "cmake-js compile --CDBUILD_TESTING=OFF",
     "clean": "cmake-js clean"
   },
   "dependencies": {
+    "cmake-js": "^8.0.0",
     "node-addon-api": "^8.9.2"
   },
-  "devDependencies": {
-    "cmake-js": "^8.0.0"
+  "engines": {
+    "node": ">=18"
   }
 }
