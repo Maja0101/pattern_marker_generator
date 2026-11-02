@@ -30,7 +30,7 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
 
         m_originalItems = geometry::calculations::prepareItems(patternPieces);
 
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             for (auto& item : m_originalItems) {
                 // SPDLOG_WARN(std::format("item {} {} {} {}", 
                 //         item.getVariant()->getPieceId(), 
