@@ -48,13 +48,15 @@ NestingResult BasicAlgorithm::runAlgorithm()
         );
     }
 
-    bool exportResult = pmg::geometry::SvgExporter::exportLayout(
-        "debug_output.svg", 
-        m_fabric,
-        sortedItems,
-        sortedItems[0].getVariant()->getSeamAllowance(),
-        sortedItems[0].getVariant()->getCuttingAllowance()
-    );
+    if constexpr (config::DEVELOPMENT) {
+        bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+            "debug_output.svg", 
+            m_fabric,
+            sortedItems,
+            sortedItems[0].getVariant()->getSeamAllowance(),
+            sortedItems[0].getVariant()->getCuttingAllowance()
+        );
+    }
 
     return result;
 }

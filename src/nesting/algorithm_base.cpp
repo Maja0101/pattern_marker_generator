@@ -25,7 +25,7 @@ AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
 NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces)
 {
     {
-        SPDLOG_INFO("Preparing the geometry...");
+        if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Preparing the geometry...");
         timing::Timer timer;
 
         m_originalItems = geometry::calculations::prepareItems(patternPieces);
@@ -74,7 +74,7 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
 
     NestingResult result;
     {
-        SPDLOG_INFO("Nesting...");
+        if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Nesting...");
         timing::Timer timer;
         result = runAlgorithm();
     }

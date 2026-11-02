@@ -11,6 +11,7 @@
 
 #include "utils/logger_setup.hpp"
 #include "utils/timer.hpp"
+#include "utils/config.hpp"
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
@@ -26,7 +27,7 @@ int main()
 {
     logging::initialize();
 
-    SPDLOG_INFO("Starting Pattern Marker Generator...");
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Starting Pattern Marker Generator...");
 
     std::vector<pattern::VariantConstraint> defaultConstraints = {
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
@@ -64,10 +65,10 @@ int main()
 
     nesting::NestingResult result =  alg.execute(samplePieces);
 
-    SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
-    SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", result.minLength));
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", result.minLength));
 
-    SPDLOG_INFO(std::format("Scraps: {} {} {} Fabric: {} {} {} Waste: {} {}", 
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {} {} {} Fabric: {} {} {} Waste: {} {}", 
         result.stats.usableScrapCount, result.stats.usableScrapsArea, result.stats.usableScrapsPercentage,
         result.stats.remainingFabricLength, result.stats.remainingFabricArea, result.stats.remainingFabricPercentage,
         result.stats.wasteArea, result.stats.wastePercentage)

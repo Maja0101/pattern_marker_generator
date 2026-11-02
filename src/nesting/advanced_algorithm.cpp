@@ -36,13 +36,15 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
             best.result = std::move(currentResult);
             best.score = std::move(currentScore);
 
-            bool exportResult = pmg::geometry::SvgExporter::exportLayout(
-                std::format("debug_output_{}.svg", ++m_svgExport), 
-                m_fabric,
-                m_originalItems,
-                m_originalItems[0].getVariant()->getSeamAllowance(),
-                m_originalItems[0].getVariant()->getCuttingAllowance()
-            );
+            if constexpr (config::DEVELOPMENT) {
+                bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+                    std::format("debug_output_{}.svg", ++m_svgExport), 
+                    m_fabric,
+                    m_originalItems,
+                    m_originalItems[0].getVariant()->getSeamAllowance(),
+                    m_originalItems[0].getVariant()->getCuttingAllowance()
+                );
+            }
         }
 
         for (auto& item : items) {
@@ -115,13 +117,15 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
 
         best.result = std::move(runSingleBottomLeft(m_originalItems));
 
-        bool exportResult = pmg::geometry::SvgExporter::exportLayout(
-            "debug_output.svg", 
-            m_fabric,
-            m_originalItems,
-            m_originalItems[0].getVariant()->getSeamAllowance(),
-            m_originalItems[0].getVariant()->getCuttingAllowance()
-        );
+        if constexpr (config::DEVELOPMENT) {
+            bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+                "debug_output.svg", 
+                m_fabric,
+                m_originalItems,
+                m_originalItems[0].getVariant()->getSeamAllowance(),
+                m_originalItems[0].getVariant()->getCuttingAllowance()
+            );
+        }
     }
 
     return best.result;
