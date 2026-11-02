@@ -43,9 +43,14 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             REQUIRE(result.usableScrapCount == 0);
             REQUIRE(result.usableScrapsArea == 0.0);
             REQUIRE(result.usableScrapsPercentage == 0.0);
+
+            REQUIRE(result.effectiveScrapsArea == 0.0);
+            REQUIRE(result.effectiveScrapsPercentage == 0.0);
+
             REQUIRE(result.remainingFabricLength == 0.0);
             REQUIRE(result.remainingFabricArea == 0.0);
             REQUIRE(result.remainingFabricPercentage == 0.0);
+
             REQUIRE(result.wasteArea == 0.0);
             REQUIRE(result.wastePercentage == 0.0);
         }
@@ -59,9 +64,14 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             REQUIRE(result.usableScrapCount == 0);
             REQUIRE(result.usableScrapsArea == 0.0);
             REQUIRE(result.usableScrapsPercentage == 0.0);
+
+            REQUIRE(result.effectiveScrapsArea == 0.0);
+            REQUIRE(result.effectiveScrapsPercentage == 0.0);
+
             REQUIRE(result.remainingFabricLength == 1.0);
             REQUIRE(result.remainingFabricArea == 0.5);
-            REQUIRE(result.remainingFabricPercentage == 1.0);
+            REQUIRE(result.remainingFabricPercentage == 100.0);
+
             REQUIRE(result.wasteArea == 0.0);
             REQUIRE(result.wastePercentage == 0.0);
         }
@@ -88,9 +98,14 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             REQUIRE(result.usableScrapCount == 0);
             REQUIRE(result.usableScrapsArea == 0.0);
             REQUIRE(result.usableScrapsPercentage == 0.0);
+
+            REQUIRE(result.effectiveScrapsArea == 0.0);
+            REQUIRE(result.effectiveScrapsPercentage == 0.0);
+
             REQUIRE(result.remainingFabricLength == 0.6);
             REQUIRE(result.remainingFabricArea == 0.3);
-            REQUIRE(result.remainingFabricPercentage == 0.6);
+            REQUIRE(result.remainingFabricPercentage == 60.0);
+
             REQUIRE(result.wasteArea == 0.0);
             REQUIRE(result.wastePercentage == 0.0);
         }
@@ -116,10 +131,15 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
 
             REQUIRE(result.usableScrapCount == 1);
             REQUIRE(result.usableScrapsArea == 0.04);
-            REQUIRE(result.usableScrapsPercentage == 0.08);
+            REQUIRE(result.usableScrapsPercentage == 8.0);
+
+            REQUIRE(result.effectiveScrapsArea == 0.04);
+            REQUIRE(result.effectiveScrapsPercentage == 8.0);
+
             REQUIRE(result.remainingFabricLength == 0.4);
             REQUIRE(result.remainingFabricArea == 0.2);
-            REQUIRE(result.remainingFabricPercentage == 0.4);
+            REQUIRE(result.remainingFabricPercentage == 40.0);
+
             REQUIRE(result.wasteArea == 0.0);
             REQUIRE(result.wastePercentage == 0.0);
         }
@@ -158,12 +178,17 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
 
                 REQUIRE(result.usableScrapCount == 2);
                 REQUIRE(result.usableScrapsArea == 0.2);
-                REQUIRE(result.usableScrapsPercentage == 0.4);
+                REQUIRE(result.usableScrapsPercentage == 40.0);
+
+                REQUIRE(result.effectiveScrapsArea == 0.2);
+                REQUIRE(result.effectiveScrapsPercentage == 40.0);
+
                 REQUIRE(result.remainingFabricLength == 0.0);
                 REQUIRE(result.remainingFabricArea == 0.0);
                 REQUIRE(result.remainingFabricPercentage == 0.0);
+
                 REQUIRE(result.wasteArea == 0.04);
-                REQUIRE(result.wastePercentage == 0.08);                
+                REQUIRE(result.wastePercentage == 8.0);                
             }
 
             SECTION("Scrap with too small area") {
@@ -190,11 +215,16 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 REQUIRE(result.usableScrapCount == 0);
                 REQUIRE(result.usableScrapsArea == 0.0);
                 REQUIRE(result.usableScrapsPercentage == 0.0);
+
+                REQUIRE(result.effectiveScrapsArea == 0.0);
+                REQUIRE(result.effectiveScrapsPercentage == 0.0);
+
                 REQUIRE(result.remainingFabricLength == 0.0);
                 REQUIRE(result.remainingFabricArea == 0.0);
                 REQUIRE(result.remainingFabricPercentage == 0.0);
+
                 REQUIRE(result.wasteArea == 0.03);
-                REQUIRE(result.wastePercentage == 0.06);    
+                REQUIRE(result.wastePercentage == 6.0);    
             }
 
         }
@@ -225,9 +255,14 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
         REQUIRE(result.usableScrapCount == 0);
         REQUIRE(result.usableScrapsArea == 0.0);
         REQUIRE(result.usableScrapsPercentage == 0.0);
+
+        REQUIRE(result.effectiveScrapsArea == 0.0);
+        REQUIRE(result.effectiveScrapsPercentage == 0.0);
+
         REQUIRE(result.remainingFabricLength == 0.6);
         REQUIRE(result.remainingFabricArea == 0.15);
-        REQUIRE(result.remainingFabricPercentage == 0.428);
+        REQUIRE(result.remainingFabricPercentage == 42.8);
+
         REQUIRE(result.wasteArea == 0.0);
         REQUIRE(result.wastePercentage == 0.0);
     }
