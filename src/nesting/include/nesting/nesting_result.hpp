@@ -16,7 +16,7 @@ struct ItemPlacement {
 struct NestingStats {
     double totalFabricArea;
     double totalFabricLength;
-    
+
     int usableScrapCount;
     double usableScrapsArea;
     double usableScrapsPercentage;
@@ -34,6 +34,11 @@ struct NestingResult {
     double minLength;
     NestingStats stats;
     std::vector<ItemPlacement> positions;
+};
+
+struct NestingScore {
+    NestingResult result;
+    double score{0.0};
 };
 
 } // namespace pmg::nesting

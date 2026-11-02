@@ -25,6 +25,7 @@ public:
     Clipper2Lib::Rect64 getItemBoundingBoxAtPosition() const;
 
     bool lockInPosition(int64_t x, int64_t y);
+    bool resetPosition();
     bool flip180();
 
     std::string toString() const;

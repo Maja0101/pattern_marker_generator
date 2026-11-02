@@ -38,9 +38,18 @@ bool NestedItem::lockInPosition(int64_t x, int64_t y)
     return true;
 }
 
+bool NestedItem::resetPosition()
+{
+    m_isLocked = false;
+    m_position.x = 0;
+    m_position.y = 0;
+
+    return true;
+}
+
 bool NestedItem::flip180()
 {
-    if ((!m_isLocked) && (m_variantRef->getIsTwoWay())) {
+    if ((m_variantRef->getIsTwoWay()) && (!m_isLocked)) {
         m_isFlipped = !m_isFlipped;
         return true;
     }
