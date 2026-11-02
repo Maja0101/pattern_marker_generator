@@ -44,7 +44,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
             ++currentN;
 
             if (total > limit) {
-                if constexpr (config::DEBUG_MODE) {
+                if constexpr (config::DEBUG_MODE_DETAILED) {
                     SPDLOG_INFO(std::format("total > limit ({})", total));
                 }
                 return false;
@@ -53,15 +53,18 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     }
 
     if (twoWayItemsCount >= 64 || (1ULL << twoWayItemsCount) > limit) {
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("twoWayItemsCount too big ({})", twoWayItemsCount));
         }
         return false;
     }
 
     uint64_t allowedTotal = limit >> twoWayItemsCount;
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("twoWayItemsCount {} allowedTotal {} total {}", twoWayItemsCount, allowedTotal, total));
+        }
     if (total > allowedTotal) {
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("total > allowedTotal ({} > {})", total, allowedTotal));
         }
         return false;
@@ -69,7 +72,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
 
     total <<= twoWayItemsCount;
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(total);
     }
     
