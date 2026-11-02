@@ -18,8 +18,29 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
         double currentScore = currentResult.wasSuccessful ? geometry::calculations::calculateNestingScore(currentResult.stats) : -1.0;
 
         if (currentScore > best.score) {
+            if constexpr (config::DEBUG_MODE) {
+                SPDLOG_INFO(std::format("curr best score {} score {} result {} {} {}, {} {} {}, {} {}", best.score, currentScore, 
+                    currentResult.stats.remainingFabricLength,
+                    currentResult.stats.remainingFabricArea,
+                    currentResult.stats.remainingFabricPercentage,
+                    currentResult.stats.usableScrapCount,
+                    currentResult.stats.usableScrapsArea,
+                    currentResult.stats.usableScrapsPercentage,
+                    currentResult.stats.wasteArea,
+                    currentResult.stats.wastePercentage
+                ));
+            }
+
             best.result = std::move(currentResult);
             best.score = std::move(currentScore);
+
+            bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+                std::format("debug_output_{}.svg", ++m_svgExport), 
+                m_fabric,
+                m_originalItems,
+                m_originalItems[0].getVariant()->getSeamAllowance(),
+                m_originalItems[0].getVariant()->getCuttingAllowance()
+            );
         }
 
         for (auto& item : items) {
@@ -48,6 +69,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
 
     if(geometry::calculations::numberOfOptionsWithinLimit(m_originalItems)) {
         double bestScore = -1.0;
+        m_svgExport = 0;
 
         do {
             evaluateDifferentRotations(m_originalItems, 0, best);
@@ -79,7 +101,16 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
         });
 
         best.result = std::move(runSingleBottomLeft(m_originalItems));
+
+        bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+            "debug_output.svg", 
+            m_fabric,
+            m_originalItems,
+            m_originalItems[0].getVariant()->getSeamAllowance(),
+            m_originalItems[0].getVariant()->getCuttingAllowance()
+        );
     }
+
     return best.result;
 }
 

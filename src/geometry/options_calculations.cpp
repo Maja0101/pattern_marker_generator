@@ -1,12 +1,20 @@
 #include <unordered_map>
 
+#include <spdlog/spdlog.h>
+
 #include "geometry/options_calculations.hpp"
+#include "utils/config.hpp"
 
 namespace pmg::geometry::calculations {
 
 bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, uint64_t limit)
 {
     size_t n = items.size();
+
+    if constexpr (config::DEBUG_MODE) {
+        SPDLOG_INFO(std::format("items size {}", n));
+    }
+
     if (n == 0) {
         return true;
     }
@@ -20,6 +28,13 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
         ++options[item.getVariant()->getGlobalId(false)];
     }
 
+    if constexpr (config::DEBUG_MODE) {
+        SPDLOG_INFO(std::format("twoWayItemsCount {}", twoWayItemsCount));
+        for (const auto& [id, freq] : options) {
+            SPDLOG_INFO(std::format("id {} freq {}", id, freq));
+        }
+    }
+
     uint64_t total = 1;
     size_t currentN = 1;
 
@@ -29,21 +44,34 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
             ++currentN;
 
             if (total > limit) {
+                if constexpr (config::DEBUG_MODE) {
+                    SPDLOG_INFO(std::format("total > limit ({})", total));
+                }
                 return false;
             }
         }
     }
 
     if (twoWayItemsCount >= 64 || (1ULL << twoWayItemsCount) > limit) {
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO(std::format("twoWayItemsCount too big ({})", twoWayItemsCount));
+        }
         return false;
     }
 
     uint64_t allowedTotal = limit >> twoWayItemsCount;
     if (total > allowedTotal) {
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO(std::format("total > allowedTotal ({} > {})", total, allowedTotal));
+        }
         return false;
     }
 
     total <<= twoWayItemsCount;
+
+    if constexpr (config::DEBUG_MODE) {
+        SPDLOG_INFO(total);
+    }
     
     return total <= limit;
 }

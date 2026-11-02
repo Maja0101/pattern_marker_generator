@@ -16,6 +16,7 @@
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
 #include "nesting/basic_algorithm.hpp"
+#include "nesting/advanced_algorithm.hpp"
 #include "nesting/nesting_result.hpp"
 #include "sample_input.hpp"
 
@@ -28,8 +29,8 @@ int main()
     SPDLOG_INFO("Starting Pattern Marker Generator...");
 
     std::vector<pattern::VariantConstraint> defaultConstraints = {
-        // { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = true },
-        { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1, .twoWay = true }
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = true },
+        // { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
     };
 
     int64_t sa = 10000; 
@@ -56,8 +57,10 @@ int main()
 
     pattern::Fabric fabric(fabricPts);
 
-    nesting::BasicAlgorithm alg(1500000, 4500000);
+    // nesting::BasicAlgorithm alg(1500000, 4500000);
     // nesting::BasicAlgorithm alg;
+
+    nesting::AdvancedAlgorithm alg(1500000, 4500000);
 
     nesting::NestingResult result =  alg.execute(samplePieces);
 
