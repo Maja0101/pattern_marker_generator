@@ -18,14 +18,16 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
         double currentScore = currentResult.wasSuccessful ? geometry::calculations::calculateNestingScore(currentResult.stats) : -1.0;
 
         if (currentScore > best.score) {
-            if constexpr (config::DEBUG_MODE) {
-                SPDLOG_INFO(std::format("curr best score {} score {} result {} {} {}, {} {} {}, {} {}", best.score, currentScore, 
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("curr best {} score {} result {} {} {}, {} {} {} {} {}, {} {}", best.score, currentScore, 
                     currentResult.stats.remainingFabricLength,
                     currentResult.stats.remainingFabricArea,
                     currentResult.stats.remainingFabricPercentage,
                     currentResult.stats.usableScrapCount,
                     currentResult.stats.usableScrapsArea,
                     currentResult.stats.usableScrapsPercentage,
+                    currentResult.stats.effectiveScrapsArea,
+                    currentResult.stats.effectiveScrapsPercentage,
                     currentResult.stats.wasteArea,
                     currentResult.stats.wastePercentage
                 ));
@@ -68,6 +70,9 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
     NestingScore best;
 
     if(geometry::calculations::numberOfOptionsWithinLimit(m_originalItems)) {
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO("Checking all options");
+        }
         double bestScore = -1.0;
         m_svgExport = 0;
 
@@ -77,7 +82,15 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
             return a.getVariant()->getGlobalId(false) < b.getVariant()->getGlobalId(false);
         }));
 
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO("Last Svg {}", m_svgExport);
+        }
+
     } else {
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO("Checking one option");
+        }
+
         int currIdx = m_originalItems[0].getVariant()->getGlobalId(false);
         size_t currIdxCount = 0;
 

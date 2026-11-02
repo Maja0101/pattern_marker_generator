@@ -20,6 +20,8 @@ struct NestingStats {
     int usableScrapCount;
     double usableScrapsArea;
     double usableScrapsPercentage;
+    double effectiveScrapsArea;
+    double effectiveScrapsPercentage;
 
     double remainingFabricLength;
     double remainingFabricArea;

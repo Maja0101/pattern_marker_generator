@@ -11,7 +11,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
 {
     size_t n = items.size();
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("items size {}", n));
     }
 
@@ -28,7 +28,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
         ++options[item.getVariant()->getGlobalId(false)];
     }
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("twoWayItemsCount {}", twoWayItemsCount));
         for (const auto& [id, freq] : options) {
             SPDLOG_INFO(std::format("id {} freq {}", id, freq));
@@ -83,7 +83,7 @@ double calculateNestingScore(const nesting::NestingStats &stats, const utils::Sc
     double sFabric = w.alphaFabric * stats.remainingFabricPercentage + (1.0 - w.alphaFabric) * lengthRatioPcs;
 
     // Scraps subscore
-    double sScrap = stats.usableScrapsPercentage;
+    double sScrap = stats.effectiveScrapsPercentage;
 
     // Waste penalty
     double pWaste = stats.wastePercentage;

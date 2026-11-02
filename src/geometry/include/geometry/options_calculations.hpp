@@ -22,7 +22,7 @@ struct ScoringWeights {
 
 namespace pmg::geometry::calculations {
 
-bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem>& items, uint64_t limit = 4000);
+bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem>& items, uint64_t limit = 100000);
 double calculateNestingScore(const nesting::NestingStats& stats, const utils::ScoringWeights w = utils::ScoringWeights());
 
 } // namespace pmg::geometry::calculations 

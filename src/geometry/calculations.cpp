@@ -6,6 +6,7 @@
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
 #include "geometry/calculations.hpp"
+#include "geometry/ifp_pocket_calculations.hpp"
 
 namespace pmg::geometry::calculations::utils {
 bool aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
@@ -269,6 +270,19 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
     return allVariants;
 }
 
+double calculateSolidity(const Clipper2Lib::Path64 &scrapPath)
+{
+    double scrapArea = std::abs(Clipper2Lib::Area(scrapPath));
+    if (scrapArea <= 0) return 0.0;
+
+    Clipper2Lib::Path64 scrapConvexHull = toClipperPath(utils::calculateConvexHull(fromClipperPath(scrapPath)));
+    double convexHullArea = std::abs(Clipper2Lib::Area(scrapConvexHull));
+    if (convexHullArea <= 0) return 0.0;
+
+    double solidity = scrapArea / convexHullArea;
+    return std::min(1.0, std::max(0.0, solidity));
+}
+
 nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const pattern::Fabric &fabric, int64_t maxRightPoint)
 {
     nesting::NestingStats result;
@@ -348,14 +362,22 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 
     result.usableScrapCount = 0;
     int64_t usableScrapsArea = 0;
+    int64_t effectiveScrapsArea = 0;
     for (const auto& scrap : cleanedScraps) {
         int64_t area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
         if (area >= minScrapArea) {
             ++result.usableScrapCount;
             usableScrapsArea += area;
+            double solidity = calculateSolidity(scrap);
+            if (solidity == 1.0) {
+                effectiveScrapsArea += area;
+            } else if (solidity > 0.0) {
+                effectiveScrapsArea += static_cast<int64_t>(static_cast<long double>(area) * solidity);
+            }
         }
     }
     result.usableScrapsArea = static_cast<double>(usableScrapsArea) / (SCALE * SCALE);
+    result.effectiveScrapsArea = static_cast<double>(effectiveScrapsArea) / (SCALE * SCALE);
 
     // Calculate remaining fabric area
     int64_t remainingFabricArea = 0;
@@ -391,8 +413,10 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     int usedAreaPercentage = usedArea * SCALE / fabricArea;
     int remainingFabricPercentage = remainingFabricArea * SCALE / fabricArea;
     int usableScrapsPercentage = usableScrapsArea * SCALE / fabricArea;
+    int effectiveScrapsPercentage = effectiveScrapsArea * SCALE / fabricArea;
     result.remainingFabricPercentage = static_cast<double>(remainingFabricPercentage) / 10.0;
     result.usableScrapsPercentage = static_cast<double>(usableScrapsPercentage) / 10.0;
+    result.effectiveScrapsPercentage = static_cast<double>(effectiveScrapsPercentage) / 10.0;
     result.wastePercentage = static_cast<double>(wasteArea * SCALE / fabricArea) / 10.0;
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
