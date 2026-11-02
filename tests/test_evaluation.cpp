@@ -227,6 +227,41 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 REQUIRE(result.wastePercentage == 6.0);    
             }
 
+            SECTION("Irregular scrap with smaller effective area") {
+                Clipper2Lib::Paths64 placedItems = {
+                    {
+                        {      0,      0},  
+                        { 200000,      0},  
+                        { 200000, 200000}, 
+                        {      0, 200000}
+                    },
+                    {
+                        { 400000,      0},  
+                        { 600000,      0},  
+                        { 600000, 500000}, 
+                        {      0, 500000},
+                        {      0, 400000},
+                        { 400000, 400000}
+                    }
+                };
+                int64_t maxRightPoint = 600000;
+                
+                pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+
+                REQUIRE(result.usableScrapCount == 1);
+                REQUIRE(result.usableScrapsArea == 0.12);
+                REQUIRE(result.usableScrapsPercentage == 24.0);
+
+                REQUIRE(result.effectiveScrapsArea == 0.102857);
+                REQUIRE(result.effectiveScrapsPercentage == 20.5);
+
+                REQUIRE(result.remainingFabricLength == 0.4);
+                REQUIRE(result.remainingFabricArea == 0.2);
+                REQUIRE(result.remainingFabricPercentage == 40.0);
+
+                REQUIRE(result.wasteArea == 0.0);
+                REQUIRE(result.wastePercentage == 0.0);    
+            }
         }
     }
 
