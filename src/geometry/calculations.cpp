@@ -6,6 +6,7 @@
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
 #include "geometry/calculations.hpp"
+#include "geometry/ifp_pocket_calculations.hpp"
 
 namespace pmg::geometry::calculations::utils {
 bool aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
@@ -30,7 +31,7 @@ bool isCollision(const nesting::BLStateView &view, const nesting::NestedItem &it
         if (aabbCollision(itemBoundsAt, view.placed_pieces_boxes[i])) {
             potential_obstacles.push_back(view.placed_pieces_polygons[i]);
             if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_WARN(std::format("Potential obstacle found", x, y));
+                SPDLOG_INFO(std::format("Potential obstacle found", x, y));
             }   
         }
     }
@@ -78,9 +79,39 @@ bool isWithinFabric(const nesting::BLStateView &view, const nesting::NestedItem 
     return overflow.empty();
 }
 
+int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
+{
+    return (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+}
+
 } // namespace pmg::geometry::calculations::utils
 
 namespace pmg::geometry::calculations {
+bool isCyclicShift(const std::vector<Point64> &polygonA, const std::vector<Point64> &polygonB)
+{
+    size_t n = polygonA.size();
+    if (n != polygonB.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < n; ++i) {
+        if (polygonA[i] == polygonB[0]) {
+            bool match = true;
+            for (size_t j = 1; j < n; ++j) {
+                if (polygonA[(i + j) % n] != polygonB[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 Clipper2Lib::Point64 toClipperPoint(const Point64 &point)
 {
     return Clipper2Lib::Point64{ point.x, point.y };
@@ -172,15 +203,15 @@ bool canPlaceAt(const nesting::BLStateView &view, const nesting::NestedItem &ite
     return true;
 }
 
-std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::PatternPiece> &patternPieces)
+std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece> &patternPieces)
 {
     std::vector<nesting::NestedItem> items;
 
-    for (const auto& piece : patternPieces) {
+    for (auto& piece : patternPieces) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(piece.toString());
         }
-        for (const auto& variant : piece.getVariants()) {
+        for (auto& variant : piece.getVariants()) {
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(variant.toString());
             }
@@ -203,7 +234,7 @@ std::vector<nesting::NestedItem> prepareItems(const std::vector<pattern::Pattern
     return items;
 }
 
-std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::PatternPiece> &patternPieces)
+std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPiece> &patternPieces)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of pattern pieces: {}", patternPieces.size()));
@@ -211,13 +242,13 @@ std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::Pat
 
     std::unordered_map<int64_t, pattern::PieceVariant> variantMap;
 
-    for (const auto& piece : patternPieces) {
+    for (auto& piece : patternPieces) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Pattern pieces no. {}", piece.getId()));
             SPDLOG_INFO(std::format("Number of variants: {}", piece.getVariants().size()));
         }
-        for (const auto& variant : piece.getVariants()) {
-            variantMap.emplace(variant.getGlobalId(), variant);
+        for (auto& variant : piece.getVariants()) {
+            variantMap.emplace(variant.getGlobalId(false), variant);
         }
     }
 
@@ -239,11 +270,161 @@ std::vector<pattern::PieceVariant> getAllVariants(const std::vector<pattern::Pat
     return allVariants;
 }
 
-bool evaluate(const std::vector<nesting::NestedItem> &items)
+double calculateSolidity(const Clipper2Lib::Path64 &scrapPath)
 {
-    // TODO evaluation function for layout 
+    double scrapArea = std::abs(Clipper2Lib::Area(scrapPath));
+    if (scrapArea <= 0) return 0.0;
+
+    Clipper2Lib::Path64 scrapConvexHull = toClipperPath(utils::calculateConvexHull(fromClipperPath(scrapPath)));
+    double convexHullArea = std::abs(Clipper2Lib::Area(scrapConvexHull));
+    if (convexHullArea <= 0) return 0.0;
+
+    double solidity = scrapArea / convexHullArea;
+    return std::min(1.0, std::max(0.0, solidity));
+}
+
+nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const pattern::Fabric &fabric, int64_t maxRightPoint)
+{
+    nesting::NestingStats result;
+
+    constexpr int SCALE = 1000; // converstion from internal units to mm
+    constexpr int minWidth = 150000; // set min scrap width to 15 cm in internal units
+    constexpr int64_t minScrapArea = 40000; // set min scrap area to 0.04 sm in smm
+
+    // Prepare fabric and placed items for calculation
+    Clipper2Lib::Paths64 fabricAsPaths = { fabric.getPath() };
+    Clipper2Lib::Paths64 allItemsCombined = Clipper2Lib::Union(allPlacedItems, Clipper2Lib::FillRule::NonZero);
+
+    // Calculate the paths of all parts of unused fabric
+    Clipper2Lib::Paths64 rawUnusedFabric = Clipper2Lib::Difference(
+        fabricAsPaths,
+        allItemsCombined,
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    // Create bounding box to the right of the max right point
+    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + 1000000; // max size + 1m 
+
+    Clipper2Lib::Path64 rightBoxPath = {
+        {maxRightPoint, fabric.getBoundingBox().top - padding},
+        {fabric.getBoundingBox().right, fabric.getBoundingBox().top - padding},
+        {fabric.getBoundingBox().right, fabric.getBoundingBox().bottom + padding},
+        {maxRightPoint, fabric.getBoundingBox().bottom + padding}
+    };
+    Clipper2Lib::Paths64 rightBox = { rightBoxPath };
     
-    return false;
+    // Get the fabric to the right of the furthest piece
+    Clipper2Lib::Paths64 rawRemainingFabric = Clipper2Lib::Intersect(
+        rawUnusedFabric,
+        rightBox,
+        Clipper2Lib::FillRule::NonZero
+    );
+    
+    // Get the scraps - unused fabric to the left of the furthest piece
+    Clipper2Lib::Paths64 rawScraps = Clipper2Lib::Difference(
+        rawUnusedFabric,
+        rightBox,
+        Clipper2Lib::FillRule::NonZero
+    );
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& path : rawScraps) {
+            for (const auto& point : path) {
+                SPDLOG_INFO(std::format("rawScraps ({}, {})", point.x, point.y));
+            }
+        }
+    }
+    
+    // Clean up scrap
+    // Deflating and Inflating scraps' paths discard the tiny and narrow scraps that are not usable
+    double delta = (minWidth / 2.0);
+    Clipper2Lib::Paths64 cleanedScraps = Clipper2Lib::InflatePaths(
+        rawScraps,
+        -delta,
+        Clipper2Lib::JoinType::Miter, 
+        Clipper2Lib::EndType::Polygon
+    );
+
+    cleanedScraps = Clipper2Lib::InflatePaths(
+        cleanedScraps,
+        delta,
+        Clipper2Lib::JoinType::Miter, 
+        Clipper2Lib::EndType::Polygon
+    );
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& path : cleanedScraps) {
+            for (const auto& point : path) {
+                SPDLOG_INFO(std::format("cleanedScraps ({}, {})", point.x, point.y));
+            }
+        }
+    }
+
+    result.usableScrapCount = 0;
+    int64_t usableScrapsArea = 0;
+    int64_t effectiveScrapsArea = 0;
+    for (const auto& scrap : cleanedScraps) {
+        int64_t area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
+        if (area >= minScrapArea) {
+            ++result.usableScrapCount;
+            usableScrapsArea += area;
+            double solidity = calculateSolidity(scrap);
+            if (solidity == 1.0) {
+                effectiveScrapsArea += area;
+            } else if (solidity > 0.0) {
+                effectiveScrapsArea += static_cast<int64_t>(static_cast<long double>(area) * solidity);
+            }
+        }
+    }
+    result.usableScrapsArea = static_cast<double>(usableScrapsArea) / (SCALE * SCALE);
+    result.effectiveScrapsArea = static_cast<double>(effectiveScrapsArea) / (SCALE * SCALE);
+
+    // Calculate remaining fabric area
+    int64_t remainingFabricArea = 0;
+    for (const auto& fabricPart : rawRemainingFabric) {
+        int64_t area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
+        if (area > 0) {
+            remainingFabricArea += area;
+        }
+    }
+    result.remainingFabricArea = static_cast<double>(remainingFabricArea) / (SCALE * SCALE);
+
+    // Calculate remaining fabric length
+    result.totalFabricLength = static_cast<double>(fabric.getBoundingBox().right) / (SCALE * SCALE);
+    result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / (SCALE * SCALE);
+
+    //Calculate waste
+    int64_t fabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
+    result.totalFabricArea = static_cast<double>(fabricArea) / (SCALE * SCALE);
+
+    int64_t usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
+
+    int64_t wasteArea = fabricArea - usedArea - remainingFabricArea - usableScrapsArea;
+    result.wasteArea = static_cast<double>(wasteArea) / (SCALE * SCALE);
+    
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_WARN(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
+            fabricArea, usedArea, remainingFabricArea, usableScrapsArea, wasteArea));
+        SPDLOG_WARN(std::format("result: remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
+            result.remainingFabricArea, result.usableScrapsArea, result.wasteArea));
+    }
+
+    // Calculate percentages
+    int usedAreaPercentage = usedArea * SCALE / fabricArea;
+    int remainingFabricPercentage = remainingFabricArea * SCALE / fabricArea;
+    int usableScrapsPercentage = usableScrapsArea * SCALE / fabricArea;
+    int effectiveScrapsPercentage = effectiveScrapsArea * SCALE / fabricArea;
+    result.remainingFabricPercentage = static_cast<double>(remainingFabricPercentage) / 10.0;
+    result.usableScrapsPercentage = static_cast<double>(usableScrapsPercentage) / 10.0;
+    result.effectiveScrapsPercentage = static_cast<double>(effectiveScrapsPercentage) / 10.0;
+    result.wastePercentage = static_cast<double>(wasteArea * SCALE / fabricArea) / 10.0;
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_WARN(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", 
+            static_cast<double>(usedAreaPercentage) / SCALE, result.remainingFabricPercentage, result.usableScrapsPercentage, result.wastePercentage));
+    }
+
+    return result;
 }
 
 } // namespace pmg::geometry::calculations

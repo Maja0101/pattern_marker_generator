@@ -13,10 +13,10 @@ BLStateView BottomLeft::makeCurrStateView() const
 
 bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 {
-    int64_t varId = item.getVariant()->getGlobalId();
+    int64_t varId = item.getVariant()->getGlobalId(item.isFlipped());
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(varId);
+        SPDLOG_INFO(std::format("findPosition {} {} {} {}", item.getVariant()->getIsTwoWay(), item.isFlipped(), item.isLocked(), varId));
     }
 
     // Fetch IFP for shape
@@ -44,14 +44,18 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 
     // Subtract NFPs of all placed items
     for (const auto& placedPiece : items) {
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Checking {} {}", placedPiece.getVariant()->getGlobalId(), placedPiece.isLocked()));
-        }
         if (placedPiece.isLocked()) {
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Processing");
             }
-            geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(), varId };
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
+            }
+            geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), varId };
+
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("key {} {}", key.variantIdA, key.variantIdB));
+            }
 
             auto nfpIt = m_nfpCache.find(key);
 
@@ -151,7 +155,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     // Lock item into place
     Clipper2Lib::Point64 bestPosition = candidatePoints.front();
 
-    // snap to boundaries so the inflated NFP won't affect coordinates values
+    // Snap to boundaries so the inflated NFP won't affect coordinates values
     bestPosition = geometry::calculations::snapToBoundaries(bestPosition, ifpIt->second, originalNFPs);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -173,17 +177,20 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 BottomLeft::BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache)
     : m_fabric(std::move(fabric)), m_ifpCache(ifpCache), m_nfpCache(nfpCache) {}
 
-bool BottomLeft::performNesting(std::vector<NestedItem> &items)
+NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Starting nesting");
     }
 
-    int i = 0;
-    for (auto& item : items) {
-        ++i;
+    NestingResult result;
+
+    int64_t minLen = 0;
+
+    for (size_t i = 0; i < items.size(); ++i) {
+        NestedItem& item = items[i];
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Nesting item no. {}", i));
+            SPDLOG_WARN(std::format("Nesting item no. {} {} {}", i, item.getVariant()->getIsTwoWay(), item.isFlipped()));
         }
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Nesting item no. {}", i));
@@ -194,11 +201,28 @@ bool BottomLeft::performNesting(std::vector<NestedItem> &items)
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Could not find position");
             }
-            return false;
+            return { .wasSuccessful = false };
         }
+
+        if (item.getItemBoundingBoxAtPosition().right > minLen) {
+            minLen = item.getItemBoundingBoxAtPosition().right;
+        }
+
+        result.positions.push_back({ 
+            .id = item.getVariant()->getPieceId(), 
+            .rotationAngle = item.getVariant()->getRotationAngle(),
+            .isMirrored = item.getVariant()->getIsMirrored(),
+            .isFlipped180 = item.isFlipped(),
+            .x = item.getPosition().x,
+            .y = item.getPosition().y
+        });
     }
 
-    return true;
+    result.wasSuccessful = true;
+    result.minLength = static_cast<double>(minLen) / 1000000;
+    result.stats = geometry::calculations::evaluate(m_placed_pieces_polygons, m_fabric, minLen);
+
+    return result;
 }
 
 } // namespace pmg::nesting

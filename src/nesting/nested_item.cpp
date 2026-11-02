@@ -6,12 +6,12 @@
 
 namespace pmg::nesting {
 
-NestedItem::NestedItem(const pattern::PieceVariant* variant) noexcept
-    : m_position(geometry::Point64()), m_variantRef(variant), m_isLocked(false) {}
+NestedItem::NestedItem(pattern::PieceVariant* variant) noexcept
+    : m_position(geometry::Point64()), m_variantRef(variant), m_isLocked(false), m_isFlipped(false) {}
 
 Clipper2Lib::Path64 NestedItem::getItemPathAtPosition(int64_t x, int64_t y) const
 {
-    return m_variantRef->getPathAt(x, y);
+    return m_variantRef->getPathAt(x, y, m_isFlipped);
 }
 
 Clipper2Lib::Path64 NestedItem::getItemPathAtPosition() const
@@ -29,11 +29,31 @@ Clipper2Lib::Rect64 NestedItem::getItemBoundingBoxAtPosition() const
     return getItemBoundingBoxAtPosition(m_position.x, m_position.y);
 }
 
-void NestedItem::lockInPosition(int64_t x, int64_t y)
+bool NestedItem::lockInPosition(int64_t x, int64_t y)
 {
     m_isLocked = true;
     m_position.x += x;
     m_position.y += y;
+
+    return true;
+}
+
+bool NestedItem::resetPosition()
+{
+    m_isLocked = false;
+    m_position.x = 0;
+    m_position.y = 0;
+
+    return true;
+}
+
+bool NestedItem::flip180()
+{
+    if ((m_variantRef->getIsTwoWay()) && (!m_isLocked)) {
+        m_isFlipped = !m_isFlipped;
+        return true;
+    }
+    return false;
 }
 
 std::string NestedItem::toString() const

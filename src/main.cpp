@@ -11,12 +11,14 @@
 
 #include "utils/logger_setup.hpp"
 #include "utils/timer.hpp"
-#include "geometry/svg_exporter.hpp"
+#include "utils/config.hpp"
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
 #include "nesting/basic_algorithm.hpp"
+#include "nesting/advanced_algorithm.hpp"
+#include "nesting/nesting_result.hpp"
 #include "sample_input.hpp"
 
 using namespace pmg;
@@ -25,11 +27,11 @@ int main()
 {
     logging::initialize();
 
-    SPDLOG_INFO("Starting Pattern Marker Generator...");
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Starting Pattern Marker Generator...");
 
     std::vector<pattern::VariantConstraint> defaultConstraints = {
-        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1 },
-        { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1 }
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        // { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
     };
 
     int64_t sa = 10000; 
@@ -39,28 +41,42 @@ int main()
         pmg::samples::getSimpleSamplePieces(defaultConstraints, sa, ca);
 
     std::vector<geometry::Point64> fabricPts = {
-        {       0,        0},  
-        {35000000,        0},  
-        {35000000, 15000000}, 
-        {       0, 15000000}  
+        {      0,       0},  
+        {4500000,       0},  
+        {4500000, 1500000}, 
+        {      0, 1500000}  
     };
 
     const std::vector<pmg::geometry::Point64> lShapePts = {
-        {       0,        0},
-        {40000000,        0},
-        {40000000, 10000000},
-        {10000000, 10000000},
-        {10000000, 15000000},
-        {       0, 15000000}
+        {      0,       0},
+        {4000000,       0},
+        {4000000, 1000000},
+        {1000000, 1000000},
+        {1000000, 1500000},
+        {      0, 1500000}
     };
 
-    pattern::Fabric fabric(lShapePts);
+    pattern::Fabric fabric(fabricPts);
 
-    nesting::BasicAlgorithm alg(fabric);
+    // nesting::BasicAlgorithm alg(1500000, 4500000);
+    // nesting::BasicAlgorithm alg;
 
-    std::vector<pattern::PatternPiece> emptyPieces;
+    nesting::AdvancedAlgorithm alg(1500000, 4500000);
 
-    alg.execute(samplePieces);
+    nesting::NestingResult result =  alg.execute(samplePieces);
+
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", result.minLength));
+
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {} {} {} Fabric: {} {} {} Waste: {} {}", 
+        result.stats.usableScrapCount, result.stats.usableScrapsArea, result.stats.usableScrapsPercentage,
+        result.stats.remainingFabricLength, result.stats.remainingFabricArea, result.stats.remainingFabricPercentage,
+        result.stats.wasteArea, result.stats.wastePercentage)
+    );
+
+    // for (const auto& ip : result.positions) {
+    //     SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}, flipped 180: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.isFlipped180, ip.x, ip.y));
+    // }
 
     return 0;
 }

@@ -7,6 +7,7 @@
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
 #include "nesting/bl_state.hpp"
+#include "nesting/nesting_result.hpp"
 #include "geometry/nfp_key.hpp"
 
 namespace pmg::nesting {
@@ -29,7 +30,7 @@ private:
 public:
     BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache);
 
-    bool performNesting(std::vector<NestedItem>& items);
+    NestingResult performNesting(std::vector<NestedItem>& items);
 };
 
 } // namespace pmg::nesting
