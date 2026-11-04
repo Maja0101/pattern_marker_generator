@@ -10,6 +10,7 @@
 #include "utils/config.hpp"
 
 namespace mapbox {
+
 namespace util {
     template <>
     struct nth<0, pmg::geometry::Point64> {
@@ -21,6 +22,7 @@ namespace util {
         inline static auto get(const pmg::geometry::Point64& p) { return p.y; }
     };
 }
+
 }
 
 namespace pmg::geometry::calculations::utils {
@@ -46,6 +48,7 @@ bool isConvex(const Point64 &a, const Point64 &b, const Point64 &c)
 {
     return crossProduct(a, b, c) >= 0;
 }
+
 } // namespace pmg::geometry::calculations::utils
 
 template<>
@@ -58,6 +61,7 @@ struct std::hash<pmg::geometry::calculations::utils::Edge> {
 };
 
 namespace pmg::geometry::calculations {
+
 bool checkConvexity(const std::vector<Point64> &polygon)
 {
     const size_t n = polygon.size();
