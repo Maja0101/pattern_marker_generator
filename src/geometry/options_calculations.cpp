@@ -9,6 +9,11 @@ namespace pmg::geometry::calculations {
 
 bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, uint64_t limit)
 {
+    // Check number of permutations
+    // Items with the same globalId are treated as equal
+    // If the item is two-way the number of possibilities 
+    // should be multiplied by two 
+
     size_t n = items.size();
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -19,6 +24,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
         return true;
     }
 
+    // Calculate the number of each item and number of two-way items
     size_t twoWayItemsCount = 0;
     std::unordered_map<int64_t, size_t> options;
     for (const auto& item : items) {
@@ -38,38 +44,51 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     uint64_t total = 1;
     size_t currentN = 1;
 
+    // Check if number of possibilites is above limit
     for (const auto& [id, freq] : options) {
         for (size_t i = 1; i <= freq; ++i) {
             total = (total * currentN) / i;
             ++currentN;
 
             if (total > limit) {
+
                 if constexpr (config::DEBUG_MODE_DETAILED) {
                     SPDLOG_INFO(std::format("total > limit ({})", total));
                 }
+
                 return false;
             }
         }
     }
 
+    // Check if number of two-way items is too large
     if (twoWayItemsCount >= 64 || (1ULL << twoWayItemsCount) > limit) {
+        
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("twoWayItemsCount too big ({})", twoWayItemsCount));
         }
+        
         return false;
     }
 
+    // Check if number of possibilites is small enough to not exceed limit 
+    // when two-way items taken into account
     uint64_t allowedTotal = limit >> twoWayItemsCount;
+
     if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("twoWayItemsCount {} allowedTotal {} total {}", twoWayItemsCount, allowedTotal, total));
-        }
+        SPDLOG_INFO(std::format("twoWayItemsCount {} allowedTotal {} total {}", twoWayItemsCount, allowedTotal, total));
+    }
+
     if (total > allowedTotal) {
+        
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("total > allowedTotal ({} > {})", total, allowedTotal));
         }
+
         return false;
     }
 
+    // Caclualte final umber of possibilites
     total <<= twoWayItemsCount;
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
