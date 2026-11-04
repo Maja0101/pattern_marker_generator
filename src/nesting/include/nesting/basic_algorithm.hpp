@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include "nesting/algorithm_base.hpp"
 
 namespace pmg::nesting {

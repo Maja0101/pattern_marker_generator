@@ -2,8 +2,8 @@
 
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
-#include "nesting/basic_algorithm.hpp"
 #include "geometry/svg_exporter.hpp"
+#include "nesting/basic_algorithm.hpp"
 
 namespace pmg::nesting {
 
@@ -49,7 +49,7 @@ NestingResult BasicAlgorithm::runAlgorithm()
     }
 
     if constexpr (config::DEVELOPMENT) {
-        bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+        pmg::geometry::SvgExporter::exportLayout(
             "debug_output.svg", 
             m_fabric,
             sortedItems,
