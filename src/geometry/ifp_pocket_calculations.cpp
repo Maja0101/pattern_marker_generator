@@ -68,7 +68,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         int64_t minProjection = dot(nx, ny, point);
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("proj {} ", minProjection));
+            SPDLOG_INFO(std::format("projection {} ", minProjection));
         }
 
         for (size_t j = 1; j < variantHull.size(); ++j) {
@@ -97,14 +97,14 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         const auto& currPlane = halfPlanes[i];
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("i {} curr plane {} {} {}", i, currPlane.a, currPlane.b, currPlane.c));
+            SPDLOG_INFO(std::format("i {} current plane {} {} {}", i, currPlane.a, currPlane.b, currPlane.c));
         }
 
         while(activePlanes.size() >= 2) {
             Point64 prevIntersection = intersect(activePlanes[activePlanes.size() - 2], activePlanes.back());
             
             if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("prevIntersection {} {}", prevIntersection.x, prevIntersection.y));
+                SPDLOG_INFO(std::format("previous intersection {} {}", prevIntersection.x, prevIntersection.y));
             }
 
             __int128_t val = static_cast<__int128_t>(currPlane.a) * prevIntersection.x +

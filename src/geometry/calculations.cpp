@@ -254,7 +254,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& path : rawScraps) {
             for (const auto& point : path) {
-                SPDLOG_INFO(std::format("rawScraps ({}, {})", point.x, point.y));
+                SPDLOG_INFO(std::format("raw scrap point ({}, {})", point.x, point.y));
             }
         }
     }
@@ -279,7 +279,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& path : cleanedScraps) {
             for (const auto& point : path) {
-                SPDLOG_INFO(std::format("cleanedScraps ({}, {})", point.x, point.y));
+                SPDLOG_INFO(std::format("cleaned scrap point ({}, {})", point.x, point.y));
             }
         }
     }
@@ -328,9 +328,9 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.wasteArea = static_cast<double>(wasteArea) / (SCALE * SCALE);
     
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_WARN(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
+        SPDLOG_INFO(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
             fabricArea, usedArea, remainingFabricArea, usableScrapsArea, wasteArea));
-        SPDLOG_WARN(std::format("result: remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
+        SPDLOG_INFO(std::format("result: remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
             result.remainingFabricArea, result.usableScrapsArea, result.wasteArea));
     }
 
@@ -345,7 +345,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.wastePercentage = static_cast<double>(wasteArea * SCALE / fabricArea) / 10.0;
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_WARN(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", 
+        SPDLOG_INFO(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", 
             static_cast<double>(usedAreaPercentage) / SCALE, result.remainingFabricPercentage, result.usableScrapsPercentage, result.wastePercentage));
     }
 

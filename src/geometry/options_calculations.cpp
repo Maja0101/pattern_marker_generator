@@ -35,7 +35,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     }
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("twoWayItemsCount {}", twoWayItemsCount));
+        SPDLOG_INFO(std::format("two ways items count: {}", twoWayItemsCount));
         for (const auto& [id, freq] : options) {
             SPDLOG_INFO(std::format("id {} freq {}", id, freq));
         }
@@ -53,7 +53,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
             if (total > limit) {
 
                 if constexpr (config::DEBUG_MODE_DETAILED) {
-                    SPDLOG_INFO(std::format("total > limit ({})", total));
+                    SPDLOG_INFO(std::format("{}: total > limit", total));
                 }
 
                 return false;
@@ -65,7 +65,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     if (twoWayItemsCount >= 64 || (1ULL << twoWayItemsCount) > limit) {
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("twoWayItemsCount too big ({})", twoWayItemsCount));
+            SPDLOG_INFO(std::format("{}: two way item count too big", twoWayItemsCount));
         }
         
         return false;
@@ -76,13 +76,13 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     uint64_t allowedTotal = limit >> twoWayItemsCount;
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("twoWayItemsCount {} allowedTotal {} total {}", twoWayItemsCount, allowedTotal, total));
+        SPDLOG_INFO(std::format("two way item count {} allowed total {} total {}", twoWayItemsCount, allowedTotal, total));
     }
 
     if (total > allowedTotal) {
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("total > allowedTotal ({} > {})", total, allowedTotal));
+            SPDLOG_INFO(std::format("{}: total > allowedTotal ({})", total, allowedTotal));
         }
 
         return false;

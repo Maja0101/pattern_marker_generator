@@ -67,7 +67,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
             for (const auto& path : Clipper2Lib::SimplifyPaths(nfp, 0.0)) {
                 SPDLOG_INFO("path in nfp");
                 for (const auto& p : path) {
-                    SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
+                    SPDLOG_INFO(std::format("NFP point: ({}, {})", p.x, p.y));
                 }
             }
         }
@@ -88,17 +88,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
     subNFPs.reserve(subShapesA.size() * subShapesB.size());
 
     for (const auto& subA : subShapesA) {
-        
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO("A");
-        }
-
         for (const auto& subB : subShapesB) {
-
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO("B");
-            }
-
             Clipper2Lib::Path64 invertedSubB = invertPath(subB);
 
             Clipper2Lib::Paths64 pairNfp = Clipper2Lib::MinkowskiSum(
@@ -111,7 +101,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
                 for (const auto& path : pairNfp) {
                     SPDLOG_INFO("path in nfp");
                     for (const auto& p : path) {
-                        SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
+                        SPDLOG_INFO(std::format("NFP point: ({}, {})", p.x, p.y));
                     }
                 }
             }
@@ -140,7 +130,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
         for (const auto& path : Clipper2Lib::SimplifyPaths(nfp, 0.0)) {
             SPDLOG_INFO("path in nfp");
             for (const auto& p : path) {
-                SPDLOG_INFO(std::format("NFP: ({}, {})", p.x, p.y));
+                SPDLOG_INFO(std::format("NFP point: ({}, {})", p.x, p.y));
             }
         }
     }
@@ -196,7 +186,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             for (const auto& p : ifp) {
-                SPDLOG_INFO(std::format("IFP: ({}, {})", p.x, p.y));
+                SPDLOG_INFO(std::format("IFP point: ({}, {})", p.x, p.y));
             }
         }
 
@@ -214,10 +204,10 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : fabricHull) {
-            SPDLOG_INFO(std::format("fabricHull: ({}, {})", p.x, p.y));
+            SPDLOG_INFO(std::format("fabricHull point: ({}, {})", p.x, p.y));
         }
         for (const auto& p : variantHull) {
-            SPDLOG_INFO(std::format("variantHull: ({}, {})", p.x, p.y));
+            SPDLOG_INFO(std::format("variantHull point: ({}, {})", p.x, p.y));
         }
     }
     
@@ -232,7 +222,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         for (const auto& path : convexIFP){
             SPDLOG_INFO("basic convexIFP path");
             for (const auto& p : path) {
-                SPDLOG_INFO(std::format("convexIFP: ({}, {})", p.x, p.y));
+                SPDLOG_INFO(std::format("convexIFP point: ({}, {})", p.x, p.y));
             }
         }   
     }
@@ -248,7 +238,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         for (const auto& path : pockets){
             SPDLOG_INFO("pockets path");
             for (const auto& p : path) {
-                SPDLOG_INFO(std::format("pocket: ({}, {})", p.x, p.y));
+                SPDLOG_INFO(std::format("pocket point: ({}, {})", p.x, p.y));
             }
         }   
     }
@@ -266,7 +256,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
             for (const auto& path : pocketNFP){
                 SPDLOG_INFO("pocketNFP path");
                 for (const auto& p : path) {
-                    SPDLOG_INFO(std::format("pocketNFP: ({}, {})", p.x, p.y));
+                    SPDLOG_INFO(std::format("pocketNFP point: ({}, {})", p.x, p.y));
                 }
             }   
         }
@@ -286,7 +276,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         for (const auto& path : ifp){
             SPDLOG_INFO("IFP path");
             for (const auto& p : path) {
-                SPDLOG_INFO(std::format("IFP: ({}, {})", p.x, p.y));
+                SPDLOG_INFO(std::format("IFPp point: ({}, {})", p.x, p.y));
             }
         }   
     }

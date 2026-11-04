@@ -27,25 +27,16 @@ NestingResult BasicAlgorithm::runAlgorithm()
 
     NestingResult result;
 
-    {
-        SPDLOG_INFO("Running single Bottom Left Fill...");
-        timing::Timer timer;
-        result = runSingleBottomLeft(sortedItems);
-    }
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running single Bottom Left Fill...");
+    
+    result = runSingleBottomLeft(sortedItems);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO("Items after single BL");
+        SPDLOG_INFO("Items after single BLF");
         for (const auto& item : sortedItems) {
             SPDLOG_INFO(item.toString());
         }
         SPDLOG_INFO("End of items");
-    }
-
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("Svg generation: w={}, h={}", 
-            ((m_fabric.getBoundingBox().Width()) / 1000), 
-            (m_fabric.getBoundingBox().Height()) / 1000)
-        );
     }
 
     if constexpr (config::DEVELOPMENT) {
