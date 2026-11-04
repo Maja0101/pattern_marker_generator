@@ -1,12 +1,13 @@
-#include <spdlog/spdlog.h>
-
 #include <deque>
+
+#include <spdlog/spdlog.h>
 
 #include "geometry/ifp_pocket_calculations.hpp"
 #include "geometry/calculations.hpp"
 #include "utils/config.hpp"
 
 namespace pmg::geometry::calculations::utils {
+
 struct HalfPlane {
     int64_t a, b, c;
 };
@@ -65,15 +66,19 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         }
 
         int64_t minProjection = dot(nx, ny, point);
+
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("proj {} ", minProjection));
         }
+
         for (size_t j = 1; j < variantHull.size(); ++j) {
             point = variantHull[j];
             int64_t proj = dot(nx, ny, point);
+
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("j {} point {} {} proj {}", j, point.x, point.y, proj));
             }
+
             if (proj < minProjection) {
                 minProjection = proj;
             }
@@ -97,6 +102,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
 
         while(activePlanes.size() >= 2) {
             Point64 prevIntersection = intersect(activePlanes[activePlanes.size() - 2], activePlanes.back());
+            
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("prevIntersection {} {}", prevIntersection.x, prevIntersection.y));
             }
@@ -108,6 +114,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("val {}", val));
             }
+
             if (val < 0) {
                 activePlanes.pop_back();
             } else {
@@ -132,6 +139,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("vertex {} {}", intersection.x, intersection.y));
         }
+        
         ifpVertices.push_back(intersection);
 
     }
