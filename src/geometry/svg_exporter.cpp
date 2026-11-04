@@ -1,12 +1,9 @@
 #include <fstream>
 #include <iomanip>
-#include <array>
 
 #include "geometry/svg_exporter.hpp"
 #include "nesting/nested_item.hpp"
 #include "pattern/shapes.hpp"
-#include "geometry/geometry_types.hpp"
-
 
 namespace pmg::geometry {
 
@@ -57,6 +54,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
 
             const auto pos = item.getPosition();
 
+            // Change the coordinates of points for display
             std::ostringstream pointsStream;
             for (const auto& pt : variant->getBoundary(item.isFlipped())) {
                 double worldX = static_cast<double>(pos.x + pt.x) / 1000.0;
