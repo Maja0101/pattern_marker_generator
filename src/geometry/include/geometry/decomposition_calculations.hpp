@@ -5,7 +5,6 @@
 #include <mapbox/earcut.hpp>
 
 #include "geometry/geometry_types.hpp"
-#include "pattern/shapes.hpp"
 
 namespace pmg::geometry::calculations {
 

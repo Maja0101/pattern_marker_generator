@@ -1,6 +1,6 @@
 #include <cmath>
-#include <vector>
 #include <cstdint>
+#include <vector>
 #include <limits>
 #include <algorithm>
 #include <numbers>

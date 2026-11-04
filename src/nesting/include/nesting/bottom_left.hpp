@@ -6,7 +6,6 @@
 
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
-#include "nesting/bl_state.hpp"
 #include "nesting/nesting_result.hpp"
 #include "geometry/nfp_key.hpp"
 
@@ -19,16 +18,16 @@ private:
     std::unordered_map<int64_t, Clipper2Lib::Paths64>& m_ifpCache;
     std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& m_nfpCache;
 
-    int64_t m_step_size;
+    int64_t m_stepSize;
 
-    Clipper2Lib::Paths64 m_placed_pieces_polygons;
-    std::vector<Clipper2Lib::Rect64> m_placed_pieces_boxes;
-
-    BLStateView makeCurrStateView() const;
+    Clipper2Lib::Paths64 m_placedPiecesPolygons;
+    std::vector<Clipper2Lib::Rect64> m_placedPiecesBoxes;
 
     bool findPosition(NestedItem& item, std::vector<NestedItem>& items);
 public:
-    BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache);
+    BottomLeft(pattern::Fabric fabric, 
+        std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, 
+        std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache);
 
     NestingResult performNesting(std::vector<NestedItem>& items);
 };

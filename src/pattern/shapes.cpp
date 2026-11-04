@@ -4,11 +4,11 @@
 
 #include <spdlog/spdlog.h>
 
-#include "pattern/shapes.hpp"
+#include "utils/config.hpp"
 #include "geometry/decomposition_calculations.hpp"
 #include "geometry/calculations.hpp"
 #include "geometry/transformations.hpp"
-#include "utils/config.hpp"
+#include "pattern/shapes.hpp"
 
 namespace pmg::pattern {
 
@@ -83,10 +83,10 @@ void PieceVariant::initializeVariantGeometry()
         std::vector<pmg::geometry::Point64> rotatedBoundary = geometry::calculations::rotateBy180(m_boundary);
         if constexpr (config::DEBUG_MODE_DETAILED) {
             for (const auto& point : m_boundary) {
-                SPDLOG_INFO(std::format("m_boundary {}", point.toString()));
+                SPDLOG_INFO(std::format("boundary point {}", point.toString()));
             }
             for (const auto& point : rotatedBoundary) {
-                SPDLOG_INFO(std::format("rotatedBoundary {}", point.toString()));
+                SPDLOG_INFO(std::format("rotated boundary point {}", point.toString()));
             }
         }
         if (geometry::calculations::isCyclicShift(m_boundary, rotatedBoundary)) {
@@ -135,22 +135,6 @@ PieceVariant::PieceVariant(Clipper2Lib::Path64 initalPath)
 
 const int64_t PieceVariant::getGlobalId(bool isFlipped) const
 {
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_WARN(std::format("isFlipped {} m_pieceId: {} m_variantId {} result {} {} {} {}", 
-            isFlipped,
-            m_pieceId,
-            m_variantId,
-            (static_cast<uint64_t>(isFlipped) << 63),
-            ((m_pieceId & 0x7FFFFFFFFFFFFULL) << 12),
-            (m_variantId & 0xFFFULL),
-            static_cast<int64_t>(
-                (static_cast<uint64_t>(isFlipped) << 63) |
-                ((m_pieceId & 0x7FFFFFFFFFFFFULL) << 12) |
-                (m_variantId & 0xFFFULL)
-            )
-        ));
-    }
-
     bool flipped = isFlipped;
     if (!m_isTwoWay) {
         flipped = false;

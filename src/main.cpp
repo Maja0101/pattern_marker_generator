@@ -1,10 +1,7 @@
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_DEBUG
 
-#include <iostream>
 #include <vector>
 #include <memory>
-#include <cmath>
-#include <algorithm>
 
 #include <spdlog/spdlog.h>
 #include <clipper2/clipper.h>
@@ -68,15 +65,17 @@ int main()
     if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
     if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", result.minLength));
 
-    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {} {} {} Fabric: {} {} {} Waste: {} {}", 
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {}, {} sm {}% Fabric: {} m, {} sm {}% Waste: {} sm {}%", 
         result.stats.usableScrapCount, result.stats.usableScrapsArea, result.stats.usableScrapsPercentage,
         result.stats.remainingFabricLength, result.stats.remainingFabricArea, result.stats.remainingFabricPercentage,
         result.stats.wasteArea, result.stats.wastePercentage)
     );
 
-    // for (const auto& ip : result.positions) {
-    //     SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}, flipped 180: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.isFlipped180, ip.x, ip.y));
-    // }
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& ip : result.positions) {
+            SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}, flipped 180: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.isFlipped180, ip.x, ip.y));
+        }
+    }
 
     return 0;
 }

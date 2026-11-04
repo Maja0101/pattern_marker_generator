@@ -8,8 +8,8 @@ namespace pmg::nesting {
 
 class AdvancedAlgorithm : public AlgorithmBase {
 private:
-    void evaluateDifferentRotations(std::vector<nesting::NestedItem>& items, size_t index, NestingScore& best);
     int m_svgExport;
+    void evaluateDifferentRotations(std::vector<nesting::NestedItem>& items, size_t index, NestingScore& best);
 protected:
     NestingResult runAlgorithm() override;
 public:

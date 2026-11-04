@@ -2,11 +2,8 @@
 
 #include <vector>
 
-#include <clipper2/clipper.h>
-
 #include "nesting/nested_item.hpp"
 #include "nesting/nesting_result.hpp"
-#include "pattern/shapes.hpp"
 
 namespace pmg::geometry::calculations::utils {
 

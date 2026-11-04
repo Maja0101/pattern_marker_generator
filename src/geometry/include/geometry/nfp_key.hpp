@@ -15,7 +15,6 @@ struct NFPKey {
     }
 };
 
-
 } // namespace pmg::geometry 
 
 template<>

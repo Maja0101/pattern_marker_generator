@@ -6,8 +6,8 @@
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
 #include "geometry/svg_exporter.hpp"
-#include "nesting/advanced_algorithm.hpp"
 #include "geometry/options_calculations.hpp"
+#include "nesting/advanced_algorithm.hpp"
 
 namespace pmg::nesting {
 
@@ -18,6 +18,7 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
         double currentScore = currentResult.wasSuccessful ? geometry::calculations::calculateNestingScore(currentResult.stats) : -1.0;
 
         if (currentScore > best.score) {
+
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("curr best {} score {} result {} {} {}, {} {} {} {} {}, {} {}", best.score, currentScore, 
                     currentResult.stats.remainingFabricLength,
@@ -37,7 +38,7 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
             best.score = std::move(currentScore);
 
             if constexpr (config::DEVELOPMENT) {
-                bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+                pmg::geometry::SvgExporter::exportLayout(
                     std::format("debug_output_{}.svg", ++m_svgExport), 
                     m_fabric,
                     m_originalItems,
@@ -70,12 +71,12 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
     });
 
     NestingScore best;
+    best.score = -1.0;
 
     if(geometry::calculations::numberOfOptionsWithinLimit(m_originalItems)) {
         if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO("Checking all options");
         }
-        double bestScore = -1.0;
         m_svgExport = 0;
 
         do {
@@ -89,6 +90,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
         }
 
     } else {
+
         if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO("Checking one option");
         }
@@ -118,7 +120,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
         best.result = std::move(runSingleBottomLeft(m_originalItems));
 
         if constexpr (config::DEVELOPMENT) {
-            bool exportResult = pmg::geometry::SvgExporter::exportLayout(
+            pmg::geometry::SvgExporter::exportLayout(
                 "debug_output.svg", 
                 m_fabric,
                 m_originalItems,

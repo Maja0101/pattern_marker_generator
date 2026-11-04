@@ -59,7 +59,6 @@ public:
         int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, 
         std::vector<geometry::Point64> initalBoundary = {});
     PieceVariant(Clipper2Lib::Path64 initalPath = {});
-
     
     const int64_t getGlobalId(bool isFlipped) const;
     

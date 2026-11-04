@@ -6,7 +6,6 @@
 #include <clipper2/clipper.h>
 
 #include "geometry/nfp_key.hpp"
-#include "geometry/calculations.hpp"
 #include "pattern/shapes.hpp"
 
 namespace pmg::geometry::calculations::utils {

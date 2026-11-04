@@ -2,9 +2,9 @@
 #include <format>
 #include <string>
 
-#include "pattern/pattern_piece.hpp"
 #include "geometry/transformations.hpp"
 #include "geometry/calculations.hpp"
+#include "pattern/pattern_piece.hpp"
 
 namespace pmg::pattern {
 PatternPiece::PatternPiece(int64_t pieceId, 
@@ -39,14 +39,14 @@ PatternPiece::PatternPiece(int64_t pieceId,
     }
 }
 
-const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored) const noexcept {
-    for (const auto& variant : m_allowedVariants) {
-        if (variant.getRotationAngle() == rotationAngle && variant.getIsMirrored() == isMirrored) {
-            return &variant;
-        }
-    }
-    return nullptr;
-}
+// const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored) const noexcept {
+//     for (const auto& variant : m_allowedVariants) {
+//         if (variant.getRotationAngle() == rotationAngle && variant.getIsMirrored() == isMirrored) {
+//             return &variant;
+//         }
+//     }
+//     return nullptr;
+// }
 
 std::string PatternPiece::toString() const
 {
