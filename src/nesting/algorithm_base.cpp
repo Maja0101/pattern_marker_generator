@@ -2,10 +2,10 @@
 
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
-#include "nesting/algorithm_base.hpp"
-#include "nesting/bottom_left.hpp"
 #include "geometry/calculations.hpp"
 #include "geometry/nfp_ifp_calculations.hpp"
+#include "nesting/bottom_left.hpp"
+#include "nesting/algorithm_base.hpp"
 
 namespace pmg::nesting {
 
@@ -26,6 +26,7 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
 {
     {
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Preparing the geometry...");
+        
         timing::Timer timer;
 
         m_originalItems = geometry::calculations::prepareItems(patternPieces);

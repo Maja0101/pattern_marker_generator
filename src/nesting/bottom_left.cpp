@@ -1,15 +1,11 @@
 #include <spdlog/spdlog.h>
 
-#include "nesting/bottom_left.hpp"
-#include "geometry/calculations.hpp"
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
+#include "geometry/calculations.hpp"
+#include "nesting/bottom_left.hpp"
 
 namespace pmg::nesting {
-BLStateView BottomLeft::makeCurrStateView() const
-{
-    return BLStateView{ m_fabric, m_placed_pieces_polygons, m_placed_pieces_boxes };
-}
 
 bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 {
@@ -22,9 +18,11 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     // Fetch IFP for shape
     auto ifpIt = m_ifpCache.find(varId);
     if (ifpIt == m_ifpCache.end() || ifpIt->second.empty()) {
+        
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("No IFP");
         }
+
         return false;
     }
 
@@ -45,12 +43,15 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     // Subtract NFPs of all placed items
     for (const auto& placedPiece : items) {
         if (placedPiece.isLocked()) {
+            
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Processing");
             }
+
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
             }
+
             geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), varId };
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -60,6 +61,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
             auto nfpIt = m_nfpCache.find(key);
 
             if (nfpIt != m_nfpCache.end() && !nfpIt->second.empty()) {
+                
                 if constexpr (config::DEBUG_MODE_DETAILED) {
                     SPDLOG_INFO("Valid nfp");
                 }
@@ -105,9 +107,11 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
                 );
 
                 if (validRegion.empty()) {
+                    
                     if constexpr (config::DEBUG_MODE_DETAILED) {
                         SPDLOG_INFO("No valid region");
                     }
+
                     return false;
                 }
             }
@@ -162,8 +166,8 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
         SPDLOG_INFO(std::format("bestPosition: ({}, {})", bestPosition.x, bestPosition.y));
     }
 
-    m_placed_pieces_polygons.push_back(item.getItemPathAtPosition(bestPosition.x, bestPosition.y));
-    m_placed_pieces_boxes.push_back(item.getItemBoundingBoxAtPosition(bestPosition.x, bestPosition.y));
+    m_placedPiecesPolygons.push_back(item.getItemPathAtPosition(bestPosition.x, bestPosition.y));
+    m_placedPiecesBoxes.push_back(item.getItemBoundingBoxAtPosition(bestPosition.x, bestPosition.y));
     item.lockInPosition(bestPosition.x, bestPosition.y);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -189,6 +193,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 
     for (size_t i = 0; i < items.size(); ++i) {
         NestedItem& item = items[i];
+        
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_WARN(std::format("Nesting item no. {} {} {}", i, item.getVariant()->getIsTwoWay(), item.isFlipped()));
         }
@@ -198,9 +203,11 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
         }
 
         if (!findPosition(item, items)) {
+            
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO("Could not find position");
             }
+
             return { .wasSuccessful = false };
         }
 
@@ -220,7 +227,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 
     result.wasSuccessful = true;
     result.minLength = static_cast<double>(minLen) / 1000000;
-    result.stats = geometry::calculations::evaluate(m_placed_pieces_polygons, m_fabric, minLen);
+    result.stats = geometry::calculations::evaluate(m_placedPiecesPolygons, m_fabric, minLen);
 
     return result;
 }
