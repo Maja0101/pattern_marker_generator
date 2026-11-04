@@ -4,11 +4,11 @@
 
 #include <spdlog/spdlog.h>
 
-#include "pattern/shapes.hpp"
+#include "utils/config.hpp"
 #include "geometry/decomposition_calculations.hpp"
 #include "geometry/calculations.hpp"
 #include "geometry/transformations.hpp"
-#include "utils/config.hpp"
+#include "pattern/shapes.hpp"
 
 namespace pmg::pattern {
 

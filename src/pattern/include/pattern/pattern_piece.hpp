@@ -3,11 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "clipper2/clipper.h"
-
 #include "geometry/geometry_types.hpp"
-#include "shapes.hpp"
-#include "variant_constraint.hpp"
+#include "pattern/shapes.hpp"
+#include "pattern/variant_constraint.hpp"
 
 namespace pmg::pattern {
 
@@ -23,7 +21,7 @@ public:
                 const std::vector<VariantConstraint>& constraints,
                 int64_t seamAllowance = 0, int64_t cuttingAllowance = 0);
 
-    const PieceVariant* getVariant(int rotationAngle, bool isMirrored) const noexcept;
+    // const PieceVariant* getVariant(int rotationAngle, bool isMirrored) const noexcept;
 
     std::vector<PieceVariant>& getVariants() noexcept { return m_allowedVariants; }
     int64_t getId() const noexcept { return m_id; }
