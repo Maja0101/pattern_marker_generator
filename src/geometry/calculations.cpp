@@ -9,75 +9,6 @@
 #include "geometry/ifp_pocket_calculations.hpp"
 
 namespace pmg::geometry::calculations::utils {
-bool aabbCollision(const Clipper2Lib::Rect64 &a, const Clipper2Lib::Rect64 &b)
-{
-    return (a.left <= b.right && a.right >= b.left) && // (aMinX <= bMaxX && aMaxX >= bMinX) &&
-            (a.top <= b.bottom && a.bottom >= b.top); // (aMinY <= bMaxY && aMaxY >= bMinY)
-}
-
-bool isCollision(const nesting::BLStateView &view, const nesting::NestedItem &item, int64_t x, int64_t y)
-{
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("Checking for collision at x={}, y={}", x, y));
-    }
-    
-    // Bounding boxes of item at potential position
-    Clipper2Lib::Rect64 itemBoundsAt = item.getItemBoundingBoxAtPosition(x, y);
-
-    // Fast check using bounding boxes and store potential collision shapes
-    Clipper2Lib::Paths64 potential_obstacles;
-
-    for (size_t i = 0; i < view.placed_pieces_boxes.size(); ++i) {
-        if (aabbCollision(itemBoundsAt, view.placed_pieces_boxes[i])) {
-            potential_obstacles.push_back(view.placed_pieces_polygons[i]);
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("Potential obstacle found", x, y));
-            }   
-        }
-    }
-
-    // No collision if there are no overlapping bounding boxes
-    if (potential_obstacles.empty()) {
-        return false;
-    }
-
-    // Item path at potential position
-    Clipper2Lib::Path64 itemPathAt = item.getItemPathAtPosition(x, y);
-
-    // Detailed intersection check
-    Clipper2Lib::Paths64 intersection = Clipper2Lib::Intersect(
-        Clipper2Lib::Paths64{ itemPathAt }, 
-        potential_obstacles, 
-        Clipper2Lib::FillRule::NonZero
-    );
-
-    return !intersection.empty();
-}
-
-bool isWithinFabric(const nesting::BLStateView &view, const nesting::NestedItem &item, int64_t x, int64_t y)
-{
-    // Bounding boxes of fabric and item at potential position
-    Clipper2Lib::Rect64 fabricBounds = view.fabric.getBoundingBox();
-    Clipper2Lib::Rect64 itemBoundsAt = item.getItemBoundingBoxAtPosition(x, y);
-
-    // Fast check using bounding box
-    if (itemBoundsAt.left < fabricBounds.left || itemBoundsAt.right > fabricBounds.right ||
-        itemBoundsAt.bottom > fabricBounds.bottom || itemBoundsAt.top < fabricBounds.top) { // bottom is maxY, top is minY
-            return false;
-    }
-
-    // Item path at potential position
-    Clipper2Lib::Path64 itemPathAt = item.getItemPathAtPosition(x, y);
-
-    // Precise check using difference between two paths
-    Clipper2Lib::Paths64 overflow = Clipper2Lib::Difference(
-        Clipper2Lib::Paths64{ itemPathAt },
-        Clipper2Lib::Paths64{ view.fabric.getPath() },
-        Clipper2Lib::FillRule::NonZero
-    );
-
-    return overflow.empty();
-}
 
 int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
 {
@@ -87,8 +18,12 @@ int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
 } // namespace pmg::geometry::calculations::utils
 
 namespace pmg::geometry::calculations {
+
 bool isCyclicShift(const std::vector<Point64> &polygonA, const std::vector<Point64> &polygonB)
 {
+    // Check whether the second polygon is the same as the first polygon
+    // even if the starting point does not match
+
     size_t n = polygonA.size();
     if (n != polygonB.size()) {
         return false;
@@ -184,38 +119,24 @@ Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2
     return point;
 }
 
-bool canPlaceAt(const nesting::BLStateView &view, const nesting::NestedItem &item, int64_t x, int64_t y)
-{
-    if (!utils::isWithinFabric(view, item, x, y)) {
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO("Item not wihin fabric");
-        }
-        return false;
-    }
-
-    if (utils::isCollision(view, item, x, y)) {
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO("Item has collision");
-        }
-        return false;
-    }
-
-    return true;
-}
-
 std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece> &patternPieces)
 {
     std::vector<nesting::NestedItem> items;
 
     for (auto& piece : patternPieces) {
+
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(piece.toString());
         }
+
         for (auto& variant : piece.getVariants()) {
+
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(variant.toString());
             }
+
             for (int i = 0; i < variant.getRequiredQuantity(); ++i) {
+
                 if constexpr (config::DEBUG_MODE_DETAILED) {
                     SPDLOG_INFO(std::format("Loop no. {}", i+1));
                 }
@@ -243,10 +164,12 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
     std::unordered_map<int64_t, pattern::PieceVariant> variantMap;
 
     for (auto& piece : patternPieces) {
+
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Pattern pieces no. {}", piece.getId()));
             SPDLOG_INFO(std::format("Number of variants: {}", piece.getVariants().size()));
         }
+
         for (auto& variant : piece.getVariants()) {
             variantMap.emplace(variant.getGlobalId(false), variant);
         }
@@ -272,6 +195,7 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
 
 double calculateSolidity(const Clipper2Lib::Path64 &scrapPath)
 {
+    // Solidity is calculated as scrap area divided by scrap's convex hull area
     double scrapArea = std::abs(Clipper2Lib::Area(scrapPath));
     if (scrapArea <= 0) return 0.0;
 
@@ -335,7 +259,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
         }
     }
     
-    // Clean up scrap
+    // Clean up scraps
     // Deflating and Inflating scraps' paths discard the tiny and narrow scraps that are not usable
     double delta = (minWidth / 2.0);
     Clipper2Lib::Paths64 cleanedScraps = Clipper2Lib::InflatePaths(
@@ -360,6 +284,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
         }
     }
 
+    // Calculate stats for scraps
     result.usableScrapCount = 0;
     int64_t usableScrapsArea = 0;
     int64_t effectiveScrapsArea = 0;

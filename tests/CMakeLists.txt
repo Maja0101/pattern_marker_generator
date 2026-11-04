@@ -19,7 +19,6 @@ if(TEST_FILES)
     test_main.cpp 
     test_example.cpp
     test_nested_item.cpp
-    test_calculations.cpp
     test_bottom_left.cpp
     test_transformations.cpp
     test_decomposition.cpp

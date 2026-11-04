@@ -5,7 +5,6 @@
 #include <cstdint>
 
 #include "nesting/nesting_result.hpp"
-#include "pattern/variant_constraint.hpp"
 #include "geometry/geometry_types.hpp"
 
 namespace pmg::pattern {
