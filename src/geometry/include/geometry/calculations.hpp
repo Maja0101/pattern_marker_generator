@@ -6,7 +6,6 @@
 
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
-#include "nesting/bl_state.hpp"
 #include "nesting/nested_item.hpp"
 #include "nesting/nesting_result.hpp"
 #include "pattern/shapes.hpp"
