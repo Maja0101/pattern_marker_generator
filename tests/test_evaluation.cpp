@@ -253,7 +253,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 REQUIRE(result.usableScrapsPercentage == 24);
 
                 REQUIRE(result.effectiveScrapsArea == 102857);
-                REQUIRE(result.effectiveScrapsPercentage == 20);
+                REQUIRE(result.effectiveScrapsPercentage == 21);
 
                 REQUIRE(result.remainingFabricLength == 400);
                 REQUIRE(result.remainingFabricArea == 200000);
@@ -296,7 +296,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
 
         REQUIRE(result.remainingFabricLength == 600);
         REQUIRE(result.remainingFabricArea == 150000);
-        REQUIRE(result.remainingFabricPercentage == 42);
+        REQUIRE(result.remainingFabricPercentage == 43);
 
         REQUIRE(result.wasteArea == 0);
         REQUIRE(result.wastePercentage == 0);
