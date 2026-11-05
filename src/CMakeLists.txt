@@ -22,13 +22,12 @@ target_include_directories(facade PUBLIC
 )
 
 # Create executable from main
-add_executable(pattern_marker_generator main.cpp
-	sample_input.cpp)
+add_executable(pattern_marker_generator main.cpp sample_input.cpp)
 
 target_link_libraries(pattern_marker_generator PRIVATE facade)
 
 if(CMAKE_JS_VERSION)
-    add_library(pmg_engine SHARED bridge/addon_bridge.cpp)
+    add_library(pmg_engine MODULE bridge/addon_bridge.cpp)
 
     target_include_directories(pmg_engine PRIVATE
         ${NODE_ADDON_API_DIR}
@@ -41,6 +40,10 @@ if(CMAKE_JS_VERSION)
     )
 
     target_link_libraries(pmg_engine PRIVATE facade ${CMAKE_JS_LIB})
+
+    if(APPLE)
+        target_link_options(pmg_engine PRIVATE "-undefined" "dynamic_lookup")
+    endif()
 
     set_target_properties(pmg_engine PROPERTIES PREFIX "" SUFFIX ".node")
 

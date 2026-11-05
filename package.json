@@ -12,8 +12,9 @@
     "libs"
   ],
   "scripts": {
-    "install": "cmake-js compile --CDBUILD_TESTING=OFF",
-    "build": "cmake-js compile --CDBUILD_TESTING=OFF",
+    "install": "cmake-js compile --isRelease --CDBUILD_TESTING=OFF",
+    "build": "cmake-js compile --isRelease --CDBUILD_TESTING=OFF",
+    "build:debug": "cmake-js compile --CDBUILD_TESTING=OFF",
     "clean": "cmake-js clean"
   },
   "dependencies": {
