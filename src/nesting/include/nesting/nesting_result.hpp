@@ -14,21 +14,21 @@ struct ItemPlacement {
 };
 
 struct NestingStats {
-    double totalFabricArea;
-    double totalFabricLength;
+    int64_t totalFabricArea;
+    int64_t totalFabricLength;
 
     int usableScrapCount;
-    double usableScrapsArea;
-    double usableScrapsPercentage;
-    double effectiveScrapsArea;
-    double effectiveScrapsPercentage;
+    int64_t usableScrapsArea;
+    int usableScrapsPercentage;
+    int64_t effectiveScrapsArea;
+    int effectiveScrapsPercentage;
 
-    double remainingFabricLength;
-    double remainingFabricArea;
-    double remainingFabricPercentage;
+    int64_t remainingFabricLength;
+    int64_t remainingFabricArea;
+    int remainingFabricPercentage;
 
-    double wasteArea;
-    double wastePercentage;
+    int64_t wasteArea;
+    int wastePercentage;
 };
 
 struct NestingResult {

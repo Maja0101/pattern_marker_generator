@@ -74,7 +74,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
     best.score = -1.0;
 
     if(geometry::calculations::numberOfOptionsWithinLimit(m_originalItems)) {
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Checking all options");
         }
         m_svgExport = 0;
@@ -91,7 +91,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
 
     } else {
 
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("Checking one option");
         }
 

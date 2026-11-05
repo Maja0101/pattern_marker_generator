@@ -106,8 +106,8 @@ namespace pmg::samples {
 
             std::vector<pattern::VariantConstraint> otherConstraints;
             for (auto& c : defaultConstraints) {
-                pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = true };
-                pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 45, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = true };
+                pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
+                pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 45, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
                 otherConstraints.push_back(constraint1);
                 otherConstraints.push_back(constraint2);
             }
