@@ -1,0 +1,3 @@
+[submodule "libs/clipper2"]
+	path = libs/clipper2
+	url = https://github.com/PolyClipping/Clipper2.git
