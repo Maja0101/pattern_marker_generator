@@ -377,7 +377,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 
     result.effectiveScrapsPercentage = static_cast<int>((result.effectiveScrapsArea * PCS_SCALE + (result.totalFabricArea / 2)) / result.totalFabricArea);
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} effectiveScrapsPercentage {} wastePercentage {}", 
             usedArea * 100 / result.totalFabricArea, result.remainingFabricPercentage, result.usableScrapsPercentage, result.effectiveScrapsPercentage, result.wastePercentage));
     }

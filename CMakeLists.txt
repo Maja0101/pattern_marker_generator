@@ -15,27 +15,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Load CTest framework
 include(CTest)
 
-# Optimize linked code flags
-if (MSVC)
-    add_compile_options(/Gy)
-    add_link_options(/OPT:REF /OPT:ICF)
-else()
-    add_compile_options(-ffunction-sections -fdata-sections)
-    if(APPLE)
-        add_link_options("-Wl,-dead_strip")
-    else()
-        add_link_options("-Wl,--gc-sections")
-    endif()
-endif()
-
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libraries" FORCE)
-
-# Do not build Clipper2's examples and tests
-set(CLIPPER2_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(CLIPPER2_TESTS OFF CACHE BOOL "" FORCE)
-
-add_subdirectory(libs/clipper2/CPP)
-
 # Node addon
 if(CMAKE_JS_VERSION)
     execute_process(
@@ -47,6 +26,14 @@ if(CMAKE_JS_VERSION)
     string(REPLACE "\"" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
     set(NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}" CACHE INTERNAL "")
 endif()
+
+# Clipper2 configuration
+set(CLIPPER2_UTILS OFF CACHE BOOL "" FORCE)
+set(CLIPPER2_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(CLIPPER2_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(libs/clipper2/CPP)
 
 # Add subdirectories
 add_subdirectory(src)

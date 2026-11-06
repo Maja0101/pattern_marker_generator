@@ -55,10 +55,10 @@ int main()
 
     pattern::Fabric fabric(fabricPts);
 
-    // nesting::BasicAlgorithm alg(1500000, 4500000);
+    nesting::BasicAlgorithm alg(1500000, 2000000);
     // nesting::BasicAlgorithm alg;
 
-    nesting::AdvancedAlgorithm alg(1500000, 4500000);
+    // nesting::AdvancedAlgorithm alg(1500000, 4500000);
 
     nesting::NestingResult result =  alg.execute(samplePieces);
 
@@ -71,7 +71,7 @@ int main()
         result.stats.wasteArea, result.stats.wastePercentage)
     );
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         for (const auto& ip : result.positions) {
             SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}, flipped 180: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.isFlipped180, ip.x, ip.y));
         }

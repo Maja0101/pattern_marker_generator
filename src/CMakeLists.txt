@@ -10,7 +10,7 @@ add_library(facade STATIC
 
 # Link library targets
 target_link_libraries(facade PUBLIC 
-	Clipper2
+    Clipper2
 	utils
 	nesting
 	pattern
@@ -34,16 +34,12 @@ if(CMAKE_JS_VERSION)
         ${CMAKE_JS_INC}
     )
 
-    target_compile_definitions(pmg_engine PRIVATE
-        NAPI_VERSION=8
+    target_compile_definitions(pmg_engine PRIVATE 
+        NAPI_VERSION=8 
         NAPI_CPP_EXCEPTIONS
     )
 
     target_link_libraries(pmg_engine PRIVATE facade ${CMAKE_JS_LIB})
-
-    if(APPLE)
-        target_link_options(pmg_engine PRIVATE "-undefined" "dynamic_lookup")
-    endif()
 
     set_target_properties(pmg_engine PROPERTIES PREFIX "" SUFFIX ".node")
 
