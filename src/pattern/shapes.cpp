@@ -11,17 +11,29 @@
 #include "pattern/shapes.hpp"
 
 namespace pmg::pattern {
+inline constexpr int64_t SCALE = 1000;
 
-Shape::Shape(std::vector<geometry::Point64> initalBoundary)
-    : m_shapePath(Clipper2Lib::SimplifyPath(geometry::calculations::toClipperPath(initalBoundary), 0.0)),
+Shape::Shape(std::vector<geometry::Point64> initalBoundary, bool toBeScaled)
+    : m_shapePath([initalBoundary, toBeScaled]() {
+        if (toBeScaled) {
+            std::vector<pmg::geometry::Point64> boundary;
+            boundary.reserve(initalBoundary.size());
+            for (const auto& point : initalBoundary) {
+                boundary.push_back({point.x * SCALE, point.y * SCALE});
+            }
+            return Clipper2Lib::SimplifyPath(geometry::calculations::toClipperPath(boundary), 0.0);
+        }
+        return Clipper2Lib::SimplifyPath(geometry::calculations::toClipperPath(initalBoundary), 0.0);
+      }()), 
       m_boundary((m_shapePath.size() == initalBoundary.size()) ? std::move(initalBoundary) : geometry::calculations::fromClipperPath(m_shapePath)),
       m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
 
-Shape::Shape(int64_t width, int64_t length)
-    : m_shapePath([width, length]() {
+Shape::Shape(int64_t width, int64_t length, bool toBeScaled)
+    : m_shapePath([width, length, toBeScaled]() {
         constexpr int64_t maxValue = 100000001;
-        int64_t w = (width < 0) ? 0 : (width % maxValue);
-        int64_t l = (length < 0) ? 0 : (length % maxValue);
+        int64_t scale = toBeScaled ? SCALE : 1;
+        int64_t w = (width < 0) ? 0 : ((width * scale) % maxValue);
+        int64_t l = (length < 0) ? 0 : ((length * scale) % maxValue);
         Clipper2Lib::Path64 temp;
         temp.reserve(4);
         temp.push_back({0L, 0L});
@@ -118,11 +130,15 @@ void PieceVariant::initializeVariantGeometry()
     }
 }
 
-PieceVariant::PieceVariant(int variantId, int64_t pieceId, int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, int64_t seamAllowance, int64_t cuttingAllowance, std::vector<geometry::Point64> initalBoundary)
+PieceVariant::PieceVariant(int variantId, int64_t pieceId, 
+    int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, 
+    int64_t seamAllowance, int64_t cuttingAllowance, 
+    std::vector<geometry::Point64> initalBoundary, geometry::Point64 referencePoint)
     : Shape(initalBoundary), m_variantId(variantId), m_pieceId(pieceId), 
       m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), 
       m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed),
-      m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance)
+      m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance),
+      m_referencePoint(referencePoint)
 {
     initializeVariantGeometry();
 }

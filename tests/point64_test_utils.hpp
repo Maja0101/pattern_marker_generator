@@ -11,9 +11,7 @@ bool pointsSimiliar(const Point64& a, const Point64& b, int64_t maxDelta = 1) {
     return std::abs(a.x - b.x) <= maxDelta && std::abs(a.y - b.y) <= maxDelta;
 }
 
-bool polygonsSimilar(const std::vector<Point64>& actual, 
-                  const std::vector<Point64>& expected, 
-                  int64_t maxDelta = 1) {
+bool polygonsSimilar(const std::vector<Point64>& actual, const std::vector<Point64>& expected, int64_t maxDelta = 1) {
     if (actual.size() != expected.size()) return false;
     for (size_t i = 0; i < actual.size(); ++i) {
         if (!pointsSimiliar(actual[i], expected[i], maxDelta)) return false;

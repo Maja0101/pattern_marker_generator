@@ -1,5 +1,4 @@
 #include <vector>
-#include <ostream>
 
 #include <catch2/catch_amalgamated.hpp>
 

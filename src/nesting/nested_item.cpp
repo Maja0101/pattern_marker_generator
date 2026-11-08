@@ -56,6 +56,16 @@ bool NestedItem::flip180()
     return false;
 }
 
+geometry::Point64 NestedItem::getPositionForItemWithoutAllowances() const
+{
+    if (!isLocked()) return geometry::Point64();
+
+    return geometry::Point64(
+        m_position.x + m_variantRef->getAllowancesDistance(),
+        m_position.y + m_variantRef->getAllowancesDistance()
+    );
+}
+
 std::string NestedItem::toString() const
 {
     if (!m_variantRef) return "";

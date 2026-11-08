@@ -11,7 +11,22 @@ namespace pmg::geometry::calculations {
     
 constexpr double DEG_TO_RAD = std::numbers::pi / 180.0;
 
-std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored) noexcept
+Point64 getTopLeftCorner(const std::vector<Point64> &polygon) noexcept
+{
+    if (polygon.empty()) return Point64();
+
+    int64_t minX = std::numeric_limits<int64_t>::max();
+    int64_t maxY = std::numeric_limits<int64_t>::min();
+
+    for (const auto& point : polygon) {
+        if (point.x < minX) minX = point.x;
+        if (point.y > maxY) maxY = point.y;
+    }
+
+    return Point64(minX, maxY);
+}
+
+std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored) noexcept
 {
     if (polygon.empty()) return {};
 
@@ -69,9 +84,11 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
         }
     }
 
-    for (size_t i = 0; i < size; ++i) {
-        transformed[i].x -= minX;
-        transformed[i].y -= minY;
+    if (toBeAnchored) {
+        for (size_t i = 0; i < size; ++i) {
+            transformed[i].x -= minX;
+            transformed[i].y -= minY;
+        }
     }
 
     if (isMirrored) {

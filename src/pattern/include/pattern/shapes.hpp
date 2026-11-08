@@ -15,8 +15,8 @@ protected:
     std::vector<geometry::Point64> m_boundary;
     Clipper2Lib::Rect64 m_shapeBoundingBox;
 public:
-    Shape(std::vector<geometry::Point64> initalBoundary = {});
-    Shape(int64_t width, int64_t length);
+    Shape(std::vector<geometry::Point64> initalBoundary = {}, bool toBeScaled = false);
+    Shape(int64_t width, int64_t length, bool toBeScaled = false);
     Shape(Clipper2Lib::Path64 initalPath);
     virtual ~Shape() = default;
     
@@ -45,6 +45,7 @@ private:
     bool m_isTwoWay;
     int64_t m_seamAllowance;
     int64_t m_cuttingAllowance;
+    geometry::Point64 m_referencePoint;
     bool m_isConvex;
     std::vector<Clipper2Lib::Path64> m_decomposedShape;
 
@@ -57,7 +58,8 @@ public:
     PieceVariant(int variantId, int64_t pieceId, int rotationAngle = 0, bool isMirrored = false, 
         int requiredQuantity = 1, bool twoWayAllowed = false, 
         int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, 
-        std::vector<geometry::Point64> initalBoundary = {});
+        std::vector<geometry::Point64> initalBoundary = {},
+        geometry::Point64 referencePoint = geometry::Point64());
     PieceVariant(Clipper2Lib::Path64 initalPath = {});
     
     const int64_t getGlobalId(bool isFlipped) const;
@@ -71,6 +73,8 @@ public:
     const int64_t getSeamAllowance() const { return m_seamAllowance; }
     const int64_t getCuttingAllowance() const { return m_cuttingAllowance; }
     const int getIsConvex() const { return m_isConvex; }
+    const int64_t getAllowancesDistance() const { return m_seamAllowance + m_cuttingAllowance; }
+    const geometry::Point64 getReferencePoint() const { return m_referencePoint; }
     
     const std::vector<geometry::Point64>& getBoundary(bool isFlipped) const;
     const Clipper2Lib::Path64& getPath(bool isFlipped) const;
