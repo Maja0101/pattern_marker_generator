@@ -255,7 +255,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
     }
 
     result.wasSuccessful = true;
-    result.minLength = static_cast<double>(minLen) / (SCALE * SCALE);
+    result.minLength = minLen / SCALE;
     result.stats = geometry::calculations::evaluate(m_placedPiecesPolygons, m_fabric, minLen);
 
     return result;

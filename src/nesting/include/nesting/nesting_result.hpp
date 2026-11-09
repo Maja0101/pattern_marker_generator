@@ -33,7 +33,7 @@ struct NestingStats {
 
 struct NestingResult {
     bool wasSuccessful;
-    double minLength;
+    int64_t minLength;
     NestingStats stats;
     std::vector<ItemPlacement> positions;
 };
