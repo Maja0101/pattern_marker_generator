@@ -109,6 +109,7 @@ Napi::Object toJs(Napi::Env env, const pmg::nesting::NestingResult& r) {
     Napi::Object out = Napi::Object::New(env);
     out.Set("wasSuccessful", r.wasSuccessful);
     out.Set("minLength", r.minLength);
+    out.Set("executionTime", r.executionTime);
 
     Napi::Object stats = Napi::Object::New(env);
     stats.Set("usableScrapCount", r.stats.usableScrapCount);

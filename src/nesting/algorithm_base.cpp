@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include <spdlog/spdlog.h>
 
 #include "utils/config.hpp"
@@ -24,6 +26,8 @@ AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
 
 NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces)
 {
+    std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
     {
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Preparing the geometry...");
         
@@ -60,6 +64,14 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
         result = runAlgorithm();
     }
 
+    std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
+    int executionTimeMs = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(end - start).count();    
+
+    if constexpr (config::DEBUG_MODE) {
+        SPDLOG_INFO(std::format("Sum execution time: {} ms", executionTimeMs));
+    }
+
+    result.executionTime = executionTimeMs;
 
     return result;
 }

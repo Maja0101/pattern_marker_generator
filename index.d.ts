@@ -42,6 +42,7 @@ export interface NestingStats {
 export interface NestingResult {
   wasSuccessful: boolean;
   minLength: number;
+  executionTime: number;
   stats: NestingStats;
   positions: ItemPlacement[];
 }

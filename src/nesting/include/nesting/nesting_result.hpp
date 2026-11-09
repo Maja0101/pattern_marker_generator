@@ -34,6 +34,7 @@ struct NestingStats {
 struct NestingResult {
     bool wasSuccessful;
     int64_t minLength;
+    int executionTime;
     NestingStats stats;
     std::vector<ItemPlacement> positions;
 };
