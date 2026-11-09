@@ -14,16 +14,16 @@ namespace pmg::pattern {
 
 namespace pmg::nesting
 {
-    class BasicAlgorithm;
+    class AlgorithmBase;
 } // namespace pmg::nesting
 
 
 class NestingEngineFacade {
 private:
-    std::unique_ptr<pmg::nesting::BasicAlgorithm> m_engine;
+    std::unique_ptr<pmg::nesting::AlgorithmBase> m_engine;
 public:
-    NestingEngineFacade(int64_t width, int64_t length);
-    NestingEngineFacade(const pmg::pattern::Fabric& fabric);
+    NestingEngineFacade(int64_t width, int64_t length, int64_t algId);
+    NestingEngineFacade(const pmg::pattern::Fabric& fabric, int64_t algId);
     ~NestingEngineFacade();
 
     pmg::nesting::NestingResult execute(std::vector<pmg::pattern::PatternPiece>& patternPieces);

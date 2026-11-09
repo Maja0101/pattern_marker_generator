@@ -1,13 +1,27 @@
 #include "api/nesting_api.hpp"
+#include "nesting/algorithm_base.hpp"
 #include "nesting/basic_algorithm.hpp"
+#include "nesting/advanced_algorithm.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/pattern_piece.hpp"
 
-NestingEngineFacade::NestingEngineFacade(int64_t width, int64_t length)
-    : m_engine(std::make_unique<pmg::nesting::BasicAlgorithm>(width, length)) {}
+NestingEngineFacade::NestingEngineFacade(int64_t width, int64_t length, int64_t algId)
+    : m_engine([&]() -> std::unique_ptr<pmg::nesting::AlgorithmBase> {
+        if (algId == 1) {
+            return std::make_unique<pmg::nesting::BasicAlgorithm>(width, length);
+        } else {
+            return std::make_unique<pmg::nesting::AdvancedAlgorithm>(width, length);
+        }
+      }()) {}
 
-NestingEngineFacade::NestingEngineFacade(const pmg::pattern::Fabric &fabric)
-    : m_engine(std::make_unique<pmg::nesting::BasicAlgorithm>(fabric)) {}
+NestingEngineFacade::NestingEngineFacade(const pmg::pattern::Fabric &fabric, int64_t algId)
+    : m_engine([&]() -> std::unique_ptr<pmg::nesting::AlgorithmBase> {
+        if (algId == 1) {
+            return std::make_unique<pmg::nesting::BasicAlgorithm>(fabric);
+        } else {
+            return std::make_unique<pmg::nesting::AdvancedAlgorithm>(fabric);
+        }
+      }()) {}
 
 NestingEngineFacade::~NestingEngineFacade() = default;
 
