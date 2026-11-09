@@ -6,6 +6,7 @@
 #include "nesting/bottom_left.hpp"
 
 namespace pmg::nesting {
+inline constexpr int64_t SCALE = 1000;
 
 bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 {
@@ -13,6 +14,9 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("findPosition {} {} {} {}", item.getVariant()->getIsTwoWay(), item.isFlipped(), item.isLocked(), varId));
+        for (const auto& p : item.getVariant()->getBoundary(false)) {
+            SPDLOG_INFO(std::format("item point ({}, {})", p.x, p.y));
+        }
     }
 
     // Fetch IFP for shape
@@ -183,6 +187,12 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
         SPDLOG_INFO("Starting nesting");
     }
 
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& point : m_fabric.getBoundary()) {
+            SPDLOG_INFO(std::format("Fabric point {}", point.toString()));
+        }
+    }
+
     NestingResult result;
 
     int64_t minLen = 0;
@@ -207,18 +217,45 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             minLen = item.getItemBoundingBoxAtPosition().right;
         }
 
+        geometry::Point64 rawPosition = item.getPosition();
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Raw position point {} for {}", rawPosition.toString(), item.getVariant()->getPieceId()));
+        }
+
+        geometry::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
+        geometry::Point64 refPoint = item.getVariant()->getReferencePoint();
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Without allowances position point {}", positionWithoutAllowances.toString()));
+            SPDLOG_INFO(std::format("xmax - xt = {} - {}", m_fabric.getBoundingBox().right, positionWithoutAllowances.x));
+        }
+
+        geometry::Point64 deltaPosition(positionWithoutAllowances.y, m_fabric.getBoundingBox().right - positionWithoutAllowances.x);
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("World position point {}", deltaPosition.toString()));
+        }
+
+        deltaPosition.x -= refPoint.x;
+        deltaPosition.y -= refPoint.y;
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Delta point {}", deltaPosition.toString()));
+        }
+
         result.positions.push_back({ 
             .id = item.getVariant()->getPieceId(), 
             .rotationAngle = item.getVariant()->getRotationAngle(),
             .isMirrored = item.getVariant()->getIsMirrored(),
             .isFlipped180 = item.isFlipped(),
-            .x = item.getPosition().x,
-            .y = item.getPosition().y
+            .x = deltaPosition.x / SCALE,
+            .y = deltaPosition.y / SCALE
         });
     }
 
     result.wasSuccessful = true;
-    result.minLength = static_cast<double>(minLen) / 1000000;
+    result.minLength = minLen / SCALE;
     result.stats = geometry::calculations::evaluate(m_placedPiecesPolygons, m_fabric, minLen);
 
     return result;

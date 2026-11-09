@@ -10,7 +10,7 @@ add_library(facade STATIC
 
 # Link library targets
 target_link_libraries(facade PUBLIC 
-	Clipper2
+    Clipper2
 	utils
 	nesting
 	pattern
@@ -22,21 +22,20 @@ target_include_directories(facade PUBLIC
 )
 
 # Create executable from main
-add_executable(pattern_marker_generator main.cpp
-	sample_input.cpp)
+add_executable(pattern_marker_generator main.cpp sample_input.cpp)
 
 target_link_libraries(pattern_marker_generator PRIVATE facade)
 
 if(CMAKE_JS_VERSION)
-    add_library(pmg_engine SHARED bridge/addon_bridge.cpp)
+    add_library(pmg_engine MODULE bridge/addon_bridge.cpp)
 
     target_include_directories(pmg_engine PRIVATE
         ${NODE_ADDON_API_DIR}
         ${CMAKE_JS_INC}
     )
 
-    target_compile_definitions(pmg_engine PRIVATE
-        NAPI_VERSION=8
+    target_compile_definitions(pmg_engine PRIVATE 
+        NAPI_VERSION=8 
         NAPI_CPP_EXCEPTIONS
     )
 

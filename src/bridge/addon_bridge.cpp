@@ -76,25 +76,31 @@ PatternPiece parsePiece(const Napi::Object& o) {
     std::vector<VariantConstraint> constraints;
     if (o.Has("constraints")) constraints = parseConstraints(requireArray(o, "constraints"));
     return PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
-                        getInt(o, "seamAllowance", 0), getInt(o, "cuttingAllowance", 0));
+                        getInt(o, "seamAllowance", 0), getInt(o, "cuttingAllowance", 0),
+                        getInt(o, "grainline", 0), true);
 }
 
+constexpr int64_t DEFAULT_WIDTH = 1400000; 
+constexpr int64_t DEFAULT_LENGTH = 100000000;
+
 Fabric parseFabric(const Napi::Object& o) {
-    if (o.Has("boundary")) return Fabric(parsePoints(requireArray(o, "boundary")));
-    if (o.Has("width") && o.Has("length")) return Fabric(getInt(o, "width", 0), getInt(o, "length", 0));
-    throw std::invalid_argument("fabric requires {width, length} or {boundary: [{x, y}, ...]}");
+    if (o.Has("boundary")) return Fabric(parsePoints(requireArray(o, "boundary")), true);
+    if (o.Has("width") && o.Has("length")) return Fabric(getInt(o, "width", 0), getInt(o, "length", 0), true);
+    return Fabric(DEFAULT_WIDTH, DEFAULT_LENGTH, false);
 }
 
 struct NestingInput {
     Fabric fabric;
     std::vector<PatternPiece> pieces;
+    int64_t algorithm;
 };
 
 NestingInput parseInput(const Napi::CallbackInfo& info) {
-    if (info.Length() < 2 || !info[0].IsObject() || !info[1].IsArray())
-        throw std::invalid_argument("usage: execute(fabric: object, pieces: object[])");
+    if (info.Length() < 3 || !info[0].IsObject() || !info[1].IsArray() || !info[2].IsNumber())
+        throw std::invalid_argument("usage: execute(fabric: object, pieces: object[], algorithm: number)");
 
-    NestingInput in{parseFabric(info[0].As<Napi::Object>()), {}};
+    int64_t algId = info[2].As<Napi::Number>().Int64Value();
+    NestingInput in{parseFabric(info[0].As<Napi::Object>()), {}, algId};
     Napi::Array arr = info[1].As<Napi::Array>();
     in.pieces.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
@@ -109,6 +115,7 @@ Napi::Object toJs(Napi::Env env, const pmg::nesting::NestingResult& r) {
     Napi::Object out = Napi::Object::New(env);
     out.Set("wasSuccessful", r.wasSuccessful);
     out.Set("minLength", r.minLength);
+    out.Set("executionTime", r.executionTime);
 
     Napi::Object stats = Napi::Object::New(env);
     stats.Set("usableScrapCount", r.stats.usableScrapCount);
@@ -147,7 +154,7 @@ public:
 protected:
     void Execute() override {
         try {
-            NestingEngineFacade facade(m_input.fabric);
+            NestingEngineFacade facade(m_input.fabric, m_input.algorithm);
             m_result = facade.execute(m_input.pieces);
         } catch (const std::exception& e) {
             SetError(e.what());
@@ -180,7 +187,7 @@ Napi::Value ExecuteSync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     try {
         NestingInput in = parseInput(info);
-        NestingEngineFacade facade(in.fabric);
+        NestingEngineFacade facade(in.fabric, in.algorithm);
         return toJs(env, facade.execute(in.pieces));
     } catch (const std::exception& e) {
         Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();

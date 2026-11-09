@@ -55,17 +55,17 @@ int main()
 
     pattern::Fabric fabric(fabricPts);
 
-    // nesting::BasicAlgorithm alg(1500000, 4500000);
+    nesting::BasicAlgorithm alg(1500000, 4500000);
     // nesting::BasicAlgorithm alg;
 
-    nesting::AdvancedAlgorithm alg(1500000, 4500000);
+    // nesting::AdvancedAlgorithm alg(1500000, 4500000);
 
     nesting::NestingResult result =  alg.execute(samplePieces);
 
     if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
-    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", result.minLength));
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", static_cast<double>(result.minLength) / 1000.0 ));
 
-    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {}, {} sm {}% Fabric: {} m, {} sm {}% Waste: {} sm {}%", 
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {}, {} smm {}% Fabric: {} mm, {} smm {}% Waste: {} smm {}%", 
         result.stats.usableScrapCount, result.stats.usableScrapsArea, result.stats.usableScrapsPercentage,
         result.stats.remainingFabricLength, result.stats.remainingFabricArea, result.stats.remainingFabricPercentage,
         result.stats.wasteArea, result.stats.wastePercentage)

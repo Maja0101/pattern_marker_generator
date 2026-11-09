@@ -1,6 +1,6 @@
 {
   "name": "@cut-sense/nesting-engine",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "C++ nesting engine responsible for generating pattern marker",
   "main": "index.js",
   "types": "index.d.ts",
@@ -12,8 +12,10 @@
     "libs"
   ],
   "scripts": {
-    "install": "cmake-js compile --CDBUILD_TESTING=OFF",
-    "build": "cmake-js compile --CDBUILD_TESTING=OFF",
+    "install": "cmake-js compile --isRelease --CDBUILD_TESTING=OFF",
+    "prepare": "cmake-js compile --isRelease --CDBUILD_TESTING=OFF",
+    "build": "cmake-js compile --isRelease --CDBUILD_TESTING=OFF",
+    "build:debug": "cmake-js compile --CDBUILD_TESTING=OFF",
     "clean": "cmake-js clean"
   },
   "dependencies": {

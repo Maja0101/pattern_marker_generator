@@ -12,24 +12,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Place executables in build directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# Load CTest framework and FetchContent module
+# Load CTest framework
 include(CTest)
-include(FetchContent)
-
-# Clipper2 library from GitHub (remote dependency)
-FetchContent_Declare(
-    Clipper2
-    GIT_REPOSITORY https://github.com/AngusJohnson/Clipper2.git
-    GIT_TAG        Clipper2_2.0.1
-    SOURCE_SUBDIR  CPP 
-)
-
-# Do not build Clipper2's examples and tests
-set(CLIPPER2_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(CLIPPER2_TESTS OFF CACHE BOOL "" FORCE)
-
-# Make Clipper2 available to the build system 
-FetchContent_MakeAvailable(Clipper2)
 
 # Node addon
 if(CMAKE_JS_VERSION)
@@ -40,7 +24,16 @@ if(CMAKE_JS_VERSION)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     string(REPLACE "\"" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
+    set(NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}" CACHE INTERNAL "")
 endif()
+
+# Clipper2 configuration
+set(CLIPPER2_UTILS OFF CACHE BOOL "" FORCE)
+set(CLIPPER2_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(CLIPPER2_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(libs/clipper2/CPP)
 
 # Add subdirectories
 add_subdirectory(src)

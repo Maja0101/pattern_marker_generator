@@ -1,4 +1,5 @@
 #include <unordered_map>
+#include <array>
 
 #include <spdlog/spdlog.h>
 
@@ -9,6 +10,35 @@
 #include "geometry/ifp_pocket_calculations.hpp"
 
 namespace pmg::geometry::calculations::utils {
+
+std::array<int, 4> calculatePercentages(const std::array<int64_t, 4>& areas, const int64_t totalArea) {
+    if (totalArea == 0) {
+        return {0, 0, 0, 0};
+    }
+
+    std::array<int, 4> results;
+    std::array<int64_t, 4> remainders;
+
+    int sum = 0;
+    for (int i = 0; i < 4; ++i) {
+        results[i] = static_cast<int>((areas[i] * 100) / totalArea);
+        remainders[i] = (areas[i] * 100) % totalArea;
+        sum += results[i];
+    }
+
+    std::array<int, 4> indexes = {0, 1, 2, 3};
+
+    std::stable_sort(indexes.begin(), indexes.end(), [&](int a, int b) {
+        return remainders[a] > remainders[b];
+    });
+
+    const int left = 100 - sum;
+    for (int i = 0; i < left; ++i) {
+        results[indexes[i]] += 1;
+    }
+
+    return results;
+}
 
 int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
 {
@@ -212,6 +242,7 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     nesting::NestingStats result;
 
     constexpr int SCALE = 1000; // converstion from internal units to mm
+    constexpr int PCS_SCALE = 100; // multiplier for calculating percenatges 
     constexpr int minWidth = 150000; // set min scrap width to 15 cm in internal units
     constexpr int64_t minScrapArea = 40000; // set min scrap area to 0.04 sm in smm
 
@@ -286,67 +317,69 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 
     // Calculate stats for scraps
     result.usableScrapCount = 0;
-    int64_t usableScrapsArea = 0;
-    int64_t effectiveScrapsArea = 0;
+    result.usableScrapsArea = 0;
+    result.effectiveScrapsArea = 0;
     for (const auto& scrap : cleanedScraps) {
         int64_t area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
         if (area >= minScrapArea) {
             ++result.usableScrapCount;
-            usableScrapsArea += area;
+            result.usableScrapsArea += area;
             double solidity = calculateSolidity(scrap);
             if (solidity == 1.0) {
-                effectiveScrapsArea += area;
+                result.effectiveScrapsArea += area;
             } else if (solidity > 0.0) {
-                effectiveScrapsArea += static_cast<int64_t>(static_cast<long double>(area) * solidity);
+                result.effectiveScrapsArea += static_cast<int64_t>(static_cast<long double>(area) * solidity);
             }
         }
     }
-    result.usableScrapsArea = static_cast<double>(usableScrapsArea) / (SCALE * SCALE);
-    result.effectiveScrapsArea = static_cast<double>(effectiveScrapsArea) / (SCALE * SCALE);
 
     // Calculate remaining fabric area
-    int64_t remainingFabricArea = 0;
+    result.remainingFabricArea = 0;
     for (const auto& fabricPart : rawRemainingFabric) {
         int64_t area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
         if (area > 0) {
-            remainingFabricArea += area;
+            result.remainingFabricArea += area;
         }
     }
-    result.remainingFabricArea = static_cast<double>(remainingFabricArea) / (SCALE * SCALE);
 
     // Calculate remaining fabric length
-    result.totalFabricLength = static_cast<double>(fabric.getBoundingBox().right) / (SCALE * SCALE);
-    result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / (SCALE * SCALE);
+    result.totalFabricLength = static_cast<double>(fabric.getBoundingBox().right) / SCALE;
+    result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / SCALE;
 
     //Calculate waste
-    int64_t fabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
-    result.totalFabricArea = static_cast<double>(fabricArea) / (SCALE * SCALE);
+    result.totalFabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
 
     int64_t usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
 
-    int64_t wasteArea = fabricArea - usedArea - remainingFabricArea - usableScrapsArea;
-    result.wasteArea = static_cast<double>(wasteArea) / (SCALE * SCALE);
+    result.wasteArea = result.totalFabricArea - usedArea - result.remainingFabricArea - result.usableScrapsArea;
     
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("fabricArea {} usedArea {} remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
-            fabricArea, usedArea, remainingFabricArea, usableScrapsArea, wasteArea));
-        SPDLOG_INFO(std::format("result: remainingFabricArea {} usableScrapsArea {} wasteArea {}", 
-            result.remainingFabricArea, result.usableScrapsArea, result.wasteArea));
+            result.totalFabricArea, usedArea, result.remainingFabricArea, result.usableScrapsArea, result.wasteArea));
     }
 
     // Calculate percentages
-    int usedAreaPercentage = usedArea * SCALE / fabricArea;
-    int remainingFabricPercentage = remainingFabricArea * SCALE / fabricArea;
-    int usableScrapsPercentage = usableScrapsArea * SCALE / fabricArea;
-    int effectiveScrapsPercentage = effectiveScrapsArea * SCALE / fabricArea;
-    result.remainingFabricPercentage = static_cast<double>(remainingFabricPercentage) / 10.0;
-    result.usableScrapsPercentage = static_cast<double>(usableScrapsPercentage) / 10.0;
-    result.effectiveScrapsPercentage = static_cast<double>(effectiveScrapsPercentage) / 10.0;
-    result.wastePercentage = static_cast<double>(wasteArea * SCALE / fabricArea) / 10.0;
+    auto [
+        usedAreaPercentage, 
+        remainingFabricPercentage, 
+        usableScrapsPercentage, 
+        wastePercentage
+    ] = utils::calculatePercentages({
+        usedArea,
+        result.remainingFabricArea,
+        result.usableScrapsArea,
+        result.wasteArea
+    }, result.totalFabricArea);
+
+    result.remainingFabricPercentage = remainingFabricPercentage;
+    result.usableScrapsPercentage = usableScrapsPercentage;
+    result.wastePercentage = wastePercentage;
+
+    result.effectiveScrapsPercentage = static_cast<int>((result.effectiveScrapsArea * PCS_SCALE + (result.totalFabricArea / 2)) / result.totalFabricArea);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} wastePercentage {}", 
-            static_cast<double>(usedAreaPercentage) / SCALE, result.remainingFabricPercentage, result.usableScrapsPercentage, result.wastePercentage));
+        SPDLOG_INFO(std::format("usedAreaPercentage {} remainingFabricPercentage {} usableScrapsPercentage {} effectiveScrapsPercentage {} wastePercentage {}", 
+            usedArea * 100 / result.totalFabricArea, result.remainingFabricPercentage, result.usableScrapsPercentage, result.effectiveScrapsPercentage, result.wastePercentage));
     }
 
     return result;

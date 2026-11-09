@@ -41,18 +41,18 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 0);
-            REQUIRE(result.usableScrapsArea == 0.0);
-            REQUIRE(result.usableScrapsPercentage == 0.0);
+            REQUIRE(result.usableScrapsArea == 0);
+            REQUIRE(result.usableScrapsPercentage == 0);
 
-            REQUIRE(result.effectiveScrapsArea == 0.0);
-            REQUIRE(result.effectiveScrapsPercentage == 0.0);
+            REQUIRE(result.effectiveScrapsArea == 0);
+            REQUIRE(result.effectiveScrapsPercentage == 0);
 
-            REQUIRE(result.remainingFabricLength == 0.0);
-            REQUIRE(result.remainingFabricArea == 0.0);
-            REQUIRE(result.remainingFabricPercentage == 0.0);
+            REQUIRE(result.remainingFabricLength == 0);
+            REQUIRE(result.remainingFabricArea == 0);
+            REQUIRE(result.remainingFabricPercentage == 0);
 
-            REQUIRE(result.wasteArea == 0.0);
-            REQUIRE(result.wastePercentage == 0.0);
+            REQUIRE(result.wasteArea == 0);
+            REQUIRE(result.wastePercentage == 0);
         }
 
         SECTION("No items") {
@@ -62,18 +62,18 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 0);
-            REQUIRE(result.usableScrapsArea == 0.0);
-            REQUIRE(result.usableScrapsPercentage == 0.0);
+            REQUIRE(result.usableScrapsArea == 0);
+            REQUIRE(result.usableScrapsPercentage == 0);
 
-            REQUIRE(result.effectiveScrapsArea == 0.0);
-            REQUIRE(result.effectiveScrapsPercentage == 0.0);
+            REQUIRE(result.effectiveScrapsArea == 0);
+            REQUIRE(result.effectiveScrapsPercentage == 0);
 
-            REQUIRE(result.remainingFabricLength == 1.0);
-            REQUIRE(result.remainingFabricArea == 0.5);
-            REQUIRE(result.remainingFabricPercentage == 100.0);
+            REQUIRE(result.remainingFabricLength == 1000);
+            REQUIRE(result.remainingFabricArea == 500000);
+            REQUIRE(result.remainingFabricPercentage == 100);
 
-            REQUIRE(result.wasteArea == 0.0);
-            REQUIRE(result.wastePercentage == 0.0);
+            REQUIRE(result.wasteArea == 0);
+            REQUIRE(result.wastePercentage == 0);
         }
 
         SECTION("Straight edge of items") {
@@ -96,18 +96,18 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 0);
-            REQUIRE(result.usableScrapsArea == 0.0);
-            REQUIRE(result.usableScrapsPercentage == 0.0);
+            REQUIRE(result.usableScrapsArea == 0);
+            REQUIRE(result.usableScrapsPercentage == 0);
 
-            REQUIRE(result.effectiveScrapsArea == 0.0);
-            REQUIRE(result.effectiveScrapsPercentage == 0.0);
+            REQUIRE(result.effectiveScrapsArea == 0);
+            REQUIRE(result.effectiveScrapsPercentage == 0);
 
-            REQUIRE(result.remainingFabricLength == 0.6);
-            REQUIRE(result.remainingFabricArea == 0.3);
-            REQUIRE(result.remainingFabricPercentage == 60.0);
+            REQUIRE(result.remainingFabricLength == 600);
+            REQUIRE(result.remainingFabricArea == 300000);
+            REQUIRE(result.remainingFabricPercentage == 60);
 
-            REQUIRE(result.wasteArea == 0.0);
-            REQUIRE(result.wastePercentage == 0.0);
+            REQUIRE(result.wasteArea == 0);
+            REQUIRE(result.wastePercentage == 0);
         }
 
         SECTION("Uneven edge of items") {
@@ -130,18 +130,18 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 1);
-            REQUIRE(result.usableScrapsArea == 0.04);
-            REQUIRE(result.usableScrapsPercentage == 8.0);
+            REQUIRE(result.usableScrapsArea == 40000);
+            REQUIRE(result.usableScrapsPercentage == 8);
 
-            REQUIRE(result.effectiveScrapsArea == 0.04);
-            REQUIRE(result.effectiveScrapsPercentage == 8.0);
+            REQUIRE(result.effectiveScrapsArea == 40000);
+            REQUIRE(result.effectiveScrapsPercentage == 8);
 
-            REQUIRE(result.remainingFabricLength == 0.4);
-            REQUIRE(result.remainingFabricArea == 0.2);
-            REQUIRE(result.remainingFabricPercentage == 40.0);
+            REQUIRE(result.remainingFabricLength == 400);
+            REQUIRE(result.remainingFabricArea == 200000);
+            REQUIRE(result.remainingFabricPercentage == 40);
 
-            REQUIRE(result.wasteArea == 0.0);
-            REQUIRE(result.wastePercentage == 0.0);
+            REQUIRE(result.wasteArea == 0);
+            REQUIRE(result.wastePercentage == 0);
         }
 
         SECTION("Scraps smaller than minimum") {
@@ -177,18 +177,18 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
                 REQUIRE(result.usableScrapCount == 2);
-                REQUIRE(result.usableScrapsArea == 0.2);
-                REQUIRE(result.usableScrapsPercentage == 40.0);
+                REQUIRE(result.usableScrapsArea == 200000);
+                REQUIRE(result.usableScrapsPercentage == 40);
 
-                REQUIRE(result.effectiveScrapsArea == 0.2);
-                REQUIRE(result.effectiveScrapsPercentage == 40.0);
+                REQUIRE(result.effectiveScrapsArea == 200000);
+                REQUIRE(result.effectiveScrapsPercentage == 40);
 
-                REQUIRE(result.remainingFabricLength == 0.0);
-                REQUIRE(result.remainingFabricArea == 0.0);
-                REQUIRE(result.remainingFabricPercentage == 0.0);
+                REQUIRE(result.remainingFabricLength == 0);
+                REQUIRE(result.remainingFabricArea == 0);
+                REQUIRE(result.remainingFabricPercentage == 0);
 
-                REQUIRE(result.wasteArea == 0.04);
-                REQUIRE(result.wastePercentage == 8.0);                
+                REQUIRE(result.wasteArea == 40000);
+                REQUIRE(result.wastePercentage == 8);                
             }
 
             SECTION("Scrap with too small area") {
@@ -213,18 +213,18 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
                 REQUIRE(result.usableScrapCount == 0);
-                REQUIRE(result.usableScrapsArea == 0.0);
-                REQUIRE(result.usableScrapsPercentage == 0.0);
+                REQUIRE(result.usableScrapsArea == 0);
+                REQUIRE(result.usableScrapsPercentage == 0);
 
-                REQUIRE(result.effectiveScrapsArea == 0.0);
-                REQUIRE(result.effectiveScrapsPercentage == 0.0);
+                REQUIRE(result.effectiveScrapsArea == 0);
+                REQUIRE(result.effectiveScrapsPercentage == 0);
 
-                REQUIRE(result.remainingFabricLength == 0.0);
-                REQUIRE(result.remainingFabricArea == 0.0);
-                REQUIRE(result.remainingFabricPercentage == 0.0);
+                REQUIRE(result.remainingFabricLength == 0);
+                REQUIRE(result.remainingFabricArea == 0);
+                REQUIRE(result.remainingFabricPercentage == 0);
 
-                REQUIRE(result.wasteArea == 0.03);
-                REQUIRE(result.wastePercentage == 6.0);    
+                REQUIRE(result.wasteArea == 30000);
+                REQUIRE(result.wastePercentage == 6);    
             }
 
             SECTION("Irregular scrap with smaller effective area") {
@@ -249,18 +249,18 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
                 REQUIRE(result.usableScrapCount == 1);
-                REQUIRE(result.usableScrapsArea == 0.12);
-                REQUIRE(result.usableScrapsPercentage == 24.0);
+                REQUIRE(result.usableScrapsArea == 120000);
+                REQUIRE(result.usableScrapsPercentage == 24);
 
-                REQUIRE(result.effectiveScrapsArea == 0.102857);
-                REQUIRE(result.effectiveScrapsPercentage == 20.5);
+                REQUIRE(result.effectiveScrapsArea == 102857);
+                REQUIRE(result.effectiveScrapsPercentage == 21);
 
-                REQUIRE(result.remainingFabricLength == 0.4);
-                REQUIRE(result.remainingFabricArea == 0.2);
-                REQUIRE(result.remainingFabricPercentage == 40.0);
+                REQUIRE(result.remainingFabricLength == 400);
+                REQUIRE(result.remainingFabricArea == 200000);
+                REQUIRE(result.remainingFabricPercentage == 40);
 
-                REQUIRE(result.wasteArea == 0.0);
-                REQUIRE(result.wastePercentage == 0.0);    
+                REQUIRE(result.wasteArea == 0);
+                REQUIRE(result.wastePercentage == 0);    
             }
         }
     }
@@ -288,17 +288,17 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
         pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
         REQUIRE(result.usableScrapCount == 0);
-        REQUIRE(result.usableScrapsArea == 0.0);
-        REQUIRE(result.usableScrapsPercentage == 0.0);
+        REQUIRE(result.usableScrapsArea == 0);
+        REQUIRE(result.usableScrapsPercentage == 0);
 
-        REQUIRE(result.effectiveScrapsArea == 0.0);
-        REQUIRE(result.effectiveScrapsPercentage == 0.0);
+        REQUIRE(result.effectiveScrapsArea == 0);
+        REQUIRE(result.effectiveScrapsPercentage == 0);
 
-        REQUIRE(result.remainingFabricLength == 0.6);
-        REQUIRE(result.remainingFabricArea == 0.15);
-        REQUIRE(result.remainingFabricPercentage == 42.8);
+        REQUIRE(result.remainingFabricLength == 600);
+        REQUIRE(result.remainingFabricArea == 150000);
+        REQUIRE(result.remainingFabricPercentage == 43);
 
-        REQUIRE(result.wasteArea == 0.0);
-        REQUIRE(result.wastePercentage == 0.0);
+        REQUIRE(result.wasteArea == 0);
+        REQUIRE(result.wastePercentage == 0);
     }
 }

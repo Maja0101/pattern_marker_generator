@@ -106,8 +106,8 @@ namespace pmg::samples {
 
             std::vector<pattern::VariantConstraint> otherConstraints;
             for (auto& c : defaultConstraints) {
-                pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = true };
-                pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 45, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = true };
+                pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
+                pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 45, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
                 otherConstraints.push_back(constraint1);
                 otherConstraints.push_back(constraint2);
             }
@@ -115,14 +115,19 @@ namespace pmg::samples {
             // Add them to vector of pattern pieces
             std::vector<pattern::PatternPiece> patternPieces;
             patternPieces.reserve(8);
-            patternPieces.emplace_back(1, trapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(1, trapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance, 90);
             // patternPieces.emplace_back(2, squarePts, defaultConstraints, seamAllowance, cuttingAllowance);
             // patternPieces.emplace_back(3, rectPts, defaultConstraints, seamAllowance, cuttingAllowance);
             patternPieces.emplace_back(4, octagonPts, defaultConstraints, seamAllowance, cuttingAllowance);
-            patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance, 90);
             // patternPieces.emplace_back(6, smallSquarePts, smallSquareConstraints, seamAllowance, cuttingAllowance);
-            patternPieces.emplace_back(7, lShapePts, otherConstraints, seamAllowance, cuttingAllowance);
-            patternPieces.emplace_back(8, cShapePts, otherConstraints, seamAllowance, cuttingAllowance);
+            patternPieces.emplace_back(7, lShapePts, otherConstraints, seamAllowance, cuttingAllowance, 90);
+            patternPieces.emplace_back(8, cShapePts, otherConstraints, seamAllowance, cuttingAllowance, 90);
+
+            // const std::vector<pmg::geometry::Point64> shape1 = {{0,0}, {1000000,0}, {1000000,500000}, {0,500000}};
+            // std::vector<pattern::VariantConstraint> constraints = {{ 0, false, 1, false }};
+            // patternPieces.emplace_back(10, shape1, constraints, 20000, 10000);
+            // patternPieces.emplace_back(11, shape1, constraints, 20000, 10000);
 
 
             if constexpr (config::DEBUG_MODE_DETAILED) {

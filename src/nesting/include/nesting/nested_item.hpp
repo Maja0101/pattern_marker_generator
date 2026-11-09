@@ -28,6 +28,8 @@ public:
     bool resetPosition();
     bool flip180();
 
+    geometry::Point64 getPositionForItemWithoutAllowances() const;
+
     std::string toString() const;
 };
 

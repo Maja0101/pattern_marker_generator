@@ -2,7 +2,8 @@ export interface Point { x: number; y: number }
 
 export type Fabric =
   | { width: number; length: number }
-  | { boundary: Point[] };
+  | { boundary: Point[] }
+  | Record<string, never>;
 
 export interface VariantConstraint {
   rotationAngle?: number;
@@ -17,6 +18,7 @@ export interface PatternPiece {
   constraints?: VariantConstraint[];
   seamAllowance?: number;
   cuttingAllowance?: number;
+  grainline?: number;
 }
 
 export interface ItemPlacement {
@@ -42,9 +44,10 @@ export interface NestingStats {
 export interface NestingResult {
   wasSuccessful: boolean;
   minLength: number;
+  executionTime: number;
   stats: NestingStats;
   positions: ItemPlacement[];
 }
 
-export function execute(fabric: Fabric, pieces: PatternPiece[]): Promise<NestingResult>;
-export function executeSync(fabric: Fabric, pieces: PatternPiece[]): NestingResult;
+export function execute(fabric: Fabric, pieces: PatternPiece[], algorithm: number): Promise<NestingResult>;
+export function executeSync(fabric: Fabric, pieces: PatternPiece[], algorithm: number): NestingResult;
