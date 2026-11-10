@@ -1,11 +1,11 @@
+#include <algorithm>
+#include <cstddef>
 #include <unordered_map>
 #include <array>
 
 #include <spdlog/spdlog.h>
 
-#include "nesting/bottom_left.hpp"
 #include "utils/config.hpp"
-#include "utils/timer.hpp"
 #include "geometry/calculations.hpp"
 #include "geometry/ifp_pocket_calculations.hpp"
 
@@ -20,20 +20,21 @@ std::array<int, 4> calculatePercentages(const std::array<int64_t, 4>& areas, con
     std::array<int64_t, 4> remainders;
 
     int sum = 0;
+    const int PCS_SCALE = 100;
     for (int i = 0; i < 4; ++i) {
-        results[i] = static_cast<int>((areas[i] * 100) / totalArea);
-        remainders[i] = (areas[i] * 100) % totalArea;
+        results[i] = static_cast<int>((areas[i] * PCS_SCALE) / totalArea);
+        remainders[i] = (areas[i] * PCS_SCALE) % totalArea;
         sum += results[i];
     }
 
     std::array<int, 4> indexes = {0, 1, 2, 3};
 
-    std::stable_sort(indexes.begin(), indexes.end(), [&](int a, int b) {
+    std::ranges::stable_sort(indexes, [&](int a, int b) {
         return remainders[a] > remainders[b];
     });
 
-    const int left = 100 - sum;
-    for (int i = 0; i < left; ++i) {
+    const int LEFT = 100 - sum;
+    for (int i = 0; i < LEFT; ++i) {
         results[indexes[i]] += 1;
     }
 
@@ -42,7 +43,7 @@ std::array<int, 4> calculatePercentages(const std::array<int64_t, 4>& areas, con
 
 int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
 {
-    return (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+    return ((b.x - a.x) * (c.y - b.y)) - ((b.y - a.y) * (c.x - b.x));
 }
 
 } // namespace pmg::geometry::calculations::utils
@@ -87,7 +88,7 @@ Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
     Clipper2Lib::Path64 path;
     path.reserve(polygon.size());
     for (const auto& point : polygon) {
-        path.push_back({point.x, point.y});
+        path.emplace_back(point.x, point.y);
     }
     return path;
 }
@@ -243,8 +244,8 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 
     constexpr int SCALE = 1000; // converstion from internal units to mm
     constexpr int PCS_SCALE = 100; // multiplier for calculating percenatges 
-    constexpr int minWidth = 150000; // set min scrap width to 15 cm in internal units
-    constexpr int64_t minScrapArea = 40000; // set min scrap area to 0.04 sm in smm
+    constexpr int MIN_WIDTH = 150000; // set min scrap width to 15 cm in internal units
+    constexpr int64_t MIN_SCRAP_AREA = 40000; // set min scrap area to 0.04 sm in smm
 
     // Prepare fabric and placed items for calculation
     Clipper2Lib::Paths64 fabricAsPaths = { fabric.getPath() };
@@ -258,7 +259,10 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     );
 
     // Create bounding box to the right of the max right point
-    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + 1000000; // max size + 1m 
+    const int64_t METRE = 1000000;
+    int64_t padding = std::max(fabric.getBoundingBox().Width(),
+                               fabric.getBoundingBox().Height()) +
+                               METRE; // max size + 1m
 
     Clipper2Lib::Path64 rightBoxPath = {
         {maxRightPoint, fabric.getBoundingBox().top - padding},
@@ -292,17 +296,17 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     
     // Clean up scraps
     // Deflating and Inflating scraps' paths discard the tiny and narrow scraps that are not usable
-    double delta = (minWidth / 2.0);
+    const double DELTA = (MIN_WIDTH / 2.0);
     Clipper2Lib::Paths64 cleanedScraps = Clipper2Lib::InflatePaths(
         rawScraps,
-        -delta,
+        -DELTA,
         Clipper2Lib::JoinType::Miter, 
         Clipper2Lib::EndType::Polygon
     );
 
     cleanedScraps = Clipper2Lib::InflatePaths(
         cleanedScraps,
-        delta,
+        DELTA,
         Clipper2Lib::JoinType::Miter, 
         Clipper2Lib::EndType::Polygon
     );
@@ -320,8 +324,8 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.usableScrapsArea = 0;
     result.effectiveScrapsArea = 0;
     for (const auto& scrap : cleanedScraps) {
-        int64_t area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
-        if (area >= minScrapArea) {
+        int64_t area = std::abs(static_cast<int64_t>(Clipper2Lib::Area(scrap))) / (static_cast<long>(SCALE * SCALE));
+        if (area >= MIN_SCRAP_AREA) {
             ++result.usableScrapCount;
             result.usableScrapsArea += area;
             double solidity = calculateSolidity(scrap);
@@ -336,20 +340,20 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     // Calculate remaining fabric area
     result.remainingFabricArea = 0;
     for (const auto& fabricPart : rawRemainingFabric) {
-        int64_t area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
+        int64_t area = std::abs(static_cast<int64_t>(Clipper2Lib::Area(fabricPart))) / (static_cast<long>(SCALE * SCALE));
         if (area > 0) {
             result.remainingFabricArea += area;
         }
     }
 
     // Calculate remaining fabric length
-    result.totalFabricLength = static_cast<double>(fabric.getBoundingBox().right) / SCALE;
-    result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / SCALE;
+    result.totalFabricLength = (fabric.getBoundingBox().right) / SCALE;
+    result.remainingFabricLength = (fabric.getBoundingBox().right - maxRightPoint) / SCALE;
 
     //Calculate waste
-    result.totalFabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
+    result.totalFabricArea = std::abs(static_cast<int64_t>(Clipper2Lib::Area(fabricAsPaths))) / (static_cast<long>(SCALE * SCALE));
 
-    int64_t usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
+    int64_t usedArea = std::abs(static_cast<int64_t>(Clipper2Lib::Area(allItemsCombined))) / (static_cast<long>(SCALE) * SCALE);
 
     result.wasteArea = result.totalFabricArea - usedArea - result.remainingFabricArea - result.usableScrapsArea;
     
