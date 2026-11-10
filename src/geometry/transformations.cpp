@@ -1,26 +1,31 @@
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <vector>
 #include <limits>
-#include <algorithm>
 #include <numbers>
 
 #include "geometry/transformations.hpp"
 
 namespace pmg::geometry::calculations {
+inline const int DEGREES_0 = 0;
+inline const int DEGREES_90 = 90;
+inline const int DEGREES_180 = 180;
+inline const int DEGREES_270 = 270;
+inline const int DEGREES_360 = 360;
     
 constexpr double DEG_TO_RAD = std::numbers::pi / 180.0;
 
 Point64 getTopLeftCorner(const std::vector<Point64> &polygon) noexcept
 {
-    if (polygon.empty()) return Point64();
+    if (polygon.empty()) return {};
 
     int64_t minX = std::numeric_limits<int64_t>::max();
     int64_t maxY = std::numeric_limits<int64_t>::min();
 
     for (const auto& point : polygon) {
-        if (point.x < minX) minX = point.x;
-        if (point.y > maxY) maxY = point.y;
+        minX = std::min(point.x, minX);
+        maxY = std::max(point.y, maxY);
     }
 
     return Point64(minX, maxY);
@@ -31,12 +36,12 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
     if (polygon.empty()) return {};
 
     // Normalize rotation angle
-    rotationAngle %= 360;
-    if (rotationAngle < 0) rotationAngle += 360;
+    rotationAngle %= DEGREES_360;
+    if (rotationAngle < 0) rotationAngle += DEGREES_360;
 
     // allocate the transformed polygon
-    const size_t size = polygon.size();
-    std::vector<Point64> transformed(size);
+    const size_t SIZE = polygon.size();
+    std::vector<Point64> transformed(SIZE);
 
     // set minX, minY values 
     // in order to anchor the transformed points back 
@@ -44,55 +49,56 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
     int64_t minX = std::numeric_limits<int64_t>::max();
     int64_t minY = std::numeric_limits<int64_t>::max();
 
-    if (rotationAngle == 0 || rotationAngle == 90 || rotationAngle == 180 || rotationAngle == 270) {
-        for (size_t i = 0; i < size; ++i) {
+    if (rotationAngle == DEGREES_0 || rotationAngle == DEGREES_90 || rotationAngle == DEGREES_180 || rotationAngle == DEGREES_270) {
+        for (size_t i = 0; i < SIZE; ++i) {
             int64_t x = polygon[i].x;
             int64_t y = isMirrored ? -polygon[i].y : polygon[i].y;
-            int64_t rx, ry;
+            int64_t rx;
+            int64_t ry;
 
             switch (rotationAngle)
             {
-                case 90:  rx =  y; ry = -x; break;
-                case 180: rx = -x; ry = -y; break;
-                case 270: rx = -y; ry =  x; break;
+                case DEGREES_90:  rx =  y; ry = -x; break;
+                case DEGREES_180: rx = -x; ry = -y; break;
+                case DEGREES_270: rx = -y; ry =  x; break;
                 default:  rx =  x; ry =  y; break;
             }
 
             transformed[i].x = rx;
             transformed[i].y = ry;
 
-            if (rx < minX) minX = rx;
-            if (ry < minY) minY = ry;
+            minX = std::min(rx, minX);
+            minY = std::min(ry, minY);
         }
     } else {
-        const double radians = static_cast<double>(rotationAngle) * DEG_TO_RAD;
-        const double cosA = std::cos(radians);
-        const double sinA = std::sin(radians);
+        const double RADIANS = static_cast<double>(rotationAngle) * DEG_TO_RAD;
+        const double COS_A = std::cos(RADIANS);
+        const double SIN_A = std::sin(RADIANS);
 
-        for (size_t i = 0; i < size; ++i) {
-            double x = static_cast<double>(polygon[i].x);
-            double y = static_cast<double>(isMirrored ? -polygon[i].y : polygon[i].y);
+        for (size_t i = 0; i < SIZE; ++i) {
+            auto x = static_cast<double>(polygon[i].x);
+            auto y = static_cast<double>(isMirrored ? -polygon[i].y : polygon[i].y);
 
-            int64_t rx = static_cast<int64_t>(std::llround(x * cosA + y * sinA));
-            int64_t ry = static_cast<int64_t>(std::llround(-x * sinA + y * cosA));
+            auto rx = static_cast<int64_t>(std::llround((x * COS_A) + (y * SIN_A)));
+            auto ry = static_cast<int64_t>(std::llround((-x * SIN_A) + (y * COS_A)));
 
             transformed[i].x = rx;
             transformed[i].y = ry;
 
-            if (rx < minX) minX = rx;
-            if (ry < minY) minY = ry;
+            minX = std::min(rx, minX);
+            minY = std::min(ry, minY);
         }
     }
 
     if (toBeAnchored) {
-        for (size_t i = 0; i < size; ++i) {
+        for (size_t i = 0; i < SIZE; ++i) {
             transformed[i].x -= minX;
             transformed[i].y -= minY;
         }
     }
 
     if (isMirrored) {
-        std::reverse(transformed.begin(), transformed.end());
+        std::ranges::reverse(transformed);
     }
 
     return transformed;
@@ -100,7 +106,7 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
 
 std::vector<Point64> rotateBy180(const std::vector<Point64> &polygon) noexcept
 {
-    return transformPolygon(polygon, 180, false);
+    return transformPolygon(polygon, DEGREES_180, false);
 }
 
 std::vector<Clipper2Lib::Path64> rotatePathsBy180(const std::vector<Clipper2Lib::Path64> &paths, int64_t offsetX, int64_t offsetY) noexcept
@@ -113,10 +119,10 @@ std::vector<Clipper2Lib::Path64> rotatePathsBy180(const std::vector<Clipper2Lib:
         rotatedPath.reserve(path.size());
 
         for (const auto& point : path) {
-            rotatedPath.push_back(Clipper2Lib::Point64(
+            rotatedPath.emplace_back(
                 (-point.x + offsetX),
                 (-point.y + offsetY)
-            ));
+            );
         }
 
         rotated.push_back(rotatedPath);

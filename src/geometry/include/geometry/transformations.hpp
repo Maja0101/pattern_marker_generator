@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "clipper2/clipper.h"
+#include <clipper2/clipper.h>
 
 #include "geometry_types.hpp"
 
