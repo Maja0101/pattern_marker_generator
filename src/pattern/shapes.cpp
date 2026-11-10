@@ -25,7 +25,7 @@ Shape::Shape(std::vector<geometry::Point64> initalBoundary, bool toBeScaled)
         }
         return Clipper2Lib::SimplifyPath(geometry::calculations::toClipperPath(initalBoundary), 0.0);
       }()), 
-      m_boundary((m_shapePath.size() == initalBoundary.size()) ? std::move(initalBoundary) : geometry::calculations::fromClipperPath(m_shapePath)),
+      m_boundary(geometry::calculations::fromClipperPath(m_shapePath)),
       m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
 
 Shape::Shape(int64_t width, int64_t length, bool toBeScaled)
