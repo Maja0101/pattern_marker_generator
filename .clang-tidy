@@ -12,9 +12,21 @@ Checks: '
 HeaderFilterRegex: 'src/.*'
 
 CheckOptions:
-  - key: readability-identifier-naming.MemberPrefix
+  - key: readability-identifier-naming.PrivateMemberPrefix
     value: 'm_'
-  - key: readability-identifier-naming.MemberCase
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: camelBack
+  - key: readability-identifier-naming.ProtectedMemberPrefix
+    value: 'm_'
+  - key: readability-identifier-naming.ProtectedMemberCase
+    value: camelBack
+  - key: readability-identifier-naming.PublicMemberPrefix
+    value: ''
+  - key: readability-identifier-naming.PublicMemberCase
+    value: camelBack
+  - key: readability-identifier-naming.StructPrefix
+    value: ''
+  - key: readability-identifier-naming.StructCase
     value: camelBack
 
   - key: readability-identifier-naming.ConstantParameterCase
@@ -43,11 +55,13 @@ CheckOptions:
   - key: modernize-replace-auto-ptr.IncludeStyle
     value: llvm
 
+  - key: readability-identifier-length.MinimumLoopCounterNameLength
+    value: 1
   - key: readability-identifier-length.MinimumVariableNameLength
     value: 3
   - key: readability-identifier-length.IgnoredVariableNames
-    value: '^[a-z]{1,2}$|^it$'
+    value: '^[a-zA-Z]{1,2}$|^[a-zA-Z][0-9]$|^it$'
   - key: readability-identifier-length.MinimumParameterNameLength
     value: 3
   - key: readability-identifier-length.IgnoredParameterNames
-    value: '^[a-z]{1,2}$'
+    value: '^[a-zA-Z]{1,2}$|^[a-zA-Z][0-9]$'
