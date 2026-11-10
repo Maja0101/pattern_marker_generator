@@ -1,8 +1,6 @@
 #include <napi.h>
 #include <cstdint>
-#include <memory>
 #include <stdexcept>
-#include <string>
 #include <vector>
 
 #include "api/nesting_api.hpp"
