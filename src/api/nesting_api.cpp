@@ -5,14 +5,6 @@
 #include "pattern/shapes.hpp"
 #include "pattern/pattern_piece.hpp"
 
-// NestingEngineFacade::NestingEngineFacade(int64_t width, int64_t length, int64_t algId)
-//     : m_engine([&]() -> std::unique_ptr<pmg::nesting::AlgorithmBase> {
-//         if (algId == 1) {
-//             return std::make_unique<pmg::nesting::BasicAlgorithm>(width, length);
-//         }
-//         return std::make_unique<pmg::nesting::AdvancedAlgorithm>(width, length);
-//       }()) {}
-
 NestingEngineFacade::NestingEngineFacade(const pmg::pattern::Fabric &fabric, int64_t algId)
     : m_engine([&]() -> std::unique_ptr<pmg::nesting::AlgorithmBase> {
         if (algId == 1) {
