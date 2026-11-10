@@ -21,23 +21,24 @@ bool SvgExporter::exportLayout(const std::string& filepath,
     const char* strokeColor = "#D9D9D9";
     const char* backgroundColor = "#FAF7F7";
     const char* borderColor = "#301560";
-    const double borderWidth = 1.0;
-    const double gapWidth = static_cast<double>(includedCuttingAllowance) / 1000;
-    const double stripeWidth = static_cast<double>(includedSeamAllowance) / 1000;
+    const double BORDER_WIDTH = 1.0;
+    const int SCALE_TO_MM = 1000;
+    const double GAP_WIDTH = static_cast<double>(includedCuttingAllowance) / SCALE_TO_MM;
+    const double STRIPE_WIDTH = static_cast<double>(includedSeamAllowance) / SCALE_TO_MM;
 
     out << std::fixed << std::setprecision(3);
 
     out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     out << "<svg xmlns=\"http://www.w3.org/2000/svg\" "
-        << "width=\"" << fabric.getBoundingBox().Height() / 1000 << "mm\" "
-        << "height=\"" << fabric.getBoundingBox().Width() / 1000 << "mm\" "
-        << "viewBox=\"0 0 " << fabric.getBoundingBox().Height() / 1000 << " " << fabric.getBoundingBox().Width() / 1000 << "\">\n\n";
+        << "width=\"" << fabric.getBoundingBox().Height() / SCALE_TO_MM << "mm\" "
+        << "height=\"" << fabric.getBoundingBox().Width() / SCALE_TO_MM << "mm\" "
+        << "viewBox=\"0 0 " << fabric.getBoundingBox().Height() / SCALE_TO_MM << " " << fabric.getBoundingBox().Width() / SCALE_TO_MM << "\">\n\n";
 
     out << "  <!-- Sheet Frame -->\n";
-    out << "  <g transform=\"rotate(90) translate(0, -" << fabric.getBoundingBox().Height() / 1000 << ") \">\n";
+    out << "  <g transform=\"rotate(90) translate(0, -" << fabric.getBoundingBox().Height() / SCALE_TO_MM << ") \">\n";
     out << "  <polygon points=\"";
     for (size_t i = 0; i < fabric.getBoundary().size(); ++i) {
-        out << fabric.getBoundary()[i].x / 1000 << "," << fabric.getBoundary()[i].y / 1000;
+        out << fabric.getBoundary()[i].x / SCALE_TO_MM << "," << fabric.getBoundary()[i].y / SCALE_TO_MM;
         if (i + 1 < fabric.getBoundary().size()) {
             out << " ";
         }
@@ -52,36 +53,37 @@ bool SvgExporter::exportLayout(const std::string& filepath,
             const auto* variant = item.getVariant();
             if (!variant) continue;
 
-            const auto pos = item.getPosition();
+            const auto POS = item.getPosition();
 
             // Change the coordinates of points for display
             std::ostringstream pointsStream;
             for (const auto& pt : variant->getBoundary(item.isFlipped())) {
-                double worldX = static_cast<double>(pos.x + pt.x) / 1000.0;
-                double worldY = static_cast<double>(pos.y + pt.y) / 1000.0;
-                double svgY = static_cast<double>(fabric.getBoundingBox().Height() / 1000) - worldY;
+                double worldX = static_cast<double>(POS.x + pt.x) / SCALE_TO_MM;
+                double worldY = static_cast<double>(POS.y + pt.y) / SCALE_TO_MM;
+                double svgY = (static_cast<double>(fabric.getBoundingBox().Height()) / SCALE_TO_MM) - worldY;
 
                 pointsStream << worldX << "," << svgY << " ";
             }
-            const std::string points = pointsStream.str();
+            const std::string POINTS = pointsStream.str();
             std::string clipId = "clip_" + std::to_string(idCounter++);
 
             // Calculate total strokes width
-            double strokeStripe      = 2.0 * (borderWidth + gapWidth + stripeWidth);
-            double strokeGap         = 2.0 * (borderWidth + gapWidth);
-            double strokeOuterBorder = 2.0 * borderWidth;
+            const double MULTIPLIER = 2.0;
+            double strokeStripe      = MULTIPLIER * (BORDER_WIDTH + GAP_WIDTH + STRIPE_WIDTH);
+            double strokeGap         = MULTIPLIER * (BORDER_WIDTH + GAP_WIDTH);
+            double strokeOuterBorder = MULTIPLIER * BORDER_WIDTH;
 
             // Output clipPath definition
             out << "  <clipPath id=\"" << clipId << "\">\n"
-                << "    <polygon points=\"" << points << "\" />\n"
+                << "    <polygon points=\"" << POINTS << "\" />\n"
                 << "  </clipPath>\n";
 
             // Output polygon referencing the clipPath
             out << "  <g clip-path=\"url(#" << clipId << ")\">\n"
-            << "    <polygon points=\"" << points << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" />\n"
-            << "    <polygon points=\"" << points << "\" fill=\"none\" stroke=\"" << strokeColor << "\" fill-opacity=\"0.45\" stroke-width=\"" << strokeStripe << "\" />\n"
-            << "    <polygon points=\"" << points << "\" fill=\"none\" stroke=\"" << backgroundColor << "\" stroke-width=\"" << strokeGap << "\" />\n"
-            << "    <polygon points=\"" << points << "\" fill=\"none\" stroke=\"" << borderColor << "\" stroke-width=\"" << strokeOuterBorder << "\" />\n"
+            << "    <polygon points=\"" << POINTS << "\" fill=\"" << strokeColor << "\" fill-opacity=\"0.45\" />\n"
+            << "    <polygon points=\"" << POINTS << R"(" fill="none" stroke=")" << strokeColor << R"(" fill-opacity="0.45" stroke-width=")" << strokeStripe << "\" />\n"
+            << "    <polygon points=\"" << POINTS << R"(" fill="none" stroke=")" << backgroundColor << "\" stroke-width=\"" << strokeGap << "\" />\n"
+            << "    <polygon points=\"" << POINTS << R"(" fill="none" stroke=")" << borderColor << "\" stroke-width=\"" << strokeOuterBorder << "\" />\n"
             << "  </g>\n";
         }
     }
