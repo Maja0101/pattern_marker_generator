@@ -1,10 +1,8 @@
 #include <algorithm>
-#include <unordered_map>
 
 #include <spdlog/spdlog.h>
 
 #include "utils/config.hpp"
-#include "utils/timer.hpp"
 #include "geometry/svg_exporter.hpp"
 #include "geometry/options_calculations.hpp"
 #include "nesting/advanced_algorithm.hpp"
@@ -66,7 +64,7 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
 
 NestingResult AdvancedAlgorithm::runAlgorithm()
 {
-    std::sort(m_originalItems.begin(), m_originalItems.end(), [](const NestedItem&a, const NestedItem& b) {
+    std::ranges::sort(m_originalItems, [](const NestedItem&a, const NestedItem& b) {
         return a.getVariant()->getGlobalId(false) < b.getVariant()->getGlobalId(false);
     });
 
@@ -81,9 +79,9 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
 
         do {
             evaluateDifferentRotations(m_originalItems, 0, best);
-        } while (std::next_permutation(m_originalItems.begin(), m_originalItems.end(), [](const NestedItem& a, const NestedItem&b) {
+        } while (std::ranges::next_permutation(m_originalItems, [](const NestedItem& a, const NestedItem&b) {
             return a.getVariant()->getGlobalId(false) < b.getVariant()->getGlobalId(false);
-        }));
+        }).found);
 
         if constexpr (config::DEBUG_MODE) {
             SPDLOG_INFO("Last Svg {}", m_svgExport);
@@ -95,7 +93,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
             SPDLOG_INFO("Checking one option");
         }
 
-        int currIdx = m_originalItems[0].getVariant()->getGlobalId(false);
+        int64_t currIdx = m_originalItems[0].getVariant()->getGlobalId(false);
         size_t currIdxCount = 0;
 
         for (auto& item : m_originalItems) {
@@ -111,7 +109,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
             ++currIdxCount;
         }
 
-        std::sort(m_originalItems.begin(), m_originalItems.end(), [](const NestedItem&a, const NestedItem& b) {
+        std::ranges::sort(m_originalItems, [](const NestedItem&a, const NestedItem& b) {
             auto aBounds = a.getItemBoundingBoxAtPosition();
             auto bBounds = b.getItemBoundingBoxAtPosition();
             return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);

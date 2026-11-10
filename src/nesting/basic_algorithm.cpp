@@ -1,7 +1,8 @@
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
+
 #include "utils/config.hpp"
-#include "utils/timer.hpp"
 #include "geometry/svg_exporter.hpp"
 #include "nesting/basic_algorithm.hpp"
 
@@ -11,7 +12,7 @@ NestingResult BasicAlgorithm::runAlgorithm()
 {
     std::vector<NestedItem> sortedItems = m_originalItems;
 
-    std::sort(sortedItems.begin(), sortedItems.end(), [](const NestedItem&a, const NestedItem& b) {
+    std::ranges::sort(sortedItems, [](const NestedItem&a, const NestedItem& b) {
         auto aBounds = a.getItemBoundingBoxAtPosition();
         auto bBounds = b.getItemBoundingBoxAtPosition();
         return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);
