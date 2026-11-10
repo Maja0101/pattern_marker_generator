@@ -148,7 +148,9 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
 }
 
 std::vector<Point64> calculateConvexHull(const std::vector<Point64> &polygon) {
-    size_t n = polygon.size();
+    // Andrew's monotone chain convex hull algorithm
+    
+    int n = static_cast<int>(polygon.size());
     if (n <= 3) return polygon;
 
     // Sort the point in the polygon lexicographically
@@ -157,7 +159,7 @@ std::vector<Point64> calculateConvexHull(const std::vector<Point64> &polygon) {
 
     // Prepare the output vector
     std::vector<Point64> hull;
-    hull.reserve(2*n);
+    hull.reserve(2UL*n);
     
     // Build lower hull
     for (int i = 0; i < n; ++i) {
@@ -169,7 +171,7 @@ std::vector<Point64> calculateConvexHull(const std::vector<Point64> &polygon) {
 
     // Build upper hull
     size_t lowerSize = hull.size();
-    for (size_t i = n - 2; i >= 0; --i) {
+    for (int i = n - 2; i >= 0; --i) {
         while (hull.size() > lowerSize && crossProduct(hull[hull.size() - 2], hull.back(), sorted[i]) <= 0) {
             hull.pop_back();
         }
