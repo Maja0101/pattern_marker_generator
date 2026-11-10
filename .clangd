@@ -1,0 +1,17 @@
+CompileFlags:
+  CompilationDatabase: "build"
+
+  Add: 
+    -Inode_modules/node-addon-api,
+    -Inode_modules/node-api-headers/include,
+    -Isrc, 
+    -Isrc/utils/include, 
+    -Isrc/pattern/include, 
+    -Isrc/nesting/include, 
+    -Isrc/geometry/include, 
+    -Isrc/api,
+    -Isrc/bridge,
+    -Ilibs/catch2,
+    -Ilibs/clipper2/CPP/Clipper2Lib/include,
+    -Ilibs/mapbox/include,
+    -Ilibs/spdlog/include,

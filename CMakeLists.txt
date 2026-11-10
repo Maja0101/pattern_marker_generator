@@ -6,6 +6,20 @@ project(PatternMarkerGenerator VERSION 1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Settings for static code analysis
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+if(CLANG_TIDY_EXE)
+    set(CMAKE_CXX_CLANG_TIDY 
+        ${CLANG_TIDY_EXE}
+        "-extra-arg=-std=c++20"
+    )
+    message(STATUS "Clang-Tidy active and integrated with CMake")
+else()
+    message(WARNING "Clang-Tidy not found - code analysis is disabled")
+endif()
+
 # Static libs linked into the Node addon
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 

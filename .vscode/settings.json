@@ -2,5 +2,6 @@
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cmake.configureOnOpen": true,
     "cmake.buildBeforeRun": true,
-    "cmake.ctest.debugLaunchTarget": "Run/Debug unit_tests"
+    "cmake.ctest.debugLaunchTarget": "Run/Debug unit_tests",
+    "cmake.copyCompileCommands": "${workspaceFolder}/build/compile_commands.json",
 }
