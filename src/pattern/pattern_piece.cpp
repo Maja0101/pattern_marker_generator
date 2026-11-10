@@ -21,7 +21,11 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         }
     }
 
-    std::vector<geometry::Point64> simplifiedPolygon = geometry::calculations::fromClipperPath(Clipper2Lib::SimplifyPath(geometry::calculations::toClipperPath(m_originalPolygon), 0.1));
+    std::vector<geometry::Point64> simplifiedPolygon = geometry::calculations::fromClipperPath(
+        Clipper2Lib::SimplifyPath(
+            geometry::calculations::toClipperPath(m_originalPolygon), 
+            0.1)
+        );
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : simplifiedPolygon) {
@@ -84,7 +88,8 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
             }
 
             // Rotate shape by 90 degrees ccw to match the algorithm logic
-            transformedBoundary = geometry::calculations::transformPolygon(transformedBoundary, 270, false, true);
+            const int CCW_90 = 270;
+            transformedBoundary = geometry::calculations::transformPolygon(transformedBoundary, CCW_90, false, true);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 for (const auto& p : transformedBoundary) {

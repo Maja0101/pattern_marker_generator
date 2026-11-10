@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "clipper2/clipper.h"
+#include <clipper2/clipper.h>
 
 #include "geometry/geometry_types.hpp"
 
@@ -20,14 +20,14 @@ public:
     Shape(Clipper2Lib::Path64 initalPath);
     virtual ~Shape() = default;
     
-    virtual const std::vector<geometry::Point64>& getBoundary() const { return m_boundary; }
-    virtual const Clipper2Lib::Path64& getPath() const { return m_shapePath; }
-    const Clipper2Lib::Rect64& getBoundingBox() const { return m_shapeBoundingBox; }
+    [[nodiscard]] virtual const std::vector<geometry::Point64>& getBoundary() const { return m_boundary; }
+    [[nodiscard]] virtual const Clipper2Lib::Path64& getPath() const { return m_shapePath; }
+    [[nodiscard]] const Clipper2Lib::Rect64& getBoundingBox() const { return m_shapeBoundingBox; }
     
-    virtual const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y) const;
-    const Clipper2Lib::Rect64 getBoundingBoxAt(int64_t x, int64_t y) const;
+    [[nodiscard]] virtual Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y) const;
+    [[nodiscard]] Clipper2Lib::Rect64 getBoundingBoxAt(int64_t x, int64_t y) const;
 
-    virtual std::string toString() const;
+    [[nodiscard]] virtual std::string toString() const;
 };
 
 class Fabric : public Shape {
@@ -62,26 +62,26 @@ public:
         geometry::Point64 referencePoint = geometry::Point64());
     PieceVariant(Clipper2Lib::Path64 initalPath = {});
     
-    const int64_t getGlobalId(bool isFlipped) const;
+    [[nodiscard]] int64_t getGlobalId(bool isFlipped) const;
     
-    const int getPieceId() const { return m_pieceId; }
-    const int getVariantId() const { return m_variantId; }
-    const int getRotationAngle() const { return m_rotationAngle; }
-    const bool getIsMirrored() const { return m_isMirrored; }
-    const int getRequiredQuantity() const { return m_requiredQuantity; }
-    const int getIsTwoWay() const { return m_isTwoWay; }
-    const int64_t getSeamAllowance() const { return m_seamAllowance; }
-    const int64_t getCuttingAllowance() const { return m_cuttingAllowance; }
-    const int getIsConvex() const { return m_isConvex; }
-    const int64_t getAllowancesDistance() const { return m_seamAllowance + m_cuttingAllowance; }
-    const geometry::Point64 getReferencePoint() const { return m_referencePoint; }
+    [[nodiscard]] int64_t getPieceId() const { return m_pieceId; }
+    [[nodiscard]] int getVariantId() const { return m_variantId; }
+    [[nodiscard]] int getRotationAngle() const { return m_rotationAngle; }
+    [[nodiscard]] bool getIsMirrored() const { return m_isMirrored; }
+    [[nodiscard]] int getRequiredQuantity() const { return m_requiredQuantity; }
+    [[nodiscard]] int getIsTwoWay() const { return m_isTwoWay; }
+    [[nodiscard]] int64_t getSeamAllowance() const { return m_seamAllowance; }
+    [[nodiscard]] int64_t getCuttingAllowance() const { return m_cuttingAllowance; }
+    [[nodiscard]] int getIsConvex() const { return m_isConvex; }
+    [[nodiscard]] int64_t getAllowancesDistance() const { return m_seamAllowance + m_cuttingAllowance; }
+    [[nodiscard]] geometry::Point64 getReferencePoint() const { return m_referencePoint; }
     
-    const std::vector<geometry::Point64>& getBoundary(bool isFlipped) const;
-    const Clipper2Lib::Path64& getPath(bool isFlipped) const;
-    const Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y, bool isFlipped) const;
-    const std::vector<Clipper2Lib::Path64>& getDecomposedShape(bool isFlipped) const;
+    [[nodiscard]] const std::vector<geometry::Point64>& getBoundary(bool isFlipped) const;
+    [[nodiscard]] const Clipper2Lib::Path64& getPath(bool isFlipped) const;
+    [[nodiscard]] Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y, bool isFlipped) const;
+    [[nodiscard]] const std::vector<Clipper2Lib::Path64>& getDecomposedShape(bool isFlipped) const;
 
-    std::string toString() const override;
+    [[nodiscard]] std::string toString() const override;
 };
 
 } // namespace pmg::pattern

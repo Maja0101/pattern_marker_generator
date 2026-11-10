@@ -26,9 +26,9 @@ public:
                 int grainline = 0, bool toBeScaled = false);
 
     std::vector<PieceVariant>& getVariants() noexcept { return m_allowedVariants; }
-    int64_t getId() const noexcept { return m_id; }
+    [[nodiscard]] int64_t getId() const noexcept { return m_id; }
 
-    std::string toString() const;
+    [[nodiscard]] std::string toString() const;
 };
 
 } // namespace pmg::pattern 

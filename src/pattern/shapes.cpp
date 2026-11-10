@@ -1,6 +1,5 @@
 #include <format>
 #include <numeric>
-#include <ranges>
 
 #include <spdlog/spdlog.h>
 
@@ -30,16 +29,16 @@ Shape::Shape(std::vector<geometry::Point64> initalBoundary, bool toBeScaled)
 
 Shape::Shape(int64_t width, int64_t length, bool toBeScaled)
     : m_shapePath([width, length, toBeScaled]() {
-        constexpr int64_t maxValue = 100000001;
+        constexpr int64_t MAX_VALUE = 100000001;
         int64_t scale = toBeScaled ? SCALE : 1;
-        int64_t w = (width < 0) ? 0 : ((width * scale) % maxValue);
-        int64_t l = (length < 0) ? 0 : ((length * scale) % maxValue);
+        int64_t w = (width < 0) ? 0 : ((width * scale) % MAX_VALUE);
+        int64_t l = (length < 0) ? 0 : ((length * scale) % MAX_VALUE);
         Clipper2Lib::Path64 temp;
         temp.reserve(4);
-        temp.push_back({0L, 0L});
-        temp.push_back({l, 0L});
-        temp.push_back({l, w});
-        temp.push_back({0L, w});
+        temp.emplace_back(0L, 0L);
+        temp.emplace_back(l, 0L);
+        temp.emplace_back(l, w);
+        temp.emplace_back(0L, w);
         return temp;
       }()), 
       m_boundary(geometry::calculations::fromClipperPath(m_shapePath)),
@@ -50,28 +49,28 @@ Shape::Shape(Clipper2Lib::Path64 initalPath)
       m_boundary(geometry::calculations::fromClipperPath(m_shapePath)),
       m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
 
-const Clipper2Lib::Path64 Shape::getPathAt(int64_t x, int64_t y) const
+Clipper2Lib::Path64 Shape::getPathAt(int64_t x, int64_t y) const
 {
-    Clipper2Lib::Path64 tranlated_path;
+    Clipper2Lib::Path64 tranlatedPath;
 
-    tranlated_path.reserve(m_shapePath.size());
+    tranlatedPath.reserve(m_shapePath.size());
 
     for (const auto& point : m_shapePath) {
-        tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
+        tranlatedPath.emplace_back(point.x + x, point.y + y);
     }
-    return tranlated_path;
+    return tranlatedPath;
 }
 
-const Clipper2Lib::Rect64 Shape::getBoundingBoxAt(int64_t x, int64_t y) const
+Clipper2Lib::Rect64 Shape::getBoundingBoxAt(int64_t x, int64_t y) const
 {
-    Clipper2Lib::Rect64 tranlated_box = m_shapeBoundingBox;
+    Clipper2Lib::Rect64 tranlatedBox = m_shapeBoundingBox;
 
-    tranlated_box.left   += x;
-    tranlated_box.right  += x;
-    tranlated_box.top    += y;
-    tranlated_box.bottom += y;
+    tranlatedBox.left   += x;
+    tranlatedBox.right  += x;
+    tranlatedBox.top    += y;
+    tranlatedBox.bottom += y;
 
-    return tranlated_box;
+    return tranlatedBox;
 }
 
 std::string Shape::toString() const
@@ -149,7 +148,7 @@ PieceVariant::PieceVariant(Clipper2Lib::Path64 initalPath)
     initializeVariantGeometry();
 }
 
-const int64_t PieceVariant::getGlobalId(bool isFlipped) const
+int64_t PieceVariant::getGlobalId(bool isFlipped) const
 {
     bool flipped = isFlipped;
     if (!m_isTwoWay) {
@@ -179,22 +178,22 @@ const Clipper2Lib::Path64 &PieceVariant::getPath(bool isFlipped) const
     return m_shapePath;
 }
 
-const Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isFlipped) const
+Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isFlipped) const
 {
-    Clipper2Lib::Path64 tranlated_path;
+    Clipper2Lib::Path64 tranlatedPath;
 
-    tranlated_path.reserve(m_shapePath.size());
+    tranlatedPath.reserve(m_shapePath.size());
 
     if (m_isTwoWay && isFlipped) {
         for (const auto& point : m_flippedShapePath) {
-            tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
+            tranlatedPath.emplace_back(point.x + x, point.y + y);
         }
     } else {
         for (const auto& point : m_shapePath) {
-            tranlated_path.push_back(Clipper2Lib::Point64(point.x + x, point.y + y));
+            tranlatedPath.emplace_back(point.x + x, point.y + y);
         }
     }
-    return tranlated_path;
+    return tranlatedPath;
 }
 
 const std::vector<Clipper2Lib::Path64> &PieceVariant::getDecomposedShape(bool isFlipped) const
