@@ -1,3 +1,10 @@
+If:
+  PathMatch: [.*test.*/.*, .*libs.*/.*, .*node_modules.*/.*]
+Diagnostics:
+  Suppress: "*"
+  UnusedIncludes: None
+
+---
 CompileFlags:
   CompilationDatabase: "build"
 
