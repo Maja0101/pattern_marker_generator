@@ -25,8 +25,6 @@ public:
                 int64_t seamAllowance = 0, int64_t cuttingAllowance = 0,
                 int grainline = 0, bool toBeScaled = false);
 
-    // const PieceVariant* getVariant(int rotationAngle, bool isMirrored) const noexcept;
-
     std::vector<PieceVariant>& getVariants() noexcept { return m_allowedVariants; }
     int64_t getId() const noexcept { return m_id; }
 

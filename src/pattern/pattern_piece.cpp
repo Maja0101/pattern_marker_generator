@@ -113,15 +113,6 @@ PatternPiece::PatternPiece(int64_t pieceId,
     initializePatternPieceGeometry(constraints, toBeScaled);
 }
 
-// const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored) const noexcept {
-//     for (const auto& variant : m_allowedVariants) {
-//         if (variant.getRotationAngle() == rotationAngle && variant.getIsMirrored() == isMirrored) {
-//             return &variant;
-//         }
-//     }
-//     return nullptr;
-// }
-
 std::string PatternPiece::toString() const
 {
     std::string boundaryStr = std::accumulate(
