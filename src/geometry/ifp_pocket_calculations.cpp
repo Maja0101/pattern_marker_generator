@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cstddef>
 #include <deque>
 
 #include <spdlog/spdlog.h>
@@ -13,7 +15,7 @@ struct HalfPlane {
 };
 
 int64_t dot(int64_t a, int64_t b, Point64 &p) {
-    return a * p.x + b * p.y;
+    return (a * p.x) + (b * p.y);
 }
 
 int64_t divToNearest(__int128_t a, __int128_t b) {
@@ -26,18 +28,18 @@ int64_t divToNearest(__int128_t a, __int128_t b) {
 }
 
 Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
-    __int128_t det = static_cast<__int128_t>(h1.a) * h2.b - static_cast<__int128_t>(h2.a) * h1.b;
+    __int128_t det = (static_cast<__int128_t>(h1.a) * h2.b) - (static_cast<__int128_t>(h2.a) * h1.b);
 
-    __int128_t x = static_cast<__int128_t>(h1.b) * h2.c - static_cast<__int128_t>(h2.b) * h1.c;
-    __int128_t y = static_cast<__int128_t>(h2.a) * h1.c - static_cast<__int128_t>(h1.a) * h2.c;
+    __int128_t x = (static_cast<__int128_t>(h1.b) * h2.c) - (static_cast<__int128_t>(h2.b) * h1.c);
+    __int128_t y = (static_cast<__int128_t>(h2.a) * h1.c) - (static_cast<__int128_t>(h1.a) * h2.c);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("det {} x {} y {} intersection {} {}", det, x, y, divToNearest(x, det), divToNearest(y, det)));
     }
 
     return {
-        divToNearest(x, det),
-        divToNearest(y, det)
+        .x=divToNearest(x, det),
+        .y=divToNearest(y, det)
     };
 }
 
@@ -48,21 +50,21 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
     std::vector<HalfPlane> halfPlanes;
 
     for (size_t i = 0; i < n; ++i) {
-        Point64 A = fabricHull[i];
-        Point64 B = fabricHull[(i + 1) % n];
+        Point64 pointA = fabricHull[i];
+        Point64 pointB = fabricHull[(i + 1) % n];
 
-        int64_t dx = B.x - A.x;
-        int64_t dy = B.y - A.y;
+        int64_t dx = pointB.x - pointA.x;
+        int64_t dy = pointB.y - pointA.y;
 
         int64_t nx = -dy;
         int64_t ny = dx;
 
-        int64_t c = -(nx * A.x + ny * A.y);
+        int64_t c = -((nx * pointA.x) + (ny * pointA.y));
 
         Point64 point = variantHull[0];
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("i {} A {} {} B {} {} d {} {} n {} {} c {} point {} {}", i, A.x, A.y, B.x, B.y, dx, dy, nx, ny, c, point.x, point.y));
+            SPDLOG_INFO(std::format("i {} A {} {} B {} {} d {} {} n {} {} c {} point {} {}", i, pointA.x, pointA.y, pointB.x, pointB.y, dx, dy, nx, ny, c, point.x, point.y));
         }
 
         int64_t minProjection = dot(nx, ny, point);
@@ -79,9 +81,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
                 SPDLOG_INFO(std::format("j {} point {} {} proj {}", j, point.x, point.y, proj));
             }
 
-            if (proj < minProjection) {
-                minProjection = proj;
-            }
+            minProjection = std::min(proj, minProjection);
         }
 
         int64_t cShifted = c + minProjection;
@@ -107,8 +107,8 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
                 SPDLOG_INFO(std::format("previous intersection {} {}", prevIntersection.x, prevIntersection.y));
             }
 
-            __int128_t val = static_cast<__int128_t>(currPlane.a) * prevIntersection.x +
-                         static_cast<__int128_t>(currPlane.b) * prevIntersection.y +
+            __int128_t val = (static_cast<__int128_t>(currPlane.a) * prevIntersection.x) +
+                         (static_cast<__int128_t>(currPlane.b) * prevIntersection.y) +
                          static_cast<__int128_t>(currPlane.c);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -148,12 +148,12 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
 }
 
 std::vector<Point64> calculateConvexHull(const std::vector<Point64> &polygon) {
-    int n = polygon.size();
+    size_t n = polygon.size();
     if (n <= 3) return polygon;
 
     // Sort the point in the polygon lexicographically
     std::vector<Point64> sorted = polygon;
-    std::sort(sorted.begin(), sorted.end());
+    std::ranges::sort(sorted);
 
     // Prepare the output vector
     std::vector<Point64> hull;
@@ -169,7 +169,7 @@ std::vector<Point64> calculateConvexHull(const std::vector<Point64> &polygon) {
 
     // Build upper hull
     size_t lowerSize = hull.size();
-    for (int i = n - 2; i >= 0; --i) {
+    for (size_t i = n - 2; i >= 0; --i) {
         while (hull.size() > lowerSize && crossProduct(hull[hull.size() - 2], hull.back(), sorted[i]) <= 0) {
             hull.pop_back();
         }
