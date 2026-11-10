@@ -62,7 +62,8 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     }
 
     // Check if number of two-way items is too large
-    if (twoWayItemsCount >= 64 || (1ULL << twoWayItemsCount) > limit) {
+    const size_t MAX_TWO_WAY_ITEMS = 64;
+    if (twoWayItemsCount >= MAX_TWO_WAY_ITEMS || (1ULL << twoWayItemsCount) > limit) {
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("{}: two way item count too big", twoWayItemsCount));
@@ -98,11 +99,11 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     return total <= limit;
 }
 
-double calculateNestingScore(const nesting::NestingStats &stats, const utils::ScoringWeights w)
+double calculateNestingScore(const nesting::NestingStats &stats, const utils::ScoringWeights &w)
 {
     // Remaining fabric subscore
-    double lengthRatioPcs = (stats.totalFabricLength > 0) ? (stats.remainingFabricLength / stats.totalFabricLength) * 100.0 : 0.0;
-    double sFabric = w.alphaFabric * stats.remainingFabricPercentage + (1.0 - w.alphaFabric) * lengthRatioPcs;
+    double lengthRatioPcs = (stats.totalFabricLength > 0) ? (static_cast<double>(stats.remainingFabricLength) / static_cast<double>(stats.totalFabricLength)) * 100.0 : 0.0;
+    double sFabric = (w.alphaFabric * stats.remainingFabricPercentage) + ((1.0 - w.alphaFabric) * lengthRatioPcs);
 
     // Scraps subscore
     double sScrap = stats.effectiveScrapsPercentage;
