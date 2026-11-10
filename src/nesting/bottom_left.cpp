@@ -1,7 +1,8 @@
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
+
 #include "utils/config.hpp"
-#include "utils/timer.hpp"
 #include "geometry/calculations.hpp"
 #include "nesting/bottom_left.hpp"
 
@@ -52,7 +53,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
                 SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
             }
 
-            geometry::NFPKey key{ placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), varId };
+            geometry::NFPKey key{ .variantIdA=placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), .variantIdB=varId };
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("key {} {}", key.variantIdA, key.variantIdB));
@@ -144,7 +145,7 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     }
 
     // Sort first by x and then by y
-    std::sort(candidatePoints.begin(), candidatePoints.end(),  
+    std::ranges::sort(candidatePoints,
         [](const Clipper2Lib::Point64& a, const Clipper2Lib::Point64& b) {
             if (a.x != b.x) return a.x < b.x;
             return a.y < b.y;
@@ -213,9 +214,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             return { .wasSuccessful = false };
         }
 
-        if (item.getItemBoundingBoxAtPosition().right > minLen) {
-            minLen = item.getItemBoundingBoxAtPosition().right;
-        }
+        minLen = std::max(item.getItemBoundingBoxAtPosition().right, minLen);
 
         geometry::Point64 rawPosition = item.getPosition();
 
