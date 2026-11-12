@@ -15,9 +15,9 @@ protected:
     std::vector<geometry::Point64> m_boundary;
     Clipper2Lib::Rect64 m_shapeBoundingBox;
 public:
-    Shape(std::vector<geometry::Point64> initalBoundary = {}, bool toBeScaled = false);
+    explicit Shape(const std::vector<geometry::Point64>& initalBoundary = {}, bool toBeScaled = false);
     Shape(int64_t width, int64_t length, bool toBeScaled = false);
-    Shape(Clipper2Lib::Path64 initalPath);
+    explicit Shape(const Clipper2Lib::Path64& initalPath);
     virtual ~Shape() = default;
     
     [[nodiscard]] virtual const std::vector<geometry::Point64>& getBoundary() const { return m_boundary; }
@@ -58,9 +58,9 @@ public:
     PieceVariant(int variantId, int64_t pieceId, int rotationAngle = 0, bool isMirrored = false, 
         int requiredQuantity = 1, bool twoWayAllowed = false, 
         int64_t seamAllowance = 0, int64_t cuttingAllowance = 0, 
-        std::vector<geometry::Point64> initalBoundary = {},
+        const std::vector<geometry::Point64>& initalBoundary = {},
         geometry::Point64 referencePoint = geometry::Point64());
-    PieceVariant(Clipper2Lib::Path64 initalPath = {});
+    explicit PieceVariant(const Clipper2Lib::Path64& initalPath);
     
     [[nodiscard]] int64_t getGlobalId(bool isFlipped) const;
     

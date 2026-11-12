@@ -123,7 +123,7 @@ std::string PatternPiece::toString() const
     std::string boundaryStr = std::accumulate(
         std::next(m_originalPolygon.begin()), m_originalPolygon.end(),
         m_originalPolygon.front().toString(),
-        [](std::string a, geometry::Point64 b) {
+        [](std::string const& a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }
     );
@@ -131,7 +131,7 @@ std::string PatternPiece::toString() const
     std::string variantsStr = std::accumulate(
         std::next(m_allowedVariants.begin()), m_allowedVariants.end(),
         m_allowedVariants.front().toString(),
-        [](std::string a, pattern::PieceVariant b) {
+        [](std::string const& a, pattern::PieceVariant const& b) {
             return a + "; " + b.toString();
         }
     );

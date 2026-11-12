@@ -5,9 +5,9 @@
 namespace pmg::timing {
 
 Timer::Timer(std::source_location location) :
-    m_logger(spdlog::get("basicConsole")),
+    start(std::chrono::high_resolution_clock::now()),
     location(location),
-    start(std::chrono::high_resolution_clock::now()){}
+    m_logger(spdlog::get("basicConsole")){}
 
 Timer::~Timer() {
     end = std::chrono::high_resolution_clock::now();

@@ -12,8 +12,8 @@
 namespace pmg::pattern {
 inline constexpr int64_t SCALE = 1000;
 
-Shape::Shape(std::vector<geometry::Point64> initalBoundary, bool toBeScaled)
-    : m_shapePath([initalBoundary, toBeScaled]() {
+Shape::Shape(const std::vector<geometry::Point64> &initalBoundary, bool toBeScaled)
+    : m_shapePath([&initalBoundary, toBeScaled]() {
         if (toBeScaled) {
             std::vector<pmg::geometry::Point64> boundary;
             boundary.reserve(initalBoundary.size());
@@ -44,7 +44,7 @@ Shape::Shape(int64_t width, int64_t length, bool toBeScaled)
       m_boundary(geometry::calculations::fromClipperPath(m_shapePath)),
       m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
 
-Shape::Shape(Clipper2Lib::Path64 initalPath)
+Shape::Shape(const Clipper2Lib::Path64 &initalPath)
     : m_shapePath(Clipper2Lib::SimplifyPath(initalPath, 0.0)),
       m_boundary(geometry::calculations::fromClipperPath(m_shapePath)),
       m_shapeBoundingBox(Clipper2Lib::GetBounds(m_shapePath)) {}
@@ -78,7 +78,7 @@ std::string Shape::toString() const
     std::string boundaryStr = std::accumulate(
         std::next(m_boundary.begin()), m_boundary.end(),
         m_boundary.front().toString(),
-        [](std::string a, geometry::Point64 b) {
+        [](std::string const& a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }
     );
@@ -115,7 +115,7 @@ void PieceVariant::initializeVariantGeometry()
         }
     } else {
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("decomposing {}", this->toString()));
+            SPDLOG_INFO("decomposing");
         }
         std::vector<std::vector<pmg::geometry::Point64>> subShapes = geometry::calculations::hertelMehlhornAlgorithm(m_boundary);
 
@@ -132,8 +132,8 @@ void PieceVariant::initializeVariantGeometry()
 PieceVariant::PieceVariant(int variantId, int64_t pieceId, 
     int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, 
     int64_t seamAllowance, int64_t cuttingAllowance, 
-    std::vector<geometry::Point64> initalBoundary, geometry::Point64 referencePoint)
-    : Shape(initalBoundary), m_variantId(variantId), m_pieceId(pieceId), 
+    const std::vector<geometry::Point64> &initalBoundary, geometry::Point64 referencePoint)
+    : Shape(initalBoundary), m_pieceId(pieceId), m_variantId(variantId), 
       m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), 
       m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed),
       m_seamAllowance(seamAllowance), m_cuttingAllowance(cuttingAllowance),
@@ -142,7 +142,7 @@ PieceVariant::PieceVariant(int variantId, int64_t pieceId,
     initializeVariantGeometry();
 }
 
-PieceVariant::PieceVariant(Clipper2Lib::Path64 initalPath)
+PieceVariant::PieceVariant(const Clipper2Lib::Path64 &initalPath)
     : Shape(initalPath)
 {
     initializeVariantGeometry();
@@ -209,7 +209,7 @@ std::string PieceVariant::toString() const
     std::string boundaryStr = std::accumulate(
         std::next(m_boundary.begin()), m_boundary.end(),
         m_boundary.front().toString(),
-        [](std::string a, geometry::Point64 b) {
+        [](std::string const& a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }
     );

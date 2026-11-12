@@ -14,7 +14,8 @@ private:
     int64_t m_id;
     std::vector<geometry::Point64> m_originalPolygon;
     std::vector<PieceVariant> m_allowedVariants;
-    int64_t m_seamAllowance, m_cuttingAllowance;
+    int64_t m_seamAllowance;
+    int64_t m_cuttingAllowance;
     int m_grainline;
 
     void initializePatternPieceGeometry(const std::vector<VariantConstraint>& constraints, bool toBeScaled);
