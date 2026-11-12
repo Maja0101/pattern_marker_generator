@@ -7,17 +7,22 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Settings for static code analysis
+option(ENABLE_CLANG_TIDY "Enable Clang-Tidy code analysis" OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-if(CLANG_TIDY_EXE)
-    set(CMAKE_CXX_CLANG_TIDY 
-        ${CLANG_TIDY_EXE}
-        "-extra-arg=-std=c++20"
-    )
-    message(STATUS "Clang-Tidy active and integrated with CMake")
+if(ENABLE_CLANG_TIDY)
+    find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+    if(CLANG_TIDY_EXE)
+        set(CMAKE_CXX_CLANG_TIDY 
+            ${CLANG_TIDY_EXE}
+            "-extra-arg=-std=c++20"
+        )
+        message(STATUS "Clang-Tidy active and integrated with CMake")
+    else()
+        message(WARNING "Clang-Tidy not found - code analysis is disabled")
+    endif()
 else()
-    message(WARNING "Clang-Tidy not found - code analysis is disabled")
+    message(STATUS "Clang-Tidy has been disabled")
 endif()
 
 # Static libs linked into the Node addon
