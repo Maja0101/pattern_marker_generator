@@ -62,8 +62,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     }
 
     // Check if number of two-way items is too large
-    const size_t MAX_TWO_WAY_ITEMS = 64;
-    if (twoWayItemsCount >= MAX_TWO_WAY_ITEMS || (1ULL << twoWayItemsCount) > limit) {
+    if (const size_t MAX_TWO_WAY_ITEMS = 64; twoWayItemsCount >= MAX_TWO_WAY_ITEMS || (1ULL << twoWayItemsCount) > limit) {
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("{}: two way item count too big", twoWayItemsCount));

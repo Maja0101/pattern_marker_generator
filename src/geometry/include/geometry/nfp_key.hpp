@@ -10,9 +10,7 @@ struct NFPKey {
     int64_t variantIdA;
     int64_t variantIdB;
 
-    bool operator==(const NFPKey& other) const {
-        return variantIdA == other.variantIdA && variantIdB == other.variantIdB;
-    }
+    bool operator==(const NFPKey& other) const = default;
 };
 
 } // namespace pmg::geometry 

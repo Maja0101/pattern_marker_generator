@@ -11,10 +11,12 @@
 namespace pmg::geometry::calculations::utils {
 
 struct HalfPlane {
-    int64_t a, b, c;
+    int64_t a;
+    int64_t b;
+    int64_t c;
 };
 
-int64_t dot(int64_t a, int64_t b, Point64 &p) {
+int64_t dot(int64_t a, int64_t b, const Point64 &p) {
     return (a * p.x) + (b * p.y);
 }
 
@@ -85,7 +87,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         }
 
         int64_t cShifted = c + minProjection;
-        halfPlanes.push_back({nx, ny, cShifted});
+        halfPlanes.emplace_back(nx, ny, cShifted);
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("half plane {} {} {}", nx, ny, cShifted));
@@ -150,7 +152,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
 std::vector<Point64> calculateConvexHull(const std::vector<Point64> &polygon) {
     // Andrew's monotone chain convex hull algorithm
     
-    int n = static_cast<int>(polygon.size());
+    auto n = static_cast<int>(polygon.size());
     if (n <= 3) return polygon;
 
     // Sort the point in the polygon lexicographically

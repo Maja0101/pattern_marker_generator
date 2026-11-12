@@ -11,12 +11,7 @@
 #include "pattern/variant_constraint.hpp"
 #include "utils/logger_setup.hpp"
 
-namespace {
-
-using pmg::geometry::Point64;
-using pmg::pattern::Fabric;
-using pmg::pattern::PatternPiece;
-using pmg::pattern::VariantConstraint;
+namespace pmg::api {
 
 int64_t getInt(const Napi::Object& obj, const char* key, int64_t def) {
     if (!obj.Has(key)) return def;
@@ -40,26 +35,26 @@ Napi::Array requireArray(const Napi::Object& obj, const char* key) {
     return v.As<Napi::Array>();
 }
 
-std::vector<Point64> parsePoints(const Napi::Array& arr) {
-    std::vector<Point64> result;
+std::vector<geometry::Point64> parsePoints(const Napi::Array& arr) {
+    std::vector<geometry::Point64> result;
     result.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
         Napi::Value item = arr.Get(i);
         if (!item.IsObject()) throw std::invalid_argument("point must be an object {x, y}");
         Napi::Object o = item.As<Napi::Object>();
-        result.push_back(Point64{getInt(o, "x", 0), getInt(o, "y", 0)});
+        result.push_back(geometry::Point64{getInt(o, "x", 0), getInt(o, "y", 0)});
     }
     return result;
 }
 
-std::vector<VariantConstraint> parseConstraints(const Napi::Array& arr) {
-    std::vector<VariantConstraint> result;
+std::vector<pattern::VariantConstraint> parseConstraints(const Napi::Array& arr) {
+    std::vector<pattern::VariantConstraint> result;
     result.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
         Napi::Value item = arr.Get(i);
         if (!item.IsObject()) throw std::invalid_argument("constraint must be an object");
         Napi::Object o = item.As<Napi::Object>();
-        VariantConstraint c{};
+        pattern::VariantConstraint c{};
         c.rotationAngle = static_cast<int>(getInt(o, "rotationAngle", 0));
         c.isMirrored = getBool(o, "isMirrored", false);
         c.requiredQuantity = static_cast<int>(getInt(o, "requiredQuantity", 1));
@@ -69,11 +64,11 @@ std::vector<VariantConstraint> parseConstraints(const Napi::Array& arr) {
     return result;
 }
 
-PatternPiece parsePiece(const Napi::Object& o) {
-    std::vector<Point64> points = parsePoints(requireArray(o, "points"));
-    std::vector<VariantConstraint> constraints;
+pattern::PatternPiece parsePiece(const Napi::Object& o) {
+    std::vector<geometry::Point64> points = parsePoints(requireArray(o, "points"));
+    std::vector<pattern::VariantConstraint> constraints;
     if (o.Has("constraints")) constraints = parseConstraints(requireArray(o, "constraints"));
-    return PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
+    return pattern::PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
                         getInt(o, "seamAllowance", 0), getInt(o, "cuttingAllowance", 0),
                         getInt(o, "grainline", 0), true);
 }
@@ -81,15 +76,15 @@ PatternPiece parsePiece(const Napi::Object& o) {
 constexpr int64_t DEFAULT_WIDTH = 1400000; 
 constexpr int64_t DEFAULT_LENGTH = 100000000;
 
-Fabric parseFabric(const Napi::Object& o) {
-    if (o.Has("boundary")) return Fabric(parsePoints(requireArray(o, "boundary")), true);
-    if (o.Has("width") && o.Has("length")) return Fabric(getInt(o, "width", 0), getInt(o, "length", 0), true);
-    return Fabric(DEFAULT_WIDTH, DEFAULT_LENGTH, false);
+pattern::Fabric parseFabric(const Napi::Object& o) {
+    if (o.Has("boundary")) return pattern::Fabric(parsePoints(requireArray(o, "boundary")), true);
+    if (o.Has("width") && o.Has("length")) return pattern::Fabric(getInt(o, "width", 0), getInt(o, "length", 0), true);
+    return pattern::Fabric(DEFAULT_WIDTH, DEFAULT_LENGTH, false);
 }
 
 struct NestingInput {
-    Fabric fabric;
-    std::vector<PatternPiece> pieces;
+    pattern::Fabric fabric;
+    std::vector<pattern::PatternPiece> pieces;
     int64_t algorithm;
 };
 
@@ -193,7 +188,7 @@ Napi::Value ExecuteSync(const Napi::CallbackInfo& info) {
     }
 }
 
-} // namespace
+} // namespace pmg::api
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     try { pmg::logging::initialize(); } catch (const std::exception&) {}

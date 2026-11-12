@@ -24,7 +24,8 @@ namespace mapbox::util {
 namespace pmg::geometry::calculations::utils {
 
 struct Edge {
-    int u, v;
+    int u;
+    int v;
     
     constexpr Edge(int a, int b) noexcept
         : u(std::min(a, b)), v(std::max(a, b)) {}
@@ -107,16 +108,16 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
     std::unordered_map<utils::Edge, int> edgeMap;
 
     for (size_t t = 0; t < TRIANGLES_COUNT; ++t) {
-        int idx0 = static_cast<int>(indexes[(t * 3) + 0]);
-        int idx1 = static_cast<int>(indexes[(t * 3) + 1]);
-        int idx2 = static_cast<int>(indexes[(t * 3) + 2]);
+        auto idx0 = static_cast<int>(indexes[(t * 3) + 0]);
+        auto idx1 = static_cast<int>(indexes[(t * 3) + 1]);
+        auto idx2 = static_cast<int>(indexes[(t * 3) + 2]);
 
         // Make sure the vertixes are counterclockwise
         if (utils::crossProduct(polygon[idx0], polygon[idx1], polygon[idx2]) < 0) {
             std::swap(idx1, idx2);
         }
 
-        int baseIdx = static_cast<int>(halfEdges.size());
+        auto baseIdx = static_cast<int>(halfEdges.size());
 
         // Create half edges for the triangle
         utils::HalfEdge e0{ .v=idx1, .next=baseIdx + 1, .prev=baseIdx + 2}; // idx0 -> idx1
@@ -203,7 +204,7 @@ std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Poin
         if (!halfEdges[i].active || visited[i]) continue;
 
         std::vector<Point64> poly;
-        int currEdgeIdx = static_cast<int>(i);
+        auto currEdgeIdx = static_cast<int>(i);
 
         while (!visited[currEdgeIdx]) {
             visited[currEdgeIdx] = true;

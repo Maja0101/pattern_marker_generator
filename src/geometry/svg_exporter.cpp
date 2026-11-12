@@ -65,7 +65,7 @@ bool SvgExporter::exportLayout(const std::string& filepath,
                 pointsStream << worldX << "," << svgY << " ";
             }
             const std::string POINTS = pointsStream.str();
-            std::string clipId = "clip_" + std::to_string(idCounter++);
+            std::string clipId = std::format("clip_{}", std::to_string(idCounter++));
 
             // Calculate total strokes width
             const double MULTIPLIER = 2.0;

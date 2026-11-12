@@ -2,6 +2,8 @@
 #include <cstddef>
 #include <unordered_map>
 #include <array>
+#include <cmath>
+#include <ranges>
 
 #include <spdlog/spdlog.h>
 
@@ -55,24 +57,20 @@ bool isCyclicShift(const std::vector<Point64> &polygonA, const std::vector<Point
     // Check whether the second polygon is the same as the first polygon
     // even if the starting point does not match
 
-    size_t n = polygonA.size();
-    if (n != polygonB.size()) {
-        return false;
-    }
+    if (polygonA.size() != polygonB.size()) return false;
+    if (polygonA.empty()) return true;
 
-    for (size_t i = 0; i < n; ++i) {
-        if (polygonA[i] == polygonB[0]) {
-            bool match = true;
-            for (size_t j = 1; j < n; ++j) {
-                if (polygonA[(i + j) % n] != polygonB[j]) {
-                    match = false;
-                    break;
-                }
-            }
-            if (match) {
+    for (auto it = std::ranges::find(polygonA, polygonB[0]); 
+         it != polygonA.end(); 
+         it = std::ranges::find(it + 1, polygonA.end(), polygonB[0])) {
+
+        const auto SPLIT = std::distance(polygonA.begin(), it);
+        const auto TAIL_LEN = polygonA.size() - SPLIT;
+
+        if (std::ranges::equal(it, polygonA.end(), polygonB.begin(), polygonB.begin() + TAIL_LEN) &&
+            std::ranges::equal(polygonA.begin(), it, polygonB.begin() + TAIL_LEN, polygonB.end())) {
                 return true;
             }
-        }
     }
 
     return false;
@@ -138,13 +136,13 @@ Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2
     }
 
     // Snap to original NFP
-    for (const auto& nfp : originalNfps) {
-        for (const auto& path : nfp) {
-            for (const auto& ref : path) {
-                if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
-                if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
-            }
-        }
+    auto snap = [&](auto& val, auto target) {
+        if (std::abs(val - target) <= epsilon) val = target;
+    };
+
+    for (const auto& ref : originalNfps | std::views::join | std::views::join) {
+        snap(point.x, ref.x);
+        snap(point.y, ref.y);
     }
 
     return point;
@@ -152,7 +150,15 @@ Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2
 
 std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece> &patternPieces)
 {
+    size_t total = 0;
+    for (auto& piece : patternPieces) {
+        for (const auto& variant : piece.getVariants()) {
+            total += variant.getRequiredQuantity();
+        }
+    }
+
     std::vector<nesting::NestedItem> items;
+    items.reserve(total);
 
     for (auto& piece : patternPieces) {
 
@@ -166,14 +172,7 @@ std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece>
                 SPDLOG_INFO(variant.toString());
             }
 
-            for (int i = 0; i < variant.getRequiredQuantity(); ++i) {
-
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    SPDLOG_INFO(std::format("Loop no. {}", i+1));
-                }
-
-                items.emplace_back(&variant);
-            }
+            items.insert(items.end(), variant.getRequiredQuantity(), &variant);
         }
     }
 
@@ -202,7 +201,7 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
         }
 
         for (auto& variant : piece.getVariants()) {
-            variantMap.emplace(variant.getGlobalId(false), variant);
+            variantMap.try_emplace(variant.getGlobalId(false), variant);
         }
     }
 
@@ -213,7 +212,7 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
     std::vector<pattern::PieceVariant> allVariants;
     allVariants.reserve(variantMap.size());
 
-    for (auto& [id, variant] : variantMap) {
+    for (const auto& [id, variant] : variantMap) {
         allVariants.push_back(variant);
     }
 

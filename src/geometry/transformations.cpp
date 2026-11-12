@@ -28,7 +28,7 @@ Point64 getTopLeftCorner(const std::vector<Point64> &polygon) noexcept
         maxY = std::max(point.y, maxY);
     }
 
-    return Point64(minX, maxY);
+    return Point64{minX, maxY};
 }
 
 std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored) noexcept

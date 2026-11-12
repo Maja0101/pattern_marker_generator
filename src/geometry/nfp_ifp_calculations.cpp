@@ -132,7 +132,7 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
     return Clipper2Lib::SimplifyPaths(nfp, 0.0);
 }
 
-Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, bool isFlipped, int64_t margin)
+Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::PieceVariant &variant, bool isFlipped)
 {
     // IFP can be calculated as calculating IFP for convex hulls of fabric and variant and subtracting the nfp of the pockets
 
@@ -206,8 +206,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     }
     
     // Calculate base IFP for convex hulls
-    int n = static_cast<int>(fabricHull.size());
-    if (n < 3) return {};
+    if (auto n = static_cast<int>(fabricHull.size()); n < 3) return {};
 
     
     Clipper2Lib::Paths64 convexIFP = { toClipperPath(calculateConvexIFP(fabricHull, variantHull)) };
@@ -282,7 +281,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
 
 namespace pmg::geometry::calculations {
 
-std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, std::vector<pattern::PieceVariant> &variants)
+std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric &fabric, const std::vector<pattern::PieceVariant> &variants)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
@@ -317,49 +316,43 @@ std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const patter
     return ifpCache;
 }
 
-std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(std::vector<pattern::PieceVariant> &variants)
+std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::vector<pattern::PieceVariant> &variants)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
     }
 
-    std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
-    for (auto& variantA : variants) {
-        if (variantA.getRequiredQuantity() > 0) {
-            bool isFlippedA = false;
-            for (auto& variantB : variants) {
-                if (variantB.getRequiredQuantity() > 0) {
-                    bool isFlippedB = false;
-                    
-                    if constexpr (config::DEBUG_MODE_DETAILED) {
-                        SPDLOG_INFO(std::format("Variants no. {} {}", variantA.getGlobalId(isFlippedA), variantB.getGlobalId(isFlippedB)));
-                    }
-                    
-                    NFPKey key{ .variantIdA=variantA.getGlobalId(isFlippedA), .variantIdB=variantB.getGlobalId(isFlippedB) };
-                    nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
-                    
-                    if (variantA.getIsTwoWay()) {
-                        isFlippedA = !isFlippedA;
-                        NFPKey key{ .variantIdA=variantA.getGlobalId(isFlippedA), .variantIdB=variantB.getGlobalId(isFlippedB) };
-                        nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
-                        if (variantB.getIsTwoWay()) {
-                            isFlippedB = !isFlippedB;
-                            NFPKey key{ .variantIdA=variantA.getGlobalId(isFlippedA), .variantIdB=variantB.getGlobalId(isFlippedB) };
-                            nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
-                            isFlippedB = !isFlippedB;
-                        }
-                        isFlippedA = !isFlippedA;
-                    }
+    struct State {
+        size_t idx;
+        bool isFlipped;
+        int64_t globalId;
+    };
 
-                    if (variantB.getIsTwoWay()) {
-                        isFlippedB = !isFlippedB;
-                        NFPKey key{ .variantIdA=variantA.getGlobalId(isFlippedA), .variantIdB=variantB.getGlobalId(isFlippedB) };
-                        nfpCache[key] = utils::buildNFPfor(variantA, variantB, isFlippedA, isFlippedB);
-                    }
-                }
-            }
+    std::vector<State> states;
+    states.reserve(variants.size() * 2);
+
+    for (size_t i = 0; i < variants.size(); ++i) {
+        states.emplace_back(i, false, variants[i].getGlobalId(false));
+        if (variants[i].getIsTwoWay()) {
+            states.emplace_back(i, true, variants[i].getGlobalId(true));
         }
     }
+
+    std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
+    nfpCache.reserve(states.size() * states.size());
+
+    for (const auto& a : states) {
+        for (const auto& b : states) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("Variants no. {} {}", a.globalId, b.globalId));
+            }
+            nfpCache.try_emplace(
+                NFPKey{ .variantIdA=a.globalId, .variantIdB=b.globalId },
+                utils::buildNFPfor(variants[a.idx],variants[b.idx], a.isFlipped, b.isFlipped)
+            );
+        }
+    }
+
     return nfpCache;
 }
 
