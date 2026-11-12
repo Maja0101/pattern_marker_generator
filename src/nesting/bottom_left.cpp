@@ -1,6 +1,7 @@
-#include <spdlog/spdlog.h>
-
 #include <algorithm>
+#include <ranges>
+
+#include <spdlog/spdlog.h>
 
 #include "utils/config.hpp"
 #include "geometry/calculations.hpp"
@@ -9,7 +10,7 @@
 namespace pmg::nesting {
 inline constexpr int64_t SCALE = 1000;
 
-bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
+bool BottomLeft::findPosition(NestedItem &item, const std::vector<NestedItem> &items)
 {
     int64_t varId = item.getVariant()->getGlobalId(item.isFlipped());
 
@@ -46,78 +47,74 @@ bool BottomLeft::findPosition(NestedItem &item, std::vector<NestedItem> &items)
     originalNFPs.reserve(items.size());
 
     // Subtract NFPs of all placed items
-    for (const auto& placedPiece : items) {
-        if (placedPiece.isLocked()) {
+    for (const auto& placedPiece : items | std::views::take_while(&NestedItem::isLocked)) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
+        }
+
+        geometry::NFPKey key{ .variantIdA=placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), .variantIdB=varId };
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("key {} {}", key.variantIdA, key.variantIdB));
+        }
+
+        auto nfpIt = m_nfpCache.find(key);
+
+        if (nfpIt != m_nfpCache.end() && !nfpIt->second.empty()) {
+            
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO("Valid nfp");
+            }
+            
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                const Clipper2Lib::Paths64& nfpPaths = nfpIt->second;
+                for (const auto& path : nfpPaths) {
+                    SPDLOG_INFO("path in nfp");
+                    for (const auto& p : path) {
+                        SPDLOG_INFO(std::format("NFP point: ({}, {})", p.x, p.y));
+                    }
+                }
+            }
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
+                SPDLOG_INFO(std::format("position: ({}, {})", placedPiece.getPosition().x, placedPiece.getPosition().y));
             }
 
-            geometry::NFPKey key{ .variantIdA=placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), .variantIdB=varId };
+            Clipper2Lib::Paths64 translatedNFP = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(placedPiece.getPosition()));
+
+            // Create small space between NFP and IFP for cases of 1D degenerated lines being valid positions
+            originalNFPs.push_back(translatedNFP);
+            translatedNFP = Clipper2Lib::InflatePaths(
+                translatedNFP,
+                -1.0,
+                Clipper2Lib::JoinType::Miter,
+                Clipper2Lib::EndType::Polygon
+            );
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("key {} {}", key.variantIdA, key.variantIdB));
-            }
-
-            auto nfpIt = m_nfpCache.find(key);
-
-            if (nfpIt != m_nfpCache.end() && !nfpIt->second.empty()) {
-                
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    SPDLOG_INFO("Valid nfp");
-                }
-                
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    const Clipper2Lib::Paths64& nfpPaths = nfpIt->second;
-                    for (const auto& path : nfpPaths) {
-                        SPDLOG_INFO("path in nfp");
-                        for (const auto& p : path) {
-                            SPDLOG_INFO(std::format("NFP point: ({}, {})", p.x, p.y));
-                        }
+                for (const auto& path : translatedNFP) {
+                    SPDLOG_INFO("path in translated nfp");
+                    for (const auto& p : path) {
+                        SPDLOG_INFO(std::format("NFP point: ({}, {})", p.x, p.y));
                     }
-                }
-
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    SPDLOG_INFO(std::format("position: ({}, {})", placedPiece.getPosition().x, placedPiece.getPosition().y));
-                }
-
-                Clipper2Lib::Paths64 translatedNFP = geometry::calculations::transaltePaths(nfpIt->second, geometry::calculations::toClipperPoint(placedPiece.getPosition()));
-
-                // Create small space between NFP and IFP for cases of 1D degenerated lines being valid positions
-                originalNFPs.push_back(translatedNFP);
-                translatedNFP = Clipper2Lib::InflatePaths(
-                    translatedNFP,
-                    -1.0,
-                    Clipper2Lib::JoinType::Miter,
-                    Clipper2Lib::EndType::Polygon
-                );
-
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    for (const auto& path : translatedNFP) {
-                        SPDLOG_INFO("path in translated nfp");
-                        for (const auto& p : path) {
-                            SPDLOG_INFO(std::format("NFP point: ({}, {})", p.x, p.y));
-                        }
-                    }
-                }
-                
-                validRegion = Clipper2Lib::Difference(
-                    validRegion,
-                    translatedNFP,
-                    Clipper2Lib::FillRule::NonZero
-                );
-
-                if (validRegion.empty()) {
-                    
-                    if constexpr (config::DEBUG_MODE_DETAILED) {
-                        SPDLOG_INFO("No valid region");
-                    }
-
-                    return false;
                 }
             }
-        } else {
-            break;
+            
+            validRegion = Clipper2Lib::Difference(
+                validRegion,
+                translatedNFP,
+                Clipper2Lib::FillRule::NonZero
+            );
+
+            if (validRegion.empty()) {
+                
+                if constexpr (config::DEBUG_MODE_DETAILED) {
+                    SPDLOG_INFO("No valid region");
+                }
+
+                return false;
+            }
+
         }
     }
 
@@ -216,9 +213,9 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 
         minLen = std::max(item.getItemBoundingBoxAtPosition().right, minLen);
 
-        geometry::Point64 rawPosition = item.getPosition();
-
+        
         if constexpr (config::DEBUG_MODE_DETAILED) {
+            geometry::Point64 rawPosition = item.getPosition();
             SPDLOG_INFO(std::format("Raw position point {} for {}", rawPosition.toString(), item.getVariant()->getPieceId()));
         }
 
@@ -230,7 +227,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             SPDLOG_INFO(std::format("xmax - xt = {} - {}", m_fabric.getBoundingBox().right, positionWithoutAllowances.x));
         }
 
-        geometry::Point64 deltaPosition(positionWithoutAllowances.y, m_fabric.getBoundingBox().right - positionWithoutAllowances.x);
+        geometry::Point64 deltaPosition{positionWithoutAllowances.y, m_fabric.getBoundingBox().right - positionWithoutAllowances.x};
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("World position point {}", deltaPosition.toString()));

@@ -15,7 +15,7 @@ Clipper2Lib::Path64 NestedItem::getItemPathAtPosition(int64_t x, int64_t y) cons
 
 Clipper2Lib::Path64 NestedItem::getItemPathAtPosition() const
 {
-    return getItemPathAtPosition(m_position.x, m_position.y);;
+    return getItemPathAtPosition(m_position.x, m_position.y);
 }
 
 Clipper2Lib::Rect64 NestedItem::getItemBoundingBoxAtPosition(int64_t x, int64_t y) const
@@ -59,10 +59,10 @@ geometry::Point64 NestedItem::getPositionForItemWithoutAllowances() const
 {
     if (!isLocked()) return {};
 
-    return geometry::Point64(
+    return geometry::Point64{
         m_position.x + m_variantRef->getAllowancesDistance(),
         m_position.y + m_variantRef->getAllowancesDistance()
-    );
+    };
 }
 
 std::string NestedItem::toString() const

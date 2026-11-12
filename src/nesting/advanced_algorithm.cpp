@@ -13,9 +13,8 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
 {
     if (index == items.size()) {
         NestingResult currentResult = runSingleBottomLeft(items);
-        double currentScore = currentResult.wasSuccessful ? geometry::calculations::calculateNestingScore(currentResult.stats) : -1.0;
 
-        if (currentScore > best.score) {
+        if (double currentScore = currentResult.wasSuccessful ? geometry::calculations::calculateNestingScore(currentResult.stats) : -1.0; currentScore > best.score) {
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("curr best {} score {} result {} {} {}, {} {} {} {} {}, {} {}", best.score, currentScore, 
@@ -33,7 +32,7 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedIt
             }
 
             best.result = std::move(currentResult);
-            best.score = std::move(currentScore);
+            best.score = currentScore;
 
             if constexpr (config::DEVELOPMENT) {
                 pmg::geometry::SvgExporter::exportLayout(
@@ -115,7 +114,7 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
             return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);
         });
 
-        best.result = std::move(runSingleBottomLeft(m_originalItems));
+        best.result = runSingleBottomLeft(m_originalItems);
 
         if constexpr (config::DEVELOPMENT) {
             pmg::geometry::SvgExporter::exportLayout(

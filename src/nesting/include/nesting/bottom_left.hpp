@@ -23,7 +23,7 @@ private:
     Clipper2Lib::Paths64 m_placedPiecesPolygons;
     std::vector<Clipper2Lib::Rect64> m_placedPiecesBoxes;
 
-    bool findPosition(NestedItem& item, std::vector<NestedItem>& items);
+    bool findPosition(NestedItem& item, const std::vector<NestedItem>& items);
 public:
     BottomLeft(pattern::Fabric fabric, 
         std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, 

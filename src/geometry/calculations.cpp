@@ -172,7 +172,7 @@ std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece>
                 SPDLOG_INFO(variant.toString());
             }
 
-            items.insert(items.end(), variant.getRequiredQuantity(), &variant);
+            items.insert(items.end(), variant.getRequiredQuantity(), nesting::NestedItem(&variant));
         }
     }
 

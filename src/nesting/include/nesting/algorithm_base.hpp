@@ -24,8 +24,8 @@ protected:
 
     NestingResult runSingleBottomLeft(std::vector<nesting::NestedItem>& items);
 public:
-    AlgorithmBase(int64_t width = 1400000, int64_t length = 100000000);
-    AlgorithmBase(pattern::Fabric fabric);
+    explicit AlgorithmBase(int64_t width = 1400000, int64_t length = 100000000);
+    explicit AlgorithmBase(pattern::Fabric fabric);
     virtual ~AlgorithmBase() = default;
 
     const std::unordered_map<int64_t, Clipper2Lib::Paths64>& getIFPCache() const { return m_ifpCache; };

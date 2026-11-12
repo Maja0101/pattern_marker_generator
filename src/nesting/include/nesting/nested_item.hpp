@@ -12,7 +12,7 @@ private:
     bool m_isLocked{false};
     bool m_isFlipped{false};
 public:
-    NestedItem(pattern::PieceVariant* variant) noexcept;
+    explicit NestedItem(pattern::PieceVariant* variant) noexcept;
     
     [[nodiscard]] geometry::Point64 getPosition() const noexcept { return m_position; }
     [[nodiscard]] const pattern::PieceVariant* getVariant() const noexcept { return m_variantRef; }
