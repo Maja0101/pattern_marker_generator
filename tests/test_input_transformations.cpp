@@ -161,7 +161,7 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         REQUIRE(result.positions[0].isFlipped180 == false);
         REQUIRE(pmg::geometry::pointsSimiliar(
             pmg::geometry::Point64{result.positions[0].x, result.positions[0].y}, 
-            pmg::geometry::Point64{-800,-400}, 
+            pmg::geometry::Point64{800,400}, 
             1)
         );
 
@@ -171,7 +171,7 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         REQUIRE(result.positions[1].isFlipped180 == false);
         REQUIRE(pmg::geometry::pointsSimiliar(
             pmg::geometry::Point64{result.positions[1].x, result.positions[1].y}, 
-            pmg::geometry::Point64{-800,-600}, 
+            pmg::geometry::Point64{800,600}, 
             1)
         );
     }

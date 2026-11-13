@@ -5,6 +5,7 @@
 
 #include "utils/config.hpp"
 #include "geometry/calculations.hpp"
+#include "geometry/transformations.hpp"
 #include "nesting/bottom_left.hpp"
 
 namespace pmg::nesting {
@@ -240,6 +241,14 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Delta point {}", deltaPosition.toString()));
+        }
+
+        const int GRAINLINE_CCW = 360 - m_fabric.getGrainline();
+
+        deltaPosition = geometry::calculations::transformPolygon({ deltaPosition }, GRAINLINE_CCW, false, false)[0];
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Delta point after grainline rotation {}", deltaPosition.toString()));
         }
 
         result.positions.push_back({ 
