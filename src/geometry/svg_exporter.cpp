@@ -25,17 +25,19 @@ bool SvgExporter::exportLayout(const std::string& filepath,
     const int SCALE_TO_MM = 1000;
     const double GAP_WIDTH = static_cast<double>(includedCuttingAllowance) / SCALE_TO_MM;
     const double STRIPE_WIDTH = static_cast<double>(includedSeamAllowance) / SCALE_TO_MM;
+    const double WIDTH = static_cast<double>(fabric.getBoundingBox().Height()) / SCALE_TO_MM;
+    const double HEIGHT = static_cast<double>(fabric.getBoundingBox().Width()) / SCALE_TO_MM;
 
     out << std::fixed << std::setprecision(3);
 
     out << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     out << "<svg xmlns=\"http://www.w3.org/2000/svg\" "
-        << "width=\"" << fabric.getBoundingBox().Height() / SCALE_TO_MM << "mm\" "
-        << "height=\"" << fabric.getBoundingBox().Width() / SCALE_TO_MM << "mm\" "
-        << "viewBox=\"0 0 " << fabric.getBoundingBox().Height() / SCALE_TO_MM << " " << fabric.getBoundingBox().Width() / SCALE_TO_MM << "\">\n\n";
+        << "width=\"" << WIDTH << "mm\" "
+        << "height=\"" << HEIGHT << "mm\" "
+        << "viewBox=\"0 0 " << WIDTH << " " << HEIGHT << "\">\n\n";
 
     out << "  <!-- Sheet Frame -->\n";
-    out << "  <g transform=\"rotate(90) translate(0, -" << fabric.getBoundingBox().Height() / SCALE_TO_MM << ") \">\n";
+    out << "  <g transform=\"rotate(90) scale(1, -1)\">\n";
     out << "  <polygon points=\"";
     for (size_t i = 0; i < fabric.getBoundary().size(); ++i) {
         out << fabric.getBoundary()[i].x / SCALE_TO_MM << "," << fabric.getBoundary()[i].y / SCALE_TO_MM;
@@ -57,12 +59,11 @@ bool SvgExporter::exportLayout(const std::string& filepath,
 
             // Change the coordinates of points for display
             std::ostringstream pointsStream;
-            for (const auto& pt : variant->getBoundary(item.isFlipped())) {
+            for (const auto& pt : variant->getBoundaryForVariant(item.isFlipped())) {
                 double worldX = static_cast<double>(POS.x + pt.x) / SCALE_TO_MM;
                 double worldY = static_cast<double>(POS.y + pt.y) / SCALE_TO_MM;
-                double svgY = (static_cast<double>(fabric.getBoundingBox().Height()) / SCALE_TO_MM) - worldY;
 
-                pointsStream << worldX << "," << svgY << " ";
+                pointsStream << worldX << "," << worldY << " ";
             }
             const std::string POINTS = pointsStream.str();
             std::string clipId = std::format("clip_{}", std::to_string(idCounter++));
