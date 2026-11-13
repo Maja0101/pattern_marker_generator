@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/libs/"
+                "${workspaceFolder}/libs/",
+                "${workspaceFolder}/node_modules/node-addon-api"
             ],
             "defines": [],
             "cStandard": "c17",
