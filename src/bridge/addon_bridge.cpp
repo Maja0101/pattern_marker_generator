@@ -192,8 +192,8 @@ Napi::Value ExecuteSync(const Napi::CallbackInfo& info) {
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     try { pmg::logging::initialize(); } catch (const std::exception&) {}
-    exports.Set("execute", Napi::Function::New(env, Execute, "execute"));
-    exports.Set("executeSync", Napi::Function::New(env, ExecuteSync, "executeSync"));
+    exports.Set("execute", Napi::Function::New(env, pmg::api::Execute, "execute"));
+    exports.Set("executeSync", Napi::Function::New(env, pmg::api::ExecuteSync, "executeSync"));
     return exports;
 }
 
