@@ -86,6 +86,80 @@ std::string Shape::toString() const
     return std::format("boundary: ({})", boundaryStr);
 }
 
+Fabric::InitState Fabric::transformBoundary(const std::vector<geometry::Point64> &initalBoundary, int grainline, bool toBeScaled) {
+    InitState state;
+    
+    const int DEGREES_360 = 360;
+    state.grainline = grainline % DEGREES_360;
+    if (state.grainline < 0) state.grainline += DEGREES_360;
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& p : initalBoundary) {
+            SPDLOG_INFO(std::format("original boundary point {}", p.toString()));
+        }
+    }
+
+    state.boundary = geometry::calculations::fromClipperPath(
+        Clipper2Lib::SimplifyPath(
+            geometry::calculations::toClipperPath(initalBoundary), 
+            0.1)
+        );
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& p : state.boundary) {
+            SPDLOG_INFO(std::format("simplified polygon point {}", p.toString()));
+        }
+    }
+
+    if (toBeScaled) {
+        for (auto& point : state.boundary) {
+            point.x *= SCALE;
+            point.y *= SCALE;
+        }
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& p : state.boundary) {
+            SPDLOG_INFO(std::format("scaled polygon point {}", p.toString()));
+        }
+    }
+
+    state.boundary = geometry::calculations::transformPolygon(state.boundary, state.grainline, false, false);
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& p : state.boundary) {
+            SPDLOG_INFO(std::format("rotated by grainline polygon point {}", p.toString()));
+        }
+    }
+
+    state.referencePoint = geometry::calculations::getTopLeftCorner(state.boundary);
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("reference point {}", state.referencePoint.toString()));
+    }
+
+    const int CCW_90 = 270;
+    state.boundary = geometry::calculations::transformPolygon(state.boundary, CCW_90, false, true);
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& p : state.boundary) {
+            SPDLOG_INFO(std::format("rotated by 90 ccw polygon point {}", p.toString()));
+        }
+    }
+
+    return state;
+}
+
+Fabric::Fabric(InitState &&state) 
+    : Shape(state.boundary), m_grainline(state.grainline), m_referencePoint(std::move(state.referencePoint)) {}
+
+Fabric::Fabric(const std::vector<geometry::Point64> &initalBoundary, int grainline, bool toBeScaled)
+    : Fabric(transformBoundary(initalBoundary, grainline, toBeScaled)) {}
+
+Fabric::Fabric(int64_t width, int64_t length, bool toBeScaled)
+    : Shape(width, length, toBeScaled), m_grainline(0), 
+      m_referencePoint(geometry::Point64{m_shapeBoundingBox.top, m_shapeBoundingBox.right}) {}
+
 void PieceVariant::initializeVariantGeometry()
 {
     m_isConvex = geometry::calculations::checkConvexity(m_boundary);
@@ -162,7 +236,7 @@ int64_t PieceVariant::getGlobalId(bool isFlipped) const
     );
 }
 
-const std::vector<geometry::Point64> &PieceVariant::getBoundary(bool isFlipped) const
+const std::vector<geometry::Point64> &PieceVariant::getBoundaryForVariant(bool isFlipped) const
 {
     if (m_isTwoWay && isFlipped) {
         return m_flippedBoundary;
@@ -170,7 +244,7 @@ const std::vector<geometry::Point64> &PieceVariant::getBoundary(bool isFlipped) 
     return m_boundary;
 }
 
-const Clipper2Lib::Path64 &PieceVariant::getPath(bool isFlipped) const
+const Clipper2Lib::Path64 &PieceVariant::getPathForVariant(bool isFlipped) const
 {
     if (m_isTwoWay && isFlipped) {
         return m_flippedShapePath;
@@ -178,7 +252,7 @@ const Clipper2Lib::Path64 &PieceVariant::getPath(bool isFlipped) const
     return m_shapePath;
 }
 
-Clipper2Lib::Path64 PieceVariant::getPathAt(int64_t x, int64_t y, bool isFlipped) const
+Clipper2Lib::Path64 PieceVariant::getPathForVariantAt(int64_t x, int64_t y, bool isFlipped) const
 {
     Clipper2Lib::Path64 tranlatedPath;
 

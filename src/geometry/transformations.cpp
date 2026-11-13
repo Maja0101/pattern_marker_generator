@@ -5,7 +5,10 @@
 #include <limits>
 #include <numbers>
 
+#include <spdlog/spdlog.h>
+
 #include "geometry/transformations.hpp"
+#include "utils/config.hpp"
 
 namespace pmg::geometry::calculations {
 inline const int DEGREES_0 = 0;
@@ -91,7 +94,15 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
     }
 
     if (toBeAnchored) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("minX {}, minY {}", minX, minY));
+        }
+
         for (size_t i = 0; i < SIZE; ++i) {
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("curr x {}, y {}", transformed[i].x, transformed[i].y));
+                SPDLOG_INFO(std::format("anchored x {}, y {}", transformed[i].x - minX, transformed[i].y - minY));
+            }
             transformed[i].x -= minX;
             transformed[i].y -= minY;
         }

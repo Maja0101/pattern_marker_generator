@@ -42,10 +42,10 @@ Clipper2Lib::Paths64 buildNFPfor(const pattern::PieceVariant &variantA, const pa
         }
 
         // Fast NFP calculation for convex shapes
-        Clipper2Lib::Path64 invertedB = invertPath(variantB.getPath(isFlippedB));
+        Clipper2Lib::Path64 invertedB = invertPath(variantB.getPathForVariant(isFlippedB));
 
         Clipper2Lib::Paths64 rawNfp = Clipper2Lib::MinkowskiSum(
-            variantA.getPath(isFlippedA),
+            variantA.getPathForVariant(isFlippedA),
             invertedB,
             true
         );
@@ -194,7 +194,7 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
     // Detailed calculation for irregular fabric
     
     std::vector<Point64> fabricHull = utils::calculateConvexHull(fabric.getBoundary());
-    std::vector<Point64> variantHull = utils::calculateConvexHull(variant.getBoundary(isFlipped));
+    std::vector<Point64> variantHull = utils::calculateConvexHull(variant.getBoundaryForVariant(isFlipped));
     
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : fabricHull) {

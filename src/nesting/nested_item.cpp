@@ -10,7 +10,7 @@ NestedItem::NestedItem(pattern::PieceVariant* variant) noexcept
 
 Clipper2Lib::Path64 NestedItem::getItemPathAtPosition(int64_t x, int64_t y) const
 {
-    return m_variantRef->getPathAt(x, y, m_isFlipped);
+    return m_variantRef->getPathForVariantAt(x, y, m_isFlipped);
 }
 
 Clipper2Lib::Path64 NestedItem::getItemPathAtPosition() const

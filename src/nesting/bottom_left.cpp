@@ -16,7 +16,7 @@ bool BottomLeft::findPosition(NestedItem &item, const std::vector<NestedItem> &i
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("findPosition {} {} {} {}", item.getVariant()->getIsTwoWay(), item.isFlipped(), item.isLocked(), varId));
-        for (const auto& p : item.getVariant()->getBoundary(false)) {
+        for (const auto& p : item.getVariant()->getBoundaryForVariant(false)) {
             SPDLOG_INFO(std::format("item point ({}, {})", p.x, p.y));
         }
     }
@@ -221,20 +221,22 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
 
         geometry::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
         geometry::Point64 refPoint = item.getVariant()->getReferencePoint();
+        geometry::Point64 fabricRefPoint = m_fabric.getReferencePoint();
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Without allowances position point {}", positionWithoutAllowances.toString()));
-            SPDLOG_INFO(std::format("xmax - xt = {} - {}", m_fabric.getBoundingBox().right, positionWithoutAllowances.x));
+            SPDLOG_INFO(std::format("Fabric reference point {}", fabricRefPoint.toString()));
+            SPDLOG_INFO(std::format("Item reference point {}", refPoint.toString()));
+            SPDLOG_INFO(std::format("World position point ({}, {})", 
+                fabricRefPoint.x + positionWithoutAllowances.y, 
+                fabricRefPoint.y - positionWithoutAllowances.x)
+            );
         }
 
-        geometry::Point64 deltaPosition{positionWithoutAllowances.y, m_fabric.getBoundingBox().right - positionWithoutAllowances.x};
-
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("World position point {}", deltaPosition.toString()));
-        }
-
-        deltaPosition.x -= refPoint.x;
-        deltaPosition.y -= refPoint.y;
+        geometry::Point64 deltaPosition{
+            (fabricRefPoint.x + positionWithoutAllowances.y) - refPoint.x, 
+            (fabricRefPoint.y - positionWithoutAllowances.x) - refPoint.y
+        };
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Delta point {}", deltaPosition.toString()));

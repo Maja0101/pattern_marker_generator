@@ -31,8 +31,23 @@ public:
 };
 
 class Fabric : public Shape {
+private:
+    int m_grainline;
+    geometry::Point64 m_referencePoint;
+    struct InitState {
+        std::vector<geometry::Point64> boundary;
+        int grainline;
+        geometry::Point64 referencePoint;
+    };
+    static InitState transformBoundary(const std::vector<geometry::Point64>& initalBoundary, int grainline, bool toBeScaled);
+    explicit Fabric(InitState&& state);
 public:
     using Shape::Shape;
+    explicit Fabric(const std::vector<geometry::Point64>& initalBoundary = {}, int grainline = 0, bool toBeScaled = false);
+    Fabric(int64_t width, int64_t length, bool toBeScaled = false);
+    
+    [[nodiscard]] int getGrainline() const { return m_grainline; }
+    [[nodiscard]] geometry::Point64 getReferencePoint() const { return m_referencePoint; }
 };
 
 class PieceVariant : public Shape {
@@ -76,9 +91,9 @@ public:
     [[nodiscard]] int64_t getAllowancesDistance() const { return m_seamAllowance + m_cuttingAllowance; }
     [[nodiscard]] geometry::Point64 getReferencePoint() const { return m_referencePoint; }
     
-    [[nodiscard]] const std::vector<geometry::Point64>& getBoundary(bool isFlipped) const;
-    [[nodiscard]] const Clipper2Lib::Path64& getPath(bool isFlipped) const;
-    [[nodiscard]] Clipper2Lib::Path64 getPathAt(int64_t x, int64_t y, bool isFlipped) const;
+    [[nodiscard]] const std::vector<geometry::Point64>& getBoundaryForVariant(bool isFlipped) const;
+    [[nodiscard]] const Clipper2Lib::Path64& getPathForVariant(bool isFlipped) const;
+    [[nodiscard]] Clipper2Lib::Path64 getPathForVariantAt(int64_t x, int64_t y, bool isFlipped) const;
     [[nodiscard]] const std::vector<Clipper2Lib::Path64>& getDecomposedShape(bool isFlipped) const;
 
     [[nodiscard]] std::string toString() const override;
