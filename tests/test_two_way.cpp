@@ -36,10 +36,10 @@ TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]"
             REQUIRE_FALSE(testVariant.getIsTwoWay());
             REQUIRE(testVariant.getGlobalId(false) == 4097);
             REQUIRE(testVariant.getGlobalId(true) == 4097);
-            REQUIRE(testVariant.getBoundary(false) == boundary);
-            REQUIRE(testVariant.getBoundary(true) == boundary);
-            REQUIRE(testVariant.getPath(false) == pmg::geometry::calculations::toClipperPath(boundary));
-            REQUIRE(testVariant.getPath(true) == pmg::geometry::calculations::toClipperPath(boundary));
+            REQUIRE(testVariant.getBoundaryForVariant(false) == boundary);
+            REQUIRE(testVariant.getBoundaryForVariant(true) == boundary);
+            REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::calculations::toClipperPath(boundary));
+            REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::calculations::toClipperPath(boundary));
             REQUIRE(testVariant.getDecomposedShape(false) == expectedDecomposedShape);
             REQUIRE(testVariant.getDecomposedShape(true) == expectedDecomposedShape);
         }
@@ -74,10 +74,10 @@ TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]"
             REQUIRE(testVariant.getIsTwoWay());
             REQUIRE(testVariant.getGlobalId(false) == 4097);
             REQUIRE(testVariant.getGlobalId(true) == -9223372036854771711);
-            REQUIRE(testVariant.getBoundary(false) == boundary);
-            REQUIRE(testVariant.getBoundary(true) == expectedFlippedBoundary);
-            REQUIRE(testVariant.getPath(false) == pmg::geometry::calculations::toClipperPath(boundary));
-            REQUIRE(testVariant.getPath(true) == pmg::geometry::calculations::toClipperPath(expectedFlippedBoundary));
+            REQUIRE(testVariant.getBoundaryForVariant(false) == boundary);
+            REQUIRE(testVariant.getBoundaryForVariant(true) == expectedFlippedBoundary);
+            REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::calculations::toClipperPath(boundary));
+            REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::calculations::toClipperPath(expectedFlippedBoundary));
             REQUIRE(testVariant.getDecomposedShape(false) == expectedDecomposedShape);
             REQUIRE(testVariant.getDecomposedShape(true) == expectedFlippedDecomposedShape);
         }
@@ -96,10 +96,10 @@ TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]"
         REQUIRE_FALSE(testVariant.getIsTwoWay());
         REQUIRE(testVariant.getGlobalId(false) == 4097);
         REQUIRE(testVariant.getGlobalId(true) == 4097);
-        REQUIRE(testVariant.getBoundary(false) == boundary);
-        REQUIRE(testVariant.getBoundary(true) == boundary);
-        REQUIRE(testVariant.getPath(false) == pmg::geometry::calculations::toClipperPath(boundary));
-        REQUIRE(testVariant.getPath(true) == pmg::geometry::calculations::toClipperPath(boundary));
+        REQUIRE(testVariant.getBoundaryForVariant(false) == boundary);
+        REQUIRE(testVariant.getBoundaryForVariant(true) == boundary);
+        REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::calculations::toClipperPath(boundary));
+        REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::calculations::toClipperPath(boundary));
         REQUIRE(testVariant.getDecomposedShape(false)[0] == pmg::geometry::calculations::toClipperPath(boundary));
         REQUIRE(testVariant.getDecomposedShape(true)[0] == pmg::geometry::calculations::toClipperPath(boundary));
     }
