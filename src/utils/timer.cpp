@@ -1,6 +1,7 @@
 #include <spdlog/spdlog.h>
 
 #include "utils/timer.hpp"
+#include "utils/config.hpp"
 
 namespace pmg::timing {
 
@@ -15,10 +16,12 @@ Timer::~Timer() {
 
     float ms = duration.count() * 1000.0f;
 
-    if (m_logger) {
-        SPDLOG_LOGGER_INFO(m_logger, "[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
-    } else {
-        spdlog::info("[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
+    if constexpr (config::DEVELOPMENT) {
+        if (m_logger) {
+            SPDLOG_LOGGER_INFO(m_logger, "[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
+        } else {
+            spdlog::info("[{}:{}] [{}] Execution time: {:.6f} ms", location.file_name(), location.line(), location.function_name(), ms);
+        }
     }
 }
 
