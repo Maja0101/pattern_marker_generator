@@ -5,137 +5,671 @@
 #include "geometry/geometry_types.hpp"
 
 namespace pmg::samples {
-    std::vector<pattern::PatternPiece> getSimpleSamplePieces(
-        std::vector<pattern::VariantConstraint> defaultConstraints,
-        int64_t seamAllowance, int64_t cuttingAllowance) {
-            // Create points for pattern pieces
-            // Trapezium 
-            std::vector<geometry::Point64> trapeziumPts = {
-                {     0, 150000},  
-                {900000,      0},  
-                {900000, 400000},  
-                {     0, 250000} 
-            };
 
-            // Square
-            std::vector<geometry::Point64> squarePts = {
-                {     0,      0}, 
-                {600000,      0}, 
-                {600000, 600000}, 
-                {     0, 600000}  
-            };
+std::vector<pattern::PatternPiece> getSimpleSamplePieces(
+    std::vector<pattern::VariantConstraint> defaultConstraints,
+    int64_t seamAllowance, int64_t cuttingAllowance) {
+        // Create points for pattern pieces
+        // Trapezium 
+        std::vector<geometry::Point64> trapeziumPts = {
+            {     0, 150000},  
+            {900000,      0},  
+            {900000, 400000},  
+            {     0, 250000} 
+        };
 
-            // Rectangle
-            std::vector<geometry::Point64> rectPts = {
-                {     0,      0},  
-                {420000,      0},  
-                {420000, 170000}, 
-                {     0, 170000}  
-            };
+        // Square
+        std::vector<geometry::Point64> squarePts = {
+            {     0,      0}, 
+            {600000,      0}, 
+            {600000, 600000}, 
+            {     0, 600000}  
+        };
 
-
-            // Octagon
-            constexpr double sideA = 120000.0;
-            const double R = sideA / (2.0 * std::sin(M_PI / 8.0));
-            std::vector<geometry::Point64> rawOctagonPts;
-
-            double minX = 1e9, minY = 1e9;
-            for (int i = 0; i < 8; ++i) {
-                double angle = (5.0 * M_PI / 4.0) + i * (M_PI / 4.0);
-                double x = R * std::cos(angle);
-                double y = R * std::sin(angle);
-                minX = std::min(minX, x);
-                minY = std::min(minY, y);
-                
-                auto px = static_cast<int64_t>(std::round(x));
-                auto py = static_cast<int64_t>(std::round(y));
-                rawOctagonPts.push_back({px, py});
-            }
-
-            std::vector<geometry::Point64> octagonPts;
-            int64_t offsetX = std::round(minX);
-            int64_t offsetY = std::round(minY);
-
-            for (const auto& pt : rawOctagonPts) {
-                octagonPts.push_back({pt.x - offsetX, pt.y - offsetY});
-            }
-
-            // Double Trapezium 
-            std::vector<geometry::Point64> doubleTrapeziumPts = {
-                {150000,      0}, 
-                {650000,  50000}, 
-                {650000, 300000}, 
-                {150000, 350000},  
-                {     0, 150000}, 
-                {     0, 100000}  
-            };
-
-            // Small Square
-            std::vector<geometry::Point64> smallSquarePts = {
-                {    0,     0}, 
-                {60000,     0}, 
-                {60000, 60000}, 
-                {    0, 60000}   
-            };
-
-            std::vector<pattern::VariantConstraint> smallSquareConstraints = {
-                { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 100 , .twoWay = false }
-            };
-
-            // L shape
-            const std::vector<pmg::geometry::Point64> lShapePts = {
-                {     0,      0},
-                {150000,      0},
-                {150000, 100000},
-                {100000, 100000},
-                {100000, 250000},
-                {     0, 250000}
-            };
-
-            // inverted C shape
-            const std::vector<pmg::geometry::Point64> cShapePts = {
-                {     0,      0},
-                {200000,      0},
-                {200000, 400000},
-                {     0, 400000},
-                {     0, 350000},
-                {100000, 350000},
-                {100000,  50000},
-                {     0,  50000}
-            };
-
-            std::vector<pattern::VariantConstraint> otherConstraints;
-            for (auto& c : defaultConstraints) {
-                pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
-                pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 45, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
-                otherConstraints.push_back(constraint1);
-                otherConstraints.push_back(constraint2);
-            }
-
-            // Add them to vector of pattern pieces
-            std::vector<pattern::PatternPiece> patternPieces;
-            patternPieces.reserve(8);
-            patternPieces.emplace_back(1, trapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance, 90);
-            // patternPieces.emplace_back(2, squarePts, defaultConstraints, seamAllowance, cuttingAllowance);
-            // patternPieces.emplace_back(3, rectPts, defaultConstraints, seamAllowance, cuttingAllowance);
-            patternPieces.emplace_back(4, octagonPts, defaultConstraints, seamAllowance, cuttingAllowance);
-            patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance, 90);
-            // patternPieces.emplace_back(6, smallSquarePts, smallSquareConstraints, seamAllowance, cuttingAllowance);
-            patternPieces.emplace_back(7, lShapePts, otherConstraints, seamAllowance, cuttingAllowance, 90);
-            patternPieces.emplace_back(8, cShapePts, otherConstraints, seamAllowance, cuttingAllowance, 90);
-
-            // const std::vector<pmg::geometry::Point64> shape1 = {{0,0}, {1000000,0}, {1000000,500000}, {0,500000}};
-            // std::vector<pattern::VariantConstraint> constraints = {{ 0, false, 1, false }};
-            // patternPieces.emplace_back(10, shape1, constraints, 20000, 10000);
-            // patternPieces.emplace_back(11, shape1, constraints, 20000, 10000);
+        // Rectangle
+        std::vector<geometry::Point64> rectPts = {
+            {     0,      0},  
+            {420000,      0},  
+            {420000, 170000}, 
+            {     0, 170000}  
+        };
 
 
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                for (const auto& piece : patternPieces) {
-                    SPDLOG_INFO(piece.toString());
-                }
-            }
+        // Octagon
+        constexpr double sideA = 120000.0;
+        const double R = sideA / (2.0 * std::sin(M_PI / 8.0));
+        std::vector<geometry::Point64> rawOctagonPts;
 
-            return patternPieces;
+        double minX = 1e9, minY = 1e9;
+        for (int i = 0; i < 8; ++i) {
+            double angle = (5.0 * M_PI / 4.0) + i * (M_PI / 4.0);
+            double x = R * std::cos(angle);
+            double y = R * std::sin(angle);
+            minX = std::min(minX, x);
+            minY = std::min(minY, y);
+            
+            auto px = static_cast<int64_t>(std::round(x));
+            auto py = static_cast<int64_t>(std::round(y));
+            rawOctagonPts.push_back({px, py});
         }
+
+        std::vector<geometry::Point64> octagonPts;
+        int64_t offsetX = std::round(minX);
+        int64_t offsetY = std::round(minY);
+
+        for (const auto& pt : rawOctagonPts) {
+            octagonPts.push_back({pt.x - offsetX, pt.y - offsetY});
+        }
+
+        // Double Trapezium 
+        std::vector<geometry::Point64> doubleTrapeziumPts = {
+            {150000,      0}, 
+            {650000,  50000}, 
+            {650000, 300000}, 
+            {150000, 350000},  
+            {     0, 150000}, 
+            {     0, 100000}  
+        };
+
+        // Small Square
+        std::vector<geometry::Point64> smallSquarePts = {
+            {    0,     0}, 
+            {60000,     0}, 
+            {60000, 60000}, 
+            {    0, 60000}   
+        };
+
+        std::vector<pattern::VariantConstraint> smallSquareConstraints = {
+            { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 100 , .twoWay = false }
+        };
+
+        // L shape
+        const std::vector<pmg::geometry::Point64> lShapePts = {
+            {     0,      0},
+            {150000,      0},
+            {150000, 100000},
+            {100000, 100000},
+            {100000, 250000},
+            {     0, 250000}
+        };
+
+        // inverted C shape
+        const std::vector<pmg::geometry::Point64> cShapePts = {
+            {     0,      0},
+            {200000,      0},
+            {200000, 400000},
+            {     0, 400000},
+            {     0, 350000},
+            {100000, 350000},
+            {100000,  50000},
+            {     0,  50000}
+        };
+
+        std::vector<pattern::VariantConstraint> otherConstraints;
+        for (auto& c : defaultConstraints) {
+            pattern::VariantConstraint constraint1 = { .rotationAngle = c.rotationAngle, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
+            pattern::VariantConstraint constraint2 = { .rotationAngle = c.rotationAngle  + 45, .isMirrored = false, .requiredQuantity = c.requiredQuantity * 1, .twoWay = false };
+            otherConstraints.push_back(constraint1);
+            otherConstraints.push_back(constraint2);
+        }
+
+        // test input
+        const std::vector<pmg::geometry::Point64> shape32 = {
+            {156, 329},
+            { 42, 317},
+            { 34, 311},
+            { 31,  12},
+            {107,  20},
+            {157,  38},
+            {145, 142},
+            {147, 238},
+            {161, 308},
+            {161, 326}
+        };
+
+        const std::vector<pmg::geometry::Point64> shape33 = {
+            {373, 475},
+            {385, 437},
+            {387, 400},
+            {381, 372},
+            {364, 349},
+            {367, 331},
+            {411, 318},
+            {443, 316},
+            {534, 343},
+            {534, 383},
+            {526, 414},
+            {497, 423},
+            {481, 433},
+            {456, 460},
+            {436, 492}
+        };
+
+        const std::vector<pmg::geometry::Point64> shape34 = {
+            {232, 481},
+            {173, 503},
+            {158, 490},
+            {137, 481},
+            {117, 477},
+            { 57, 476},
+            { 43, 385},
+            { 44, 328},
+            {151, 332},
+            {225, 357},
+            {227, 363},
+            {220, 387},
+            {220, 441}
+        };
+
+        const std::vector<pmg::geometry::Point64> shape35 = {
+            {534, 340},
+            {450, 312},
+            {461, 213},
+            {462,  46},
+            {466,  40},
+            {571,  29},
+            {575,  31},
+            {577,  52},
+            {560, 225},
+            {557, 324},
+            {552, 341}
+        };
+
+        const std::vector<pmg::geometry::Point64> shape36 = {
+            {226, 349},
+            {166, 324},
+            {180, 262},
+            {188, 194},
+            {187, 123},
+            {174,  39},
+            {247,  31},
+            {294,  36},
+            {292, 212},
+            {304, 306},
+            {265, 322},
+            {241, 349}
+        };
+
+        const std::vector<pmg::geometry::Point64> shape37 = {
+            {359, 326},
+            {316, 306},
+            {331, 197},
+            {329,  38},
+            {385,  28},
+            {426,  29},
+            {460,  36},
+            {462,  47},
+            {437, 211},
+            {438, 307}
+        };
+
+        std::vector<pattern::VariantConstraint> constraints = {
+            { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        };
+
+        // Add them to vector of pattern pieces
+        std::vector<pattern::PatternPiece> patternPieces;
+        patternPieces.reserve(8);
+        // patternPieces.emplace_back(1, trapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance, 90);
+        // patternPieces.emplace_back(2, squarePts, defaultConstraints, seamAllowance, cuttingAllowance);
+        // patternPieces.emplace_back(3, rectPts, defaultConstraints, seamAllowance, cuttingAllowance);
+        // patternPieces.emplace_back(4, octagonPts, defaultConstraints, seamAllowance, cuttingAllowance);
+        // patternPieces.emplace_back(5, doubleTrapeziumPts, defaultConstraints, seamAllowance, cuttingAllowance, 90);
+        // patternPieces.emplace_back(6, smallSquarePts, smallSquareConstraints, seamAllowance, cuttingAllowance);
+        // patternPieces.emplace_back(7, lShapePts, otherConstraints, seamAllowance, cuttingAllowance, 90);
+        // patternPieces.emplace_back(8, cShapePts, otherConstraints, seamAllowance, cuttingAllowance, 90);
+
+        // const std::vector<pmg::geometry::Point64> shape1 = {{0,0}, {1000,0}, {1000,500}, {0,500}};
+        // std::vector<pattern::VariantConstraint> constraints = {{ 0, false, 1, false }};
+        // patternPieces.emplace_back(10, shape1, constraints, 20, 10, 0, true);
+        // patternPieces.emplace_back(11, shape1, constraints, 20, 10, 0, true);
+
+        patternPieces.emplace_back(32, shape32, constraints, 5, 20, 0, true);
+        patternPieces.emplace_back(33, shape33, constraints, 5, 20, 0, true);
+        patternPieces.emplace_back(34, shape34, constraints, 5, 20, 0, true);
+        patternPieces.emplace_back(35, shape35, constraints, 5, 20, 0, true);
+        patternPieces.emplace_back(36, shape36, constraints, 5, 20, 0, true);
+        patternPieces.emplace_back(37, shape37, constraints, 5, 20, 0, true);
+
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            for (const auto& piece : patternPieces) {
+                SPDLOG_INFO(piece.toString());
+            }
+        }
+
+        return patternPieces;
+}
+
+std::vector<std::vector<pattern::PatternPiece>> getTestPieces()
+{
+    std::vector<std::vector<pattern::PatternPiece>> testConfigurations;
+    testConfigurations.reserve(1);
+
+    std::vector<pattern::PatternPiece> patternPieces;
+    patternPieces.reserve(21);
+
+    int sa = 15;
+    int ca = 5;
+    int g = 0;
+
+    std::vector<geometry::Point64> shape34 = {
+        {1130, 655},
+        {1157, 537},
+        {1218, 434},
+        {1255, 290},
+        {1252, 196},
+        {1260, 39},
+        {1405, 51},
+        {1351, 650},
+        {1299, 645},
+        {1258, 646},
+        {1222, 659},
+        {1200, 686},
+        {1130, 655}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints34 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape35 = {
+        {1221, 1334},
+        {1193, 1319},
+        {1138, 1262},
+        {1129, 1169},
+        {1133, 1050},
+        {1148, 923},
+        {1183, 741},
+        {1338, 751},
+        {1334, 966},
+        {1358, 1181},
+        {1338, 1196},
+        {1326, 1250},
+        {1297, 1306},
+        {1263, 1334},
+        {1221, 1334}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints35 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape36 = {
+        {872, 656},
+        {885, 597},
+        {883, 538},
+        {908, 408},
+        {920, 297},
+        {915, 50},
+        {1126, 58},
+        {1120, 495},
+        {1107, 614},
+        {1089, 668},
+        {1061, 633},
+        {989, 652},
+        {973, 698},
+        {872, 656}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints36 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape37 = {
+        {293, 749},
+        {255, 752},
+        {244, 711},
+        {176, 681},
+        {135, 719},
+        {127, 605},
+        {130, 541},
+        {175, 135},
+        {297, 144},
+        {269, 435},
+        {269, 563},
+        {293, 749}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints37 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape38 = {
+        {122, 1411},
+        {108, 1375},
+        {69, 1342},
+        {32, 1336},
+        {55, 1147},
+        {57, 1017},
+        {54, 906},
+        {143, 894},
+        {158, 1079},
+        {161, 1185},
+        {150, 1314},
+        {122, 1411}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints38 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape39 = {
+        {454, 1059},
+        {305, 1026},
+        {328, 882},
+        {338, 872},
+        {472, 889},
+        {478, 903},
+        {454, 1059}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints39 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape40 = {
+        {1409, 1226},
+        {1417, 610},
+        {1443, 50},
+        {1573, 57},
+        {1561, 614},
+        {1562, 966},
+        {1527, 1000},
+        {1517, 1065},
+        {1549, 1068},
+        {1538, 1227},
+        {1409, 1226}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints40 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape41 = {
+        {223, 1501},
+        {232, 1349},
+        {779, 1377},
+        {1373, 1427},
+        {1372, 1479},
+        {1210, 1486},
+        {1150, 1496},
+        {1106, 1539},
+        {1093, 1598},
+        {914, 1551},
+        {223, 1501}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints41 = {
+        { .rotationAngle = 270, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 270, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape42 = {
+        {495, 712},
+        {447, 712},
+        {425, 725},
+        {302, 695},
+        {324, 583},
+        {367, 500},
+        {407, 354},
+        {407, 74},
+        {528, 85},
+        {505, 377},
+        {507, 560},
+        {495, 712}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints42 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape43 = {
+        {897, 1203},
+        {880, 1163},
+        {848, 1147},
+        {868, 984},
+        {863, 832},
+        {870, 746},
+        {970, 756},
+        {954, 898},
+        {937, 981},
+        {936, 1092},
+        {923, 1152},
+        {897, 1203}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints43 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape44 = {
+        {254, 1119},
+        {254, 1086},
+        {304, 1062},
+        {369, 1088},
+        {437, 1090},
+        {443, 1143},
+        {362, 1143},
+        {261, 1129},
+        {254, 1119}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints44 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape45 = {
+        {547, 1171},
+        {477, 1159},
+        {476, 1008},
+        {517, 526},
+        {536, 53},
+        {682, 58},
+        {652, 1042},
+        {631, 1187},
+        {547, 1171}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints45 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape46 = {
+        {811, 1199},
+        {674, 1193},
+        {677, 913},
+        {723, 56},
+        {847, 61},
+        {822, 746},
+        {824, 1093},
+        {811, 1199}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints46 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape47 = {
+        {1036, 1366},
+        {966, 1337},
+        {979, 1277},
+        {979, 1224},
+        {1007, 1059},
+        {1006, 748},
+        {1097, 749},
+        {1090, 1133},
+        {1063, 1280},
+        {1036, 1366}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints47 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape48 = {
+        {276, 811},
+        {286, 776},
+        {475, 785},
+        {454, 834},
+        {381, 830},
+        {323, 846},
+        {276, 811}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints48 = {
+        { .rotationAngle = 180, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 180, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape49 = {
+        {445, 1231},
+        {430, 1211},
+        {402, 1199},
+        {369, 1193},
+        {370, 1154},
+        {402, 1158},
+        {449, 1175},
+        {481, 1219},
+        {445, 1231}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints49 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape50 = {
+        {898, 1380},
+        {650, 1341},
+        {536, 1339},
+        {462, 1327},
+        {402, 1298},
+        {467, 1280},
+        {491, 1242},
+        {658, 1248},
+        {780, 1243},
+        {902, 1248},
+        {898, 1380}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints50 = {
+        { .rotationAngle = 270, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 270, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape51 = {
+        {77, 826},
+        {67, 789},
+        {133, 770},
+        {213, 770},
+        {263, 775},
+        {253, 815},
+        {198, 810},
+        {135, 810},
+        {77, 826}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints51 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 2, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 2, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape52 = {
+        {206, 1180},
+        {206, 1138},
+        {353, 1143},
+        {353, 1185},
+        {206, 1180}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints52 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 2, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape53 = {
+        {246, 839},
+        {237, 858},
+        {151, 865},
+        {106, 859},
+        {107, 840},
+        {152, 845},
+        {246, 839}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints53 = {
+        { .rotationAngle = 180, .isMirrored = false, .requiredQuantity = 2, .twoWay = false },
+        { .rotationAngle = 180, .isMirrored = true, .requiredQuantity = 2, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape54 = {
+        {284, 1039},
+        {297, 875},
+        {246, 871},
+        {232, 1034},
+        {284, 1039}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints54 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    };
+
+    std::vector<geometry::Point64> shape55 = {
+        {218, 1081},
+        {181, 1095},
+        {168, 1017},
+        {179, 889},
+        {219, 896},
+        {211, 1010},
+        {218, 1081}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints55 = {
+        { .rotationAngle = 90, .isMirrored = false, .requiredQuantity = 2, .twoWay = false },
+        { .rotationAngle = 90, .isMirrored = true, .requiredQuantity = 2, .twoWay = false }
+    };
+
+    patternPieces.emplace_back(34, shape34, constraints34, sa, ca, g, true);
+    // patternPieces.emplace_back(35, shape35, constraints35, sa, ca, g, true);
+    // patternPieces.emplace_back(36, shape36, constraints36, sa, ca, g, true);
+    // patternPieces.emplace_back(37, shape37, constraints37, sa, ca, g, true);
+    // patternPieces.emplace_back(38, shape38, constraints38, sa, ca, g, true);
+    // patternPieces.emplace_back(39, shape39, constraints39, sa, ca, g, true);
+    // patternPieces.emplace_back(40, shape40, constraints40, sa, ca, g, true);
+    // patternPieces.emplace_back(41, shape41, constraints41, sa, ca, g, true);
+    // patternPieces.emplace_back(42, shape42, constraints42, sa, ca, g, true);
+    // patternPieces.emplace_back(43, shape43, constraints43, sa, ca, g, true);
+    // patternPieces.emplace_back(44, shape44, constraints44, sa, ca, g, true);
+    // patternPieces.emplace_back(45, shape45, constraints45, sa, ca, g, true);
+    // patternPieces.emplace_back(46, shape46, constraints46, sa, ca, g, true);
+    // patternPieces.emplace_back(47, shape47, constraints47, sa, ca, g, true);
+    // patternPieces.emplace_back(48, shape48, constraints48, sa, ca, g, true);
+    // patternPieces.emplace_back(49, shape49, constraints49, sa, ca, g, true);
+    // patternPieces.emplace_back(50, shape50, constraints50, sa, ca, g, true);
+    // patternPieces.emplace_back(51, shape51, constraints51, sa, ca, g, true);
+    // patternPieces.emplace_back(52, shape52, constraints52, sa, ca, g, true);
+    // patternPieces.emplace_back(53, shape53, constraints53, sa, ca, g, true);
+    // patternPieces.emplace_back(54, shape54, constraints54, sa, ca, g, true);
+    // patternPieces.emplace_back(55, shape55, constraints55, sa, ca, g, true);
+
+    testConfigurations.emplace_back(patternPieces);
+
+    return testConfigurations;
+}
+
 } // namespace pmg::samples

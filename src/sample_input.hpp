@@ -10,4 +10,6 @@ namespace pmg::samples {
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 2 }},
         int64_t seamAllowance = 15000, int64_t cuttingAllowance = 5000
     );
+
+    std::vector<std::vector<pattern::PatternPiece>> getTestPieces();
 } // namespace pmg::samples
