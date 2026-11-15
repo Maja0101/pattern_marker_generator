@@ -102,13 +102,14 @@ double calculateNestingScore(const nesting::NestingStats &stats, const utils::Sc
 {
     // Remaining fabric subscore
     double lengthRatioPcs = (stats.totalFabricLength > 0) ? (static_cast<double>(stats.remainingFabricLength) / static_cast<double>(stats.totalFabricLength)) * 100.0 : 0.0;
-    double sFabric = (w.alphaFabric * stats.remainingFabricPercentage) + ((1.0 - w.alphaFabric) * lengthRatioPcs);
+    double fabricAreaRationPcs = (stats.remainingFabricArea > 0) ? (static_cast<double>(stats.remainingFabricArea) / static_cast<double>(stats.totalFabricArea)) * 100.0 : 0.0;
+    double sFabric = (w.alphaFabric * fabricAreaRationPcs) + ((1.0 - w.alphaFabric) * lengthRatioPcs);
 
     // Scraps subscore
-    double sScrap = stats.effectiveScrapsPercentage;
+    double sScrap = (stats.effectiveScrapsArea > 0) ? (static_cast<double>(stats.effectiveScrapsArea) / static_cast<double>(stats.totalFabricArea)) * 100.0 : 0.0;
 
     // Waste penalty
-    double pWaste = stats.wastePercentage;
+    double pWaste = (stats.wasteArea > 0) ? (static_cast<double>(stats.wasteArea) / static_cast<double>(stats.totalFabricArea)) * 100.0 : 0.0;
 
     // Fragmentation penalty
     double pFrag = 0.0;
