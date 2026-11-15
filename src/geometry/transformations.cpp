@@ -86,10 +86,16 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
 
         for (size_t i = 0; i < SIZE; ++i) {
             auto x = static_cast<double>(polygon[i].x);
-            auto y = static_cast<double>(isMirrored ? -polygon[i].y : polygon[i].y);
+            auto y = static_cast<double>(polygon[i].y);
 
             auto rx = static_cast<int64_t>(std::llround((x * COS_A) + (y * SIN_A)));
             auto ry = static_cast<int64_t>(std::llround((-x * SIN_A) + (y * COS_A)));
+
+            if (mirroringInFlippedXAxis) {
+                ry = isMirrored ? -ry : ry;
+            } else {
+                rx = isMirrored ? -rx : rx;
+            }
 
             transformed[i].x = rx;
             transformed[i].y = ry;
