@@ -34,7 +34,7 @@ Point64 getTopLeftCorner(const std::vector<Point64> &polygon) noexcept
     return Point64{minX, maxY};
 }
 
-std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored) noexcept
+std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored, bool mirroringInFlippedXAxis) noexcept
 {
     if (polygon.empty()) return {};
 
@@ -55,16 +55,22 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
     if (rotationAngle == DEGREES_0 || rotationAngle == DEGREES_90 || rotationAngle == DEGREES_180 || rotationAngle == DEGREES_270) {
         for (size_t i = 0; i < SIZE; ++i) {
             int64_t x = polygon[i].x;
-            int64_t y = isMirrored ? -polygon[i].y : polygon[i].y;
+            int64_t y = polygon[i].y;
             int64_t rx;
             int64_t ry;
-
+            
             switch (rotationAngle)
             {
                 case DEGREES_90:  rx =  y; ry = -x; break;
                 case DEGREES_180: rx = -x; ry = -y; break;
                 case DEGREES_270: rx = -y; ry =  x; break;
                 default:  rx =  x; ry =  y; break;
+            }
+
+            if (mirroringInFlippedXAxis) {
+                ry = isMirrored ? -ry : ry;
+            } else {
+                rx = isMirrored ? -rx : rx;
             }
 
             transformed[i].x = rx;

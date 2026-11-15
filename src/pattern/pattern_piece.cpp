@@ -73,7 +73,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
             std::vector<pmg::geometry::Point64> transformedBoundary;
             transformedBoundary.reserve(offsetPath.size());
 
-            transformedBoundary = geometry::calculations::transformPolygon(offsetPath, m_grainline + req.rotationAngle, req.isMirrored, false);
+            transformedBoundary = geometry::calculations::transformPolygon(offsetPath, m_grainline + req.rotationAngle, req.isMirrored, false, false);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 for (const auto& p : transformedBoundary) {
