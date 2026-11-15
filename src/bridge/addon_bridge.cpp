@@ -113,7 +113,10 @@ NestingInput parseWidthInput(const Napi::CallbackInfo& info) {
         throw std::invalid_argument("usage: calcMinimum(width: number, pieces: object[])");
 
     int64_t width = info[0].As<Napi::Number>().Int64Value();
-    NestingInput in{pattern::Fabric(std::min(0L, width), METRE_100_IN_MM, true), {}, DEFAULT_ALG_ID};
+    if (width <= 0)
+        throw std::invalid_argument("width must be greater than 0");
+    
+    NestingInput in{pattern::Fabric(width, METRE_100_IN_MM, true), {}, DEFAULT_ALG_ID};
     Napi::Array arr = info[1].As<Napi::Array>();
     in.pieces.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
