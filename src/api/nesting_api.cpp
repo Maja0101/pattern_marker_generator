@@ -19,3 +19,8 @@ pmg::nesting::NestingResult NestingEngineFacade::execute(std::vector<pmg::patter
 {
     return m_engine->execute(patternPieces);
 }
+
+int64_t NestingEngineFacade::calcMinimum(std::vector<pmg::pattern::PatternPiece> &patternPieces)
+{
+    return m_engine->execute(patternPieces).minLength;
+}

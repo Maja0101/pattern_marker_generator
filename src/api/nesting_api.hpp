@@ -25,4 +25,5 @@ public:
     ~NestingEngineFacade();
 
     pmg::nesting::NestingResult execute(std::vector<pmg::pattern::PatternPiece>& patternPieces);
+    int64_t calcMinimum(std::vector<pmg::pattern::PatternPiece>& patternPieces);
 };

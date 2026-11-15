@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 #include "api/nesting_api.hpp"
 #include "geometry/geometry_types.hpp"
@@ -104,6 +105,25 @@ NestingInput parseInput(const Napi::CallbackInfo& info) {
     return in;
 }
 
+constexpr int64_t METRE_100_IN_MM = 100000;
+constexpr int64_t DEFAULT_ALG_ID = 1;
+
+NestingInput parseWidthInput(const Napi::CallbackInfo& info) {
+    if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsArray())
+        throw std::invalid_argument("usage: calcMinimum(width: number, pieces: object[])");
+
+    int64_t width = info[0].As<Napi::Number>().Int64Value();
+    NestingInput in{pattern::Fabric(std::min(0L, width), METRE_100_IN_MM, true), {}, DEFAULT_ALG_ID};
+    Napi::Array arr = info[1].As<Napi::Array>();
+    in.pieces.reserve(arr.Length());
+    for (uint32_t i = 0; i < arr.Length(); ++i) {
+        Napi::Value v = arr.Get(i);
+        if (!v.IsObject()) throw std::invalid_argument("each piece must be an object");
+        in.pieces.push_back(parsePiece(v.As<Napi::Object>()));
+    }
+    return in;
+}
+
 Napi::Object toJs(Napi::Env env, const pmg::nesting::NestingResult& r) {
     Napi::Object out = Napi::Object::New(env);
     out.Set("wasSuccessful", r.wasSuccessful);
@@ -188,12 +208,72 @@ Napi::Value ExecuteSync(const Napi::CallbackInfo& info) {
     }
 }
 
+class CalcMinimumWorker : public Napi::AsyncWorker {
+public:
+    CalcMinimumWorker(Napi::Env env, NestingInput input)
+        : Napi::AsyncWorker(env), m_deferred(Napi::Promise::Deferred::New(env)), m_input(std::move(input)) {}
+
+    Napi::Promise Promise() { return m_deferred.Promise(); }
+
+protected:
+    void Execute() override {
+        try {
+            NestingEngineFacade facade(m_input.fabric, m_input.algorithm);
+            m_minLen = facade.calcMinimum(m_input.pieces);
+        } catch (const std::exception& e) {
+            SetError(e.what());
+        }
+    }
+
+    void OnOK() override { 
+        m_deferred.Resolve(Napi::Number::New(Env(), m_minLen)); 
+    }
+
+    void OnError(const Napi::Error& e) override { 
+        m_deferred.Reject(e.Value()); 
+    }
+
+private:
+    Napi::Promise::Deferred m_deferred;
+    NestingInput m_input;
+    int64_t m_minLen{0};
+};
+
+Napi::Value CalcMinimum(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    try {
+        auto* worker = new CalcMinimumWorker(env, parseWidthInput(info));
+        Napi::Promise p = worker->Promise();
+        worker->Queue();
+        return p;
+    } catch (const std::exception& e) {
+        Napi::Promise::Deferred d = Napi::Promise::Deferred::New(env);
+        d.Reject(Napi::Error::New(env, e.what()).Value());
+        return d.Promise();
+    }
+}
+
+Napi::Value CalcMinimumSync(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    try {
+        NestingInput in = parseWidthInput(info);
+        NestingEngineFacade facade(in.fabric, in.algorithm);
+        int64_t result = facade.calcMinimum(in.pieces);
+        return Napi::Number::New(env, result);
+    } catch (const std::exception& e) {
+        Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+}
+
 } // namespace pmg::api
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     try { pmg::logging::initialize(); } catch (const std::exception&) {}
     exports.Set("execute", Napi::Function::New(env, pmg::api::Execute, "execute"));
     exports.Set("executeSync", Napi::Function::New(env, pmg::api::ExecuteSync, "executeSync"));
+    exports.Set("calcMinimum", Napi::Function::New(env, pmg::api::CalcMinimum, "calcMinimum"));
+    exports.Set("calcMinimumSync", Napi::Function::New(env, pmg::api::CalcMinimumSync, "calcMinimumSync"));
     return exports;
 }
 
