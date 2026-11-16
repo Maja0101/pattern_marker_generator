@@ -24,11 +24,6 @@ int main()
 {
     logging::initialize();
 
-    if constexpr (config::BENCHMARK) {
-        // TODO benchmarks
-    }
-
-
     if constexpr (config::MAIN_DEBUG) {
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Starting Pattern Marker Generator...");
@@ -69,19 +64,21 @@ int main()
         };
 
         // pattern::Fabric fabric(fabricPts, 360, true);
-        // pattern::Fabric fabric(1000, 1000, true);
-
-        // nesting::BasicAlgorithm alg(fabric);
+        
         // nesting::BasicAlgorithm alg;
-
+        
         // nesting::AdvancedAlgorithm alg(1500000, 4500000);
-
-        // nesting::NestingResult result =  alg.execute(samplePieces);
+        
+        // pattern::Fabric fabric(1000, 750, true);
+        // nesting::BasicAlgorithm alg(fabric);
+        // std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
+        // nesting::NestingResult result =  alg.execute(piecesToCheck);
 
 
         pattern::Fabric fabric(1400, 4500, true);
         nesting::AdvancedAlgorithm alg(fabric);
-        nesting::NestingResult result =  alg.execute(samples::getTestPieces()[0]);
+        std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
+        nesting::NestingResult result =  alg.execute(testPieces);
 
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));

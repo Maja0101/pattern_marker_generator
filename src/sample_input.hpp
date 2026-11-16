@@ -11,5 +11,6 @@ namespace pmg::samples {
         int64_t seamAllowance = 15000, int64_t cuttingAllowance = 5000
     );
 
-    std::vector<std::vector<pattern::PatternPiece>> getTestPieces();
+    std::vector<pattern::PatternPiece> getPiecesToCheck();
+    std::vector<pattern::PatternPiece> getTestPieces();
 } // namespace pmg::samples
