@@ -84,7 +84,7 @@ public:
     [[nodiscard]] int getRotationAngle() const { return m_rotationAngle; }
     [[nodiscard]] bool getIsMirrored() const { return m_isMirrored; }
     [[nodiscard]] int getRequiredQuantity() const { return m_requiredQuantity; }
-    [[nodiscard]] int getIsTwoWay() const { return m_isTwoWay; }
+    [[nodiscard]] bool getIsTwoWay() const { return m_isTwoWay; }
     [[nodiscard]] int64_t getSeamAllowance() const { return m_seamAllowance; }
     [[nodiscard]] int64_t getCuttingAllowance() const { return m_cuttingAllowance; }
     [[nodiscard]] int getIsConvex() const { return m_isConvex; }

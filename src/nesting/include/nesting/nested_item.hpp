@@ -18,6 +18,7 @@ public:
     [[nodiscard]] const pattern::PieceVariant* getVariant() const noexcept { return m_variantRef; }
     [[nodiscard]] bool isLocked() const noexcept { return m_isLocked; }
     [[nodiscard]] bool isFlipped() const noexcept { return m_isFlipped; }
+    [[nodiscard]] bool canBeFlipped() const noexcept { return m_variantRef->getIsTwoWay(); }
 
     [[nodiscard]] Clipper2Lib::Path64 getItemPathAtPosition(int64_t x, int64_t y) const;
     [[nodiscard]] Clipper2Lib::Path64 getItemPathAtPosition() const;
@@ -31,6 +32,10 @@ public:
     [[nodiscard]] geometry::Point64 getPositionForItemWithoutAllowances() const;
 
     [[nodiscard]] std::string toString() const;
+
+    bool operator==(const NestedItem& other) const noexcept {
+        return m_variantRef->getGlobalId(m_isFlipped) == other.getVariant()->getGlobalId(other.isFlipped());
+    }
 };
 
 } // namespace pmg::nesting
