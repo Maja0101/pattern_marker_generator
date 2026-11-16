@@ -10,10 +10,13 @@
 #include "nesting/nested_item.hpp"
 #include "nesting/nesting_result.hpp"
 #include "geometry/nfp_key.hpp"
+#include "utils/phase_timings.hpp"
 
 namespace pmg::nesting {
 
 class AlgorithmBase {
+private:
+    void reset();
 protected:
     pattern::Fabric m_fabric;
     std::vector<nesting::NestedItem> m_originalItems;
@@ -31,7 +34,7 @@ public:
     const std::unordered_map<int64_t, Clipper2Lib::Paths64>& getIFPCache() const { return m_ifpCache; };
     const std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& getNFPCache() const { return m_nfpCache; };
 
-    NestingResult execute(std::vector<pattern::PatternPiece>& patternPieces);
+    NestingResult execute(std::vector<pattern::PatternPiece>& patternPieces, timing::PhaseTimings* timings = nullptr);
 };
 
 } // namespace pmg::nesting

@@ -10,6 +10,12 @@
 #include "nesting/algorithm_base.hpp"
 
 namespace pmg::nesting {
+void AlgorithmBase::reset()
+{
+    m_ifpCache.clear();
+    m_nfpCache.clear();
+    m_originalItems.clear();
+}
 
 NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
 {
@@ -24,9 +30,18 @@ AlgorithmBase::AlgorithmBase(int64_t width, int64_t length)
 AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
     : m_fabric(std::move(fabric)) {}
 
-NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces)
+NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces, timing::PhaseTimings* timings)
 {
+    reset();
+    
     std::chrono::time_point<std::chrono::high_resolution_clock> start = std::chrono::high_resolution_clock::now();
+
+    // Time points for benchmarking
+    std::chrono::steady_clock::time_point t0;
+    std::chrono::steady_clock::time_point t1;
+    std::chrono::steady_clock::time_point t2;
+
+    if constexpr (config::BENCHMARK) t0 = std::chrono::steady_clock::now();
 
     {
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Preparing the geometry...");
@@ -57,6 +72,8 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
         }
     }
 
+    if constexpr (config::BENCHMARK) t1 = std::chrono::steady_clock::now();
+
     NestingResult result;
     {
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Nesting...");
@@ -72,6 +89,13 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
     }
 
     result.executionTime = executionTimeMs;
+
+    if constexpr (config::BENCHMARK) {
+        t2 = std::chrono::steady_clock::now();
+        timings->preparationNs = std::chrono::duration<double, std::nano>(t1 - t0).count();
+        timings->calculationNs = std::chrono::duration<double, std::nano>(t2 - t1).count();
+        timings->totalNs = std::chrono::duration<double, std::nano>(t2 - t0).count();
+    }
 
     return result;
 }
