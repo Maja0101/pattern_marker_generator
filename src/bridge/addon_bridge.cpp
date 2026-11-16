@@ -78,7 +78,7 @@ constexpr int64_t DEFAULT_WIDTH = 1400000;
 constexpr int64_t DEFAULT_LENGTH = 100000000;
 
 pattern::Fabric parseFabric(const Napi::Object& o) {
-    if (o.Has("boundary")) return pattern::Fabric(parsePoints(requireArray(o, "boundary")), true);
+    if (o.Has("boundary") && o.Has("grainline")) return pattern::Fabric(parsePoints(requireArray(o, "boundary")), getInt(o, "grainline", 0), true);
     if (o.Has("width") && o.Has("length")) return pattern::Fabric(getInt(o, "width", 0), getInt(o, "length", 0), true);
     return pattern::Fabric(DEFAULT_WIDTH, DEFAULT_LENGTH, false);
 }

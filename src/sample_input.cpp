@@ -248,7 +248,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
     int g = 0;
 
     std::vector<pattern::PatternPiece> patternPieces;
-        patternPieces.reserve(8);
+    patternPieces.reserve(8);
 
     std::vector<geometry::Point64> shape48 = {
         {285, 202},
@@ -422,6 +422,186 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
     };
 
     patternPieces.emplace_back(55, shape55, constraints55, sa, ca, g, true);
+
+    return patternPieces;
+}
+
+std::vector<pattern::PatternPiece> getPiecesToCheck2()
+{
+    int sa = 5;
+    int ca = 20;
+    int g = 0;
+
+    std::vector<pattern::PatternPiece> patternPieces;
+    patternPieces.reserve(6);
+
+    std::vector<geometry::Point64> shape7 = {
+        {109, 321},
+        {34, 312},
+        {30, 10},
+        {107, 20},
+        {158, 35},
+        {145, 142},
+        {146, 210},
+        {153, 274},
+        {165, 321},
+        {153, 328},
+        {109, 321}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints7 = {
+        { .rotationAngle = 338, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 338, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+    // std::vector<pattern::VariantConstraint> constraints7 = {
+    //     { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+    //     { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    // };
+
+    patternPieces.emplace_back(7, shape7, constraints7, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape8 = {
+        {370, 473},
+        {384, 436},
+        {386, 399},
+        {380, 371},
+        {373, 358},
+        {361, 346},
+        {362, 331},
+        {410, 317},
+        {442, 315},
+        {533, 342},
+        {533, 382},
+        {525, 413},
+        {496, 422},
+        {480, 432},
+        {455, 459},
+        {433, 493},
+        {370, 473}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints8 = {
+        { .rotationAngle = 136, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 136, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    };
+    // std::vector<pattern::VariantConstraint> constraints8 = {
+    //     { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+    //     { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    // };
+
+    patternPieces.emplace_back(8, shape8, constraints8, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape9 = {
+        {235, 479},
+        {173, 502},
+        {165, 492},
+        {153, 485},
+        {137, 480},
+        {117, 476},
+        {57, 475},
+        {45, 389},
+        {44, 325},
+        {151, 331},
+        {198, 344},
+        {229, 357},
+        {220, 386},
+        {220, 440},
+        {235, 479}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints9 = {
+        { .rotationAngle = 82, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 82, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+    // std::vector<pattern::VariantConstraint> constraints9 = {
+    //     { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+    //     { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    // };
+
+    patternPieces.emplace_back(9, shape9, constraints9, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape10 = {
+        {499, 329},
+        {445, 308},
+        {457, 254},
+        {463, 168},
+        {463, 47},
+        {465, 40},
+        {504, 33},
+        {577, 27},
+        {576, 52},
+        {559, 225},
+        {555, 341},
+        {499, 329}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints10 = {
+        { .rotationAngle = 63, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 63, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    };
+    // std::vector<pattern::VariantConstraint> constraints10 = {
+    //     { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+    //     { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    // };
+
+    patternPieces.emplace_back(10, shape10, constraints10, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape11 = {
+        {165, 321},
+        {180, 262},
+        {188, 194},
+        {187, 123},
+        {173, 36},
+        {247, 31},
+        {298, 35},
+        {293, 140},
+        {292, 212},
+        {305, 305},
+        {276, 314},
+        {256, 327},
+        {238, 350},
+        {165, 321}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints11 = {
+        { .rotationAngle = 303, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 303, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    };
+    // std::vector<pattern::VariantConstraint> constraints11 = {
+    //     { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+    //     { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+    // };
+
+    patternPieces.emplace_back(11, shape11, constraints11, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape12 = {
+        {358, 325},
+        {335, 312},
+        {314, 304},
+        {329, 214},
+        {330, 132},
+        {327, 35},
+        {384, 28},
+        {425, 29},
+        {463, 35},
+        {445, 141},
+        {435, 234},
+        {439, 302},
+        {434, 309},
+        {390, 315},
+        {358, 325}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints12 = {
+        { .rotationAngle = 339, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+        { .rotationAngle = 339, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    };
+    // std::vector<pattern::VariantConstraint> constraints12 = {
+    //     { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
+    //     { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+    // };
+
+    patternPieces.emplace_back(12, shape12, constraints12, sa, ca, g, true);
 
     return patternPieces;
 }

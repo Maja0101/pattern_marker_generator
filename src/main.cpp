@@ -68,17 +68,26 @@ int main()
         // nesting::BasicAlgorithm alg;
         
         // nesting::AdvancedAlgorithm alg(1500000, 4500000);
+
+        fabricPts = {
+            {501, 1352},
+            {546, 477},
+            {1540, 213},
+            {1492, 1002},
+            {1012, 1317}
+        };
         
         // pattern::Fabric fabric(1000, 750, true);
-        // nesting::BasicAlgorithm alg(fabric);
-        // std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
-        // nesting::NestingResult result =  alg.execute(piecesToCheck);
+        pattern::Fabric fabric(fabricPts, 0, true);
+        nesting::BasicAlgorithm alg(fabric);
+        std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck2();
+        nesting::NestingResult result =  alg.execute(piecesToCheck);
 
 
-        pattern::Fabric fabric(1400, 4500, true);
-        nesting::AdvancedAlgorithm alg(fabric);
-        std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
-        nesting::NestingResult result =  alg.execute(testPieces);
+        // pattern::Fabric fabric(1400, 4500, true);
+        // nesting::AdvancedAlgorithm alg(fabric);
+        // std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
+        // nesting::NestingResult result =  alg.execute(testPieces);
 
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));

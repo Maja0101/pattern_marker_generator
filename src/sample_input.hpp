@@ -12,5 +12,6 @@ namespace pmg::samples {
     );
 
     std::vector<pattern::PatternPiece> getPiecesToCheck();
+    std::vector<pattern::PatternPiece> getPiecesToCheck2();
     std::vector<pattern::PatternPiece> getTestPieces();
 } // namespace pmg::samples
