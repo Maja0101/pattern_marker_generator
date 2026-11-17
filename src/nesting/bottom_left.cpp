@@ -261,7 +261,7 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             (fabricRefPoint.y - rawPosition.x) - refPoint.y
         };
 
-        if constexpr (config::DEBUG_MODE) {
+        if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Id {}, mirrored {} World position point ({}, {}) Delta returned point {}", 
                 item.getVariant()->getPieceId(),
                 item.getVariant()->getIsMirrored(),
