@@ -428,8 +428,8 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
 std::vector<pattern::PatternPiece> getPiecesToCheck2()
 {
-    int sa = 0;
-    int ca = 0;
+    int sa = 5;
+    int ca = 20;
     int g = 0;
 
     std::vector<pattern::PatternPiece> patternPieces;
@@ -633,8 +633,8 @@ std::vector<pattern::PatternPiece> getPiecesToCheck3()
     };
 
     std::vector<pattern::VariantConstraint> constraints1 = {
-        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
-        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 0, .twoWay = false }
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 0, .twoWay = false },
+        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
     patternPieces.emplace_back(1, shape1, constraints1, sa, ca, g, true);
 
