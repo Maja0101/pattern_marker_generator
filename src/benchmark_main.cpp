@@ -35,7 +35,7 @@ struct MetricStats {
         minNs = std::min(minNs, ns);
     }
 
-    [[nodiscard]] double avgUs(std::size_t iterations) const { return (sumNs / iterations) / 1000.0; }
+    [[nodiscard]] double avgUs(std::size_t iterations) const { return (sumNs / static_cast<double>(iterations)) / 1000.0; }
     [[nodiscard]] double minUs() const { return minNs / 1000.0; }
 };
 
@@ -502,9 +502,6 @@ int main() {
     std::span<std::vector<pmg::geometry::Point64>> fullShapes{shapes};
     std::span<std::vector<pmg::pattern::VariantConstraint>> fullConstraints{constraints};
 
-    pmg::nesting::BasicAlgorithm algorithm;
-    // pmg::nesting::AdvancedAlgorithm algorithm;
-
     constexpr int64_t width = 1500;
     constexpr int64_t height = 4500;
     const std::vector<pmg::geometry::Point64> boundary = {
@@ -525,15 +522,15 @@ int main() {
     };
 
     std::vector<AlgVariant> engines;
-    engines.push_back({"QuickAlgorithm_RegularFabric", std::make_unique<pmg::nesting::BasicAlgorithm>(regularFabric)});
-    engines.push_back({"QuickAlgorithm_IrregularFabric", std::make_unique<pmg::nesting::BasicAlgorithm>(irregularFabric)});
-    engines.push_back({"FullSearchAlgorithm_RegularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(regularFabric)});
-    engines.push_back({"FullSearchAlgorithm_IrregularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(irregularFabric)});
+    engines.emplace_back("QuickAlgorithm_RegularFabric", std::make_unique<pmg::nesting::BasicAlgorithm>(regularFabric));
+    engines.emplace_back("QuickAlgorithm_IrregularFabric", std::make_unique<pmg::nesting::BasicAlgorithm>(irregularFabric));
+    engines.emplace_back("FullSearchAlgorithm_RegularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(regularFabric));
+    engines.emplace_back("FullSearchAlgorithm_IrregularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(irregularFabric));
 
     // const std::vector<std::size_t> testSizes = {2, 4, 8, 16};
     // const std::vector<double> twoWayRatios = {0.0, 0.25, 0.5, 1.0};
-    const std::vector<std::size_t> testSizes = {2, 4};
-    const std::vector<double> twoWayRatios = {1.0};
+    const std::vector<std::size_t> testSizes {2, 4};
+    const std::vector twoWayRatios {0.0, 1.0};
     constexpr int grainline = 0;
     constexpr int seamAllowance = 0;
     constexpr int cuttingAllowance = 0;
@@ -543,10 +540,10 @@ int main() {
     for (const auto& engine : engines) {
         for (std::size_t ts : testSizes) {
             for (double ratio : twoWayRatios) {
-                std::size_t flags = static_cast<std::size_t>(ts * ratio);
+                auto flags = static_cast<std::size_t>(static_cast<double>(ts) * ratio);
                 auto r = pmg::bench::runBenchmark(
                     engine.name,
-                    algorithm,
+                    *engine.instance,
                     fullIds.first(ts),
                     fullShapes.first(ts),
                     fullConstraints.first(ts),
