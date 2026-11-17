@@ -319,6 +319,8 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
     const int MAX_NO_IMPROVEMENT = 25;
     constexpr double MIN_MEANINGFUL_GAIN = 0.02;
 
+    m_idxDist = std::uniform_int_distribution<size_t>{0, n - 1};
+
     bool identical = checkAllIdentical();
 
     NestingScore currentScore = evaluate();
@@ -430,9 +432,9 @@ NestingResult AdvancedAlgorithm::runAlgorithm()
 }
 
 AdvancedAlgorithm::AdvancedAlgorithm(int64_t width, int64_t length)
-    : AlgorithmBase(width, length), m_rng(124125), m_probDist(0.0, 1.0), m_idxDist(0, m_originalItems.size() - 1) {}
+    : AlgorithmBase(width, length), m_rng(124125), m_probDist(0.0, 1.0) {}
 
 AdvancedAlgorithm::AdvancedAlgorithm(pattern::Fabric fabric)
-    : AlgorithmBase(fabric), m_rng(124125), m_probDist(0.0, 1.0), m_idxDist(0, m_originalItems.size() - 1) {}
+    : AlgorithmBase(fabric), m_rng(124125), m_probDist(0.0, 1.0) {}
 
 } // namespace pmg::nesting
