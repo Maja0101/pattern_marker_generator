@@ -1,6 +1,9 @@
 #pragma once
 
 #include <vector>
+#include <algorithm>
+#include <cmath>
+#include <random>
 
 #include "nesting/algorithm_base.hpp"
 
@@ -25,16 +28,30 @@ namespace pmg::nesting {
 class AdvancedAlgorithm : public AlgorithmBase {
 private:
     int m_svgExport;
+
+    std::mt19937 m_rng;
+    std::uniform_real_distribution<double> m_probDist;
+    std::uniform_int_distribution<size_t> m_idxDist;
+
     void evaluateDifferentRotations(std::vector<nesting::NestedItem>& items, size_t index, NestingScore& best);
     void applyMove(const utils::Move& m);
     void undoMove(const utils::Move& m);
+
     NestingScore fullSearch();
     NestingScore checkOneOption();
+
+    NestingScore evaluate();
+    void resetAllPositions();
+    bool checkAllIdentical();
+    size_t pickBiasedIndex(size_t n, double exponent);
+    bool pickValidMove(size_t n, bool identical, utils::Move& outMove, double biasExponent);
+    double setInitialTemp(const NestingScore& currentScore, NestingScore& bestScore, std::vector<NestedItem>& bestItems, size_t n, bool identical);
     NestingScore simulatedAnnealing();
 protected:
     NestingResult runAlgorithm() override;
 public:
-    using AlgorithmBase::AlgorithmBase;
+    explicit AdvancedAlgorithm(int64_t width, int64_t length);
+    explicit AdvancedAlgorithm(pattern::Fabric fabric);
 };
 
 } // namespace pmg::nesting
