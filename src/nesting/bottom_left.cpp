@@ -215,9 +215,9 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
         minLen = std::max(item.getItemBoundingBoxAtPosition().right, minLen);
 
         
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            geometry::Point64 rawPosition = item.getPosition();
-            SPDLOG_INFO(std::format("Raw position point {} for {}", rawPosition.toString(), item.getVariant()->getPieceId()));
+        geometry::Point64 rawPosition = item.getPosition();
+        if constexpr (config::DEBUG_MODE) {
+            SPDLOG_INFO(std::format("Raw position point {} for {} {}", rawPosition.toString(), item.getVariant()->getPieceId(), item.getVariant()->getIsMirrored()));
         }
 
         geometry::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
@@ -229,14 +229,36 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
             SPDLOG_INFO(std::format("Fabric reference point {}", fabricRefPoint.toString()));
             SPDLOG_INFO(std::format("Item reference point {}", refPoint.toString()));
             SPDLOG_INFO(std::format("World position point ({}, {})", 
+                fabricRefPoint.x + rawPosition.y, 
+                fabricRefPoint.y - rawPosition.x)
+            );
+            SPDLOG_INFO(std::format("Delta ({}, {})", 
+                fabricRefPoint.x + rawPosition.y - refPoint.x, 
+                fabricRefPoint.y - rawPosition.x - refPoint.y)
+            );
+            SPDLOG_INFO(std::format("Old World position point ({}, {})", 
                 fabricRefPoint.x + positionWithoutAllowances.y, 
                 fabricRefPoint.y - positionWithoutAllowances.x)
+            );
+            SPDLOG_INFO(std::format("Old Delta ({}, {})", 
+                fabricRefPoint.x + positionWithoutAllowances.y - refPoint.x, 
+                fabricRefPoint.y - positionWithoutAllowances.x - refPoint.y)
+            );
+        }
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("Id {}, mirrored {}, Reference point {}, World position point ({}, {})", 
+                item.getVariant()->getPieceId(),
+                item.getVariant()->getIsMirrored(),
+                refPoint.toString(),
+                fabricRefPoint.x + rawPosition.y, 
+                fabricRefPoint.y - rawPosition.x)
             );
         }
 
         geometry::Point64 deltaPosition{
-            (fabricRefPoint.x + positionWithoutAllowances.y) - refPoint.x, 
-            (fabricRefPoint.y - positionWithoutAllowances.x) - refPoint.y
+            (fabricRefPoint.x + rawPosition.y) - refPoint.x, 
+            (fabricRefPoint.y - rawPosition.x) - refPoint.y
         };
 
         if constexpr (config::DEBUG_MODE_DETAILED) {

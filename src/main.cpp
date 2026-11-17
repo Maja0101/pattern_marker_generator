@@ -76,11 +76,26 @@ int main()
             {1492, 1002},
             {1012, 1317}
         };
+
+        fabricPts = {
+            {0, 1686},
+            {59, 415},
+            {1531, 0},
+            {1424, 1211},
+            {760, 1638}
+        };
         
         // pattern::Fabric fabric(1000, 750, true);
         pattern::Fabric fabric(fabricPts, 0, true);
         nesting::BasicAlgorithm alg(fabric);
-        std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck2();
+        std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck3();
+        // for (auto& piece : piecesToCheck) {
+        //     SPDLOG_WARN(piece.getId());
+        //     for (auto& variant : piece.getVariants()) {
+        //         SPDLOG_WARN(variant.toString());
+        //         SPDLOG_WARN(variant.getReferencePoint().toString());
+        //     }
+        // }
         nesting::NestingResult result =  alg.execute(piecesToCheck);
 
 
