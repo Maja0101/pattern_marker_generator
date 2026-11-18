@@ -10,17 +10,10 @@ namespace pmg::nesting {
 
 NestingResult BasicAlgorithm::runAlgorithm()
 {
-    // std::vector<NestedItem> sortedItems = m_originalItems;
-
-    // std::ranges::sort(m_originalItems, [](const NestedItem&a, const NestedItem& b) {
-    //     auto aBounds = a.getItemBoundingBoxAtPosition();
-    //     auto bBounds = b.getItemBoundingBoxAtPosition();
-    //     return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);
-    // });
-
     std::ranges::stable_sort(m_originalItems, [](const NestedItem& a, const NestedItem& b) {
         auto aBounds = a.getItemBoundingBoxAtPosition();
         auto bBounds = b.getItemBoundingBoxAtPosition();
+
         int64_t aHeight = aBounds.bottom - aBounds.top;
         int64_t bHeight = bBounds.bottom - bBounds.top;
 
@@ -28,13 +21,14 @@ NestingResult BasicAlgorithm::runAlgorithm()
             return aHeight > bHeight;
         }
 
-        const auto* aVar = a.getVariant();
-        const auto* bVar = b.getVariant();
-        if (aVar->getPieceId() != bVar->getPieceId()) {
-            return aVar->getPieceId() < bVar->getPieceId();
+        const auto* aVariant = a.getVariant();
+        const auto* bVariant = b.getVariant();
+
+        if (aVariant->getPieceId() != bVariant->getPieceId()) {
+            return aVariant->getPieceId() < bVariant->getPieceId();
         }
 
-        return aVar->getIsMirrored() < bVar->getIsMirrored();
+        return !aVariant->getIsMirrored() && bVariant->getIsMirrored();
     });
 
     if constexpr (config::DEBUG_MODE_DETAILED) {

@@ -91,7 +91,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     // Caclualte final umber of possibilites
     total <<= twoWayItemsCount;
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(total);
     }
     

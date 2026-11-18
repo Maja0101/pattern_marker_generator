@@ -105,9 +105,7 @@ NestingScore AdvancedAlgorithm::fullSearch()
     NestingScore best;
     best.score = -1.0;
 
-    if constexpr (config::DEBUG_MODE) {
-        SPDLOG_INFO("Checking all options");
-    }
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running Full Search...");
     m_svgExport = 0;
 
     do {
@@ -128,9 +126,7 @@ NestingScore AdvancedAlgorithm::checkOneOption()
     NestingScore best;
     best.score = -1.0;
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO("Checking one option");
-    }
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running Smart Single Bottom Left...");
 
     int64_t currIdx = m_originalItems[0].getVariant()->getGlobalId(false);
     size_t currIdxCount = 0;
@@ -297,9 +293,7 @@ double AdvancedAlgorithm::setInitialTemp(const NestingScore &currentScore, Nesti
 
 NestingScore AdvancedAlgorithm::simulatedAnnealing()
 {
-    if constexpr (config::DEBUG_MODE) {
-        SPDLOG_INFO("Simulated Annealing");
-    }
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running Simulated Annealing...");
     m_svgExport = 0;
 
     const size_t n = m_originalItems.size();
@@ -339,7 +333,7 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
     resetAllPositions();
     std::vector<NestedItem> bestItems = m_originalItems;
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Initial score {}", bestScore.score));
     }
 
@@ -373,7 +367,7 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
 
                     bestScore = currentScore;
 
-                    if constexpr (config::DEBUG_MODE) {
+                    if constexpr (config::DEBUG_MODE_DETAILED) {
                         SPDLOG_INFO(std::format("temp {} step {} delta {}", temp, step, deltaE));
                     }
 
@@ -387,7 +381,7 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
                         );
                     }
                     
-                    if constexpr (config::DEBUG_MODE) {
+                    if constexpr (config::DEBUG_MODE_DETAILED) {
                         SPDLOG_INFO(std::format("Score improved to {} for last svg {}", bestScore.score, m_svgExport));
                     }
 

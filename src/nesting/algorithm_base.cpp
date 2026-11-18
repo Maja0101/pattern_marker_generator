@@ -84,7 +84,7 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
     std::chrono::time_point<std::chrono::high_resolution_clock> end = std::chrono::high_resolution_clock::now();
     int executionTimeMs = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(end - start).count();    
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEVELOPMENT) {
         SPDLOG_INFO(std::format("Sum execution time: {} ms", executionTimeMs));
     }
 
