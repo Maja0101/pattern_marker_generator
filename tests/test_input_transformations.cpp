@@ -102,21 +102,21 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         REQUIRE(result.positions[0].rotationAngle == 90);
         REQUIRE(result.positions[0].isMirrored == false);
         REQUIRE(result.positions[0].isFlipped180 == false);
-        REQUIRE(result.positions[0].x == -800);
-        REQUIRE(result.positions[0].y == 2800);
+        REQUIRE(result.positions[0].x == -900);
+        REQUIRE(result.positions[0].y == 2900);
 
         REQUIRE(result.positions[1].id == 1);
         REQUIRE(result.positions[1].rotationAngle == 90);
         REQUIRE(result.positions[1].isMirrored == false);
         REQUIRE(result.positions[1].isFlipped180 == false);
-        REQUIRE(result.positions[1].x == 900);
-        REQUIRE(result.positions[1].y == 2200);
+        REQUIRE(result.positions[1].x == 800);
+        REQUIRE(result.positions[1].y == 2300);
 
         REQUIRE(result.positions[2].id == 3);
         REQUIRE(result.positions[2].rotationAngle == 0);
         REQUIRE(result.positions[2].isMirrored == false);
         REQUIRE(result.positions[2].isFlipped180 == false);
-        REQUIRE(result.positions[2].x == 200);
+        REQUIRE(result.positions[2].x == -900);
         REQUIRE(result.positions[2].y == -400);
     }
 
