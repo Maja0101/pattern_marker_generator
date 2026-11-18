@@ -47,11 +47,11 @@ int main()
         // };
         
         // Verify the result and compatibilty of the algorithm
-        // pattern::Fabric fabric(1000, 750, true);
-        pattern::Fabric fabric(fabricPts, 0, true);
+        pattern::Fabric fabric(1000, 750, true);
+        // pattern::Fabric fabric(fabricPts, 0, true);
         nesting::BasicAlgorithm alg(fabric);
         std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
-        nesting::NestingResult result =  alg.execute(piecesToCheck);
+        nesting::NestingResult result = alg.execute(piecesToCheck);
 
         // Verification of results for new version of advanced algorithm with complex pattern
         // pattern::Fabric fabric(1400, 4500, true);

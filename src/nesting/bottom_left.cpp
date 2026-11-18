@@ -11,6 +11,42 @@
 namespace pmg::nesting {
 inline constexpr int64_t SCALE = 1000;
 
+void BottomLeft::sortCandidatePoints(std::vector<Clipper2Lib::Point64> &candidatePoints, const NestedItem &currentItem, double jumpRatio)
+{
+    // Sort first by x and y where x is more important than y 
+    // Gurading against small changes in x but big y value being picked as the best solution
+
+    constexpr double UM_TO_MM = 0.001;
+
+    const Clipper2Lib::Rect64 itemBounds = currentItem.getVariant()->getBoundingBox();
+    const Clipper2Lib::Rect64 fabricBounds = m_fabric.getBoundingBox();
+    const double itemLengthMM = static_cast<double>(itemBounds.right - itemBounds.left) * UM_TO_MM;
+    const double fabricWidthMM = static_cast<double>(fabricBounds.bottom - fabricBounds.top) * UM_TO_MM;
+
+    const double maxAcceptableJump = std::max(1.0, jumpRatio * itemLengthMM);
+    const double safeFabricWidth = std::max(1.0, fabricWidthMM);
+    
+    const double weightX = 1.0 / maxAcceptableJump;
+    const double weightY = 1.0 / safeFabricWidth;
+    
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("itemLength {} fabcircWidth {} maxAcceptableJump {} safeFabricWidth {} weightX {} weightY {}", 
+            itemLengthMM, fabricWidthMM, maxAcceptableJump, safeFabricWidth, weightX, weightY));
+    }
+
+    std::ranges::sort(candidatePoints,
+        [weightX, weightY, UM_TO_MM](const Clipper2Lib::Point64& a, const Clipper2Lib::Point64& b) {
+            const double scoreA = weightX * (static_cast<double>(a.x) * UM_TO_MM) +
+                                  weightY * (static_cast<double>(a.y) * UM_TO_MM);
+            const double scoreB = weightX * (static_cast<double>(b.x) * UM_TO_MM) +
+                                  weightY * (static_cast<double>(b.y) * UM_TO_MM); 
+            
+            if (scoreA != scoreB) return scoreA < scoreB;
+            if (a.x != b.x) return a.x < b.x;
+            return a.y < b.y;
+        });
+}
+
 bool BottomLeft::findPosition(NestedItem &item, const std::vector<NestedItem> &items)
 {
     int64_t varId = item.getVariant()->getGlobalId(item.isFlipped());
@@ -142,12 +178,8 @@ bool BottomLeft::findPosition(NestedItem &item, const std::vector<NestedItem> &i
         return false;
     }
 
-    // Sort first by x and then by y
-    std::ranges::sort(candidatePoints,
-        [](const Clipper2Lib::Point64& a, const Clipper2Lib::Point64& b) {
-            if (a.x != b.x) return a.x < b.x;
-            return a.y < b.y;
-        });
+    // Sort the candidate points by the score of their coordinates
+    sortCandidatePoints(candidatePoints, item);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : candidatePoints) {

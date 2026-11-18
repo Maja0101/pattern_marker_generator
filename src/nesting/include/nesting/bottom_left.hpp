@@ -18,11 +18,10 @@ private:
     std::unordered_map<int64_t, Clipper2Lib::Paths64>& m_ifpCache;
     std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& m_nfpCache;
 
-    int64_t m_stepSize;
-
     Clipper2Lib::Paths64 m_placedPiecesPolygons;
     std::vector<Clipper2Lib::Rect64> m_placedPiecesBoxes;
 
+    void sortCandidatePoints(std::vector<Clipper2Lib::Point64>& candidatePoints, const NestedItem& currentItem, double jumpRatio = 0.25);
     bool findPosition(NestedItem& item, const std::vector<NestedItem>& items);
 public:
     BottomLeft(pattern::Fabric fabric, 
