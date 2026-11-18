@@ -491,7 +491,7 @@ std::vector<std::vector<pattern::VariantConstraint>> getBenchConstraints() {
 } // namespace pmg::bench
 
 int main() {
-    constexpr std::size_t ITERATIONS = 2;
+    constexpr std::size_t ITERATIONS = 10;
 
     // Prepare input data
     std::vector<int64_t> ids = pmg::bench::getBenchIds();
@@ -524,16 +524,14 @@ int main() {
     std::vector<AlgVariant> engines;
     engines.emplace_back("QuickAlgorithm_RegularFabric", std::make_unique<pmg::nesting::BasicAlgorithm>(regularFabric));
     engines.emplace_back("QuickAlgorithm_IrregularFabric", std::make_unique<pmg::nesting::BasicAlgorithm>(irregularFabric));
-    engines.emplace_back("FullSearchAlgorithm_RegularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(regularFabric));
-    engines.emplace_back("FullSearchAlgorithm_IrregularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(irregularFabric));
+    engines.emplace_back("ThoroughAlgorithm_RegularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(regularFabric));
+    engines.emplace_back("ThoroughAlgorithm_IrregularFabric", std::make_unique<pmg::nesting::AdvancedAlgorithm>(irregularFabric));
 
-    // const std::vector<std::size_t> testSizes = {2, 4, 8, 16};
-    // const std::vector<double> twoWayRatios = {0.0, 0.25, 0.5, 1.0};
-    const std::vector<std::size_t> testSizes {2, 4};
-    const std::vector twoWayRatios {0.0, 1.0};
+    const std::vector<std::size_t> testSizes {2, 4, 8, 16};
+    const std::vector twoWayRatios {0.0, 0.25, 0.5, 1.0};
     constexpr int grainline = 0;
-    constexpr int seamAllowance = 0;
-    constexpr int cuttingAllowance = 0;
+    constexpr int seamAllowance = 15;
+    constexpr int cuttingAllowance = 5;
 
     std::cout << "Engine,Size,TwoWay,BuildAvg(us),BuildMin(us),PrepAvg(us),PrepMin(us),CalcAvg(us),CalcMin(us),TotalAvg(us),TotalMin(us)\n";
 
