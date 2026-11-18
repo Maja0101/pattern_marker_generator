@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <algorithm>
 #include <format>
 #include <string>
 
@@ -13,7 +12,7 @@ struct Point64 {
 
     auto operator<=>(const Point64&) const = default;
 
-    std::string toString() const {
+    [[nodiscard]] std::string toString() const {
         return std::format("({},{})", x, y);
     }
 };

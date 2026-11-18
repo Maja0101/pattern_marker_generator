@@ -30,6 +30,14 @@ cmake --build --preset release
 ./build/release/pattern_marker_generator
 ```
 
+### Release
+
+```bash
+cmake --preset benchmark
+cmake --build --preset benchmark
+./build/bench/calc_bench
+```
+
 ## Unit tests using CLI
 
 ### Debug

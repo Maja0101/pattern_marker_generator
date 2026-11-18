@@ -62,7 +62,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     }
 
     // Check if number of two-way items is too large
-    if (twoWayItemsCount >= 64 || (1ULL << twoWayItemsCount) > limit) {
+    if (const size_t MAX_TWO_WAY_ITEMS = 64; twoWayItemsCount >= MAX_TWO_WAY_ITEMS || (1ULL << twoWayItemsCount) > limit) {
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("{}: two way item count too big", twoWayItemsCount));
@@ -98,17 +98,18 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     return total <= limit;
 }
 
-double calculateNestingScore(const nesting::NestingStats &stats, const utils::ScoringWeights w)
+double calculateNestingScore(const nesting::NestingStats &stats, const utils::ScoringWeights &w)
 {
     // Remaining fabric subscore
-    double lengthRatioPcs = (stats.totalFabricLength > 0) ? (stats.remainingFabricLength / stats.totalFabricLength) * 100.0 : 0.0;
-    double sFabric = w.alphaFabric * stats.remainingFabricPercentage + (1.0 - w.alphaFabric) * lengthRatioPcs;
+    double lengthRatioPcs = (stats.totalFabricLength > 0) ? (static_cast<double>(stats.remainingFabricLength) / static_cast<double>(stats.totalFabricLength)) * 100.0 : 0.0;
+    double fabricAreaRationPcs = (stats.remainingFabricArea > 0) ? (static_cast<double>(stats.remainingFabricArea) / static_cast<double>(stats.totalFabricArea)) * 100.0 : 0.0;
+    double sFabric = (w.alphaFabric * fabricAreaRationPcs) + ((1.0 - w.alphaFabric) * lengthRatioPcs);
 
     // Scraps subscore
-    double sScrap = stats.effectiveScrapsPercentage;
+    double sScrap = (stats.effectiveScrapsArea > 0) ? (static_cast<double>(stats.effectiveScrapsArea) / static_cast<double>(stats.totalFabricArea)) * 100.0 : 0.0;
 
     // Waste penalty
-    double pWaste = stats.wastePercentage;
+    double pWaste = (stats.wasteArea > 0) ? (static_cast<double>(stats.wasteArea) / static_cast<double>(stats.totalFabricArea)) * 100.0 : 0.0;
 
     // Fragmentation penalty
     double pFrag = 0.0;

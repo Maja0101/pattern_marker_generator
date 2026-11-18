@@ -1,11 +1,13 @@
+#include <algorithm>
+#include <cstddef>
 #include <unordered_map>
 #include <array>
+#include <cmath>
+#include <ranges>
 
 #include <spdlog/spdlog.h>
 
-#include "nesting/bottom_left.hpp"
 #include "utils/config.hpp"
-#include "utils/timer.hpp"
 #include "geometry/calculations.hpp"
 #include "geometry/ifp_pocket_calculations.hpp"
 
@@ -20,20 +22,21 @@ std::array<int, 4> calculatePercentages(const std::array<int64_t, 4>& areas, con
     std::array<int64_t, 4> remainders;
 
     int sum = 0;
+    const int PCS_SCALE = 100;
     for (int i = 0; i < 4; ++i) {
-        results[i] = static_cast<int>((areas[i] * 100) / totalArea);
-        remainders[i] = (areas[i] * 100) % totalArea;
+        results[i] = static_cast<int>((areas[i] * PCS_SCALE) / totalArea);
+        remainders[i] = (areas[i] * PCS_SCALE) % totalArea;
         sum += results[i];
     }
 
     std::array<int, 4> indexes = {0, 1, 2, 3};
 
-    std::stable_sort(indexes.begin(), indexes.end(), [&](int a, int b) {
+    std::ranges::stable_sort(indexes, [&](int a, int b) {
         return remainders[a] > remainders[b];
     });
 
-    const int left = 100 - sum;
-    for (int i = 0; i < left; ++i) {
+    const int LEFT = 100 - sum;
+    for (int i = 0; i < LEFT; ++i) {
         results[indexes[i]] += 1;
     }
 
@@ -42,7 +45,7 @@ std::array<int, 4> calculatePercentages(const std::array<int64_t, 4>& areas, con
 
 int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
 {
-    return (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+    return ((b.x - a.x) * (c.y - b.y)) - ((b.y - a.y) * (c.x - b.x));
 }
 
 } // namespace pmg::geometry::calculations::utils
@@ -54,24 +57,20 @@ bool isCyclicShift(const std::vector<Point64> &polygonA, const std::vector<Point
     // Check whether the second polygon is the same as the first polygon
     // even if the starting point does not match
 
-    size_t n = polygonA.size();
-    if (n != polygonB.size()) {
-        return false;
-    }
+    if (polygonA.size() != polygonB.size()) return false;
+    if (polygonA.empty()) return true;
 
-    for (size_t i = 0; i < n; ++i) {
-        if (polygonA[i] == polygonB[0]) {
-            bool match = true;
-            for (size_t j = 1; j < n; ++j) {
-                if (polygonA[(i + j) % n] != polygonB[j]) {
-                    match = false;
-                    break;
-                }
-            }
-            if (match) {
+    for (auto it = std::ranges::find(polygonA, polygonB[0]); 
+         it != polygonA.end(); 
+         it = std::ranges::find(it + 1, polygonA.end(), polygonB[0])) {
+
+        const auto SPLIT = std::distance(polygonA.begin(), it);
+        const auto TAIL_LEN = polygonA.size() - SPLIT;
+
+        if (std::ranges::equal(it, polygonA.end(), polygonB.begin(), polygonB.begin() + TAIL_LEN) &&
+            std::ranges::equal(polygonA.begin(), it, polygonB.begin() + TAIL_LEN, polygonB.end())) {
                 return true;
             }
-        }
     }
 
     return false;
@@ -87,7 +86,7 @@ Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
     Clipper2Lib::Path64 path;
     path.reserve(polygon.size());
     for (const auto& point : polygon) {
-        path.push_back({point.x, point.y});
+        path.emplace_back(point.x, point.y);
     }
     return path;
 }
@@ -137,13 +136,13 @@ Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2
     }
 
     // Snap to original NFP
-    for (const auto& nfp : originalNfps) {
-        for (const auto& path : nfp) {
-            for (const auto& ref : path) {
-                if (std::abs(point.x - ref.x) <= epsilon) point.x = ref.x;
-                if (std::abs(point.y - ref.y) <= epsilon) point.y = ref.y;
-            }
-        }
+    auto snap = [&](auto& val, auto target) {
+        if (std::abs(val - target) <= epsilon) val = target;
+    };
+
+    for (const auto& ref : originalNfps | std::views::join | std::views::join) {
+        snap(point.x, ref.x);
+        snap(point.y, ref.y);
     }
 
     return point;
@@ -151,7 +150,15 @@ Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2
 
 std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece> &patternPieces)
 {
+    size_t total = 0;
+    for (auto& piece : patternPieces) {
+        for (const auto& variant : piece.getVariants()) {
+            total += variant.getRequiredQuantity();
+        }
+    }
+
     std::vector<nesting::NestedItem> items;
+    items.reserve(total);
 
     for (auto& piece : patternPieces) {
 
@@ -165,14 +172,7 @@ std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece>
                 SPDLOG_INFO(variant.toString());
             }
 
-            for (int i = 0; i < variant.getRequiredQuantity(); ++i) {
-
-                if constexpr (config::DEBUG_MODE_DETAILED) {
-                    SPDLOG_INFO(std::format("Loop no. {}", i+1));
-                }
-
-                items.emplace_back(&variant);
-            }
+            items.insert(items.end(), variant.getRequiredQuantity(), nesting::NestedItem(&variant));
         }
     }
 
@@ -201,7 +201,7 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
         }
 
         for (auto& variant : piece.getVariants()) {
-            variantMap.emplace(variant.getGlobalId(false), variant);
+            variantMap.try_emplace(variant.getGlobalId(false), variant);
         }
     }
 
@@ -212,7 +212,7 @@ std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPi
     std::vector<pattern::PieceVariant> allVariants;
     allVariants.reserve(variantMap.size());
 
-    for (auto& [id, variant] : variantMap) {
+    for (const auto& [id, variant] : variantMap) {
         allVariants.push_back(variant);
     }
 
@@ -243,8 +243,8 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
 
     constexpr int SCALE = 1000; // converstion from internal units to mm
     constexpr int PCS_SCALE = 100; // multiplier for calculating percenatges 
-    constexpr int minWidth = 150000; // set min scrap width to 15 cm in internal units
-    constexpr int64_t minScrapArea = 40000; // set min scrap area to 0.04 sm in smm
+    constexpr int MIN_WIDTH = 150000; // set min scrap width to 15 cm in internal units
+    constexpr int64_t MIN_SCRAP_AREA = 40000; // set min scrap area to 0.04 sm in smm
 
     // Prepare fabric and placed items for calculation
     Clipper2Lib::Paths64 fabricAsPaths = { fabric.getPath() };
@@ -258,7 +258,10 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     );
 
     // Create bounding box to the right of the max right point
-    int64_t padding = std::max(fabric.getBoundingBox().Width(), fabric.getBoundingBox().Height()) + 1000000; // max size + 1m 
+    const int64_t METRE = 1000000;
+    int64_t padding = std::max(fabric.getBoundingBox().Width(),
+                               fabric.getBoundingBox().Height()) +
+                               METRE; // max size + 1m
 
     Clipper2Lib::Path64 rightBoxPath = {
         {maxRightPoint, fabric.getBoundingBox().top - padding},
@@ -292,17 +295,17 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     
     // Clean up scraps
     // Deflating and Inflating scraps' paths discard the tiny and narrow scraps that are not usable
-    double delta = (minWidth / 2.0);
+    const double DELTA = (MIN_WIDTH / 2.0);
     Clipper2Lib::Paths64 cleanedScraps = Clipper2Lib::InflatePaths(
         rawScraps,
-        -delta,
+        -DELTA,
         Clipper2Lib::JoinType::Miter, 
         Clipper2Lib::EndType::Polygon
     );
 
     cleanedScraps = Clipper2Lib::InflatePaths(
         cleanedScraps,
-        delta,
+        DELTA,
         Clipper2Lib::JoinType::Miter, 
         Clipper2Lib::EndType::Polygon
     );
@@ -320,8 +323,8 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     result.usableScrapsArea = 0;
     result.effectiveScrapsArea = 0;
     for (const auto& scrap : cleanedScraps) {
-        int64_t area = std::abs(Clipper2Lib::Area(scrap)) / (SCALE * SCALE);
-        if (area >= minScrapArea) {
+        int64_t area = std::abs(static_cast<int64_t>(Clipper2Lib::Area(scrap))) / (static_cast<long>(SCALE * SCALE));
+        if (area >= MIN_SCRAP_AREA) {
             ++result.usableScrapCount;
             result.usableScrapsArea += area;
             double solidity = calculateSolidity(scrap);
@@ -336,20 +339,20 @@ nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     // Calculate remaining fabric area
     result.remainingFabricArea = 0;
     for (const auto& fabricPart : rawRemainingFabric) {
-        int64_t area = std::abs(Clipper2Lib::Area(fabricPart)) / (SCALE * SCALE);
+        int64_t area = std::abs(static_cast<int64_t>(Clipper2Lib::Area(fabricPart))) / (static_cast<long>(SCALE * SCALE));
         if (area > 0) {
             result.remainingFabricArea += area;
         }
     }
 
     // Calculate remaining fabric length
-    result.totalFabricLength = static_cast<double>(fabric.getBoundingBox().right) / SCALE;
-    result.remainingFabricLength = static_cast<double>(fabric.getBoundingBox().right - maxRightPoint) / SCALE;
+    result.totalFabricLength = (fabric.getBoundingBox().right) / SCALE;
+    result.remainingFabricLength = (fabric.getBoundingBox().right - maxRightPoint) / SCALE;
 
     //Calculate waste
-    result.totalFabricArea = std::abs(Clipper2Lib::Area(fabricAsPaths)) / (SCALE * SCALE);
+    result.totalFabricArea = std::abs(static_cast<int64_t>(Clipper2Lib::Area(fabricAsPaths))) / (static_cast<long>(SCALE * SCALE));
 
-    int64_t usedArea = std::abs(Clipper2Lib::Area(allItemsCombined)) / (SCALE * SCALE);
+    int64_t usedArea = std::abs(static_cast<int64_t>(Clipper2Lib::Area(allItemsCombined))) / (static_cast<long>(SCALE) * SCALE);
 
     result.wasteArea = result.totalFabricArea - usedArea - result.remainingFabricArea - result.usableScrapsArea;
     

@@ -9,15 +9,15 @@ namespace pmg::timing {
 
 struct Timer
 {
-    std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+    explicit Timer(std::source_location location = std::source_location::current());
+    ~Timer();
+    
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> end;
     std::chrono::duration<float> duration;
     std::source_location location;
-
-    Timer(std::source_location location = std::source_location::current());
-    ~Timer();
-
-    private:
-        std::shared_ptr<spdlog::logger> m_logger;
+    std::shared_ptr<spdlog::logger> m_logger;
 };
     
 } // namespace pmg::timing

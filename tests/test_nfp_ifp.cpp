@@ -15,7 +15,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {6000, 6000}, 
             {   0, 6000} 
         };
-        pmg::pattern::Fabric fabric(fabricPts);
+        pmg::pattern::Fabric fabric(fabricPts, 90);
 
         std::vector<pmg::geometry::Point64> polygon = {
             {2000,    0},  
@@ -46,7 +46,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {6000, 6000}, 
             {   0, 6000} 
         };
-        pmg::pattern::Fabric fabric(fabricPts);
+        pmg::pattern::Fabric fabric(fabricPts, 90);
 
         std::vector<pmg::geometry::Point64> polygon = {
             {   0,    0},  
@@ -70,7 +70,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {6000,  6000}, 
             {   0,  6000}
         };
-        pmg::pattern::Fabric fabric(fabricPts);
+        pmg::pattern::Fabric fabric(fabricPts, 90);
 
         std::vector<pmg::geometry::Point64> polygon = {
             {   0,    0},  
@@ -100,7 +100,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {   0,  6000},
             {   0,  3000}
         };
-        pmg::pattern::Fabric fabric(fabricPts);
+        pmg::pattern::Fabric fabric(fabricPts, 90);
 
         std::vector<pmg::geometry::Point64> polygon = {
             {2000,     0},  
@@ -133,7 +133,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {   0,  3000},
             {3000,  3000}
         };
-        pmg::pattern::Fabric fabric(fabricPts);
+        pmg::pattern::Fabric fabric(fabricPts, 90);
 
         std::vector<pmg::geometry::Point64> polygon = {
             {2000,     0},  
@@ -172,7 +172,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
             {   0,  3000},
             {3000,  3000}
         };
-        pmg::pattern::Fabric fabric(fabricPts);
+        pmg::pattern::Fabric fabric(fabricPts, 90);
 
         std::vector<pmg::geometry::Point64> polygon = {
             {1000,     0},  
@@ -285,7 +285,7 @@ TEST_CASE("Creating cache for two-way pieces", "[NFP][IFP]") {
         {60000, 60000}, 
         {    0, 60000} 
     };
-    pmg::pattern::Fabric fabric(fabricPts);
+    pmg::pattern::Fabric fabric(fabricPts, 90);
 
     std::vector<pmg::geometry::Point64> boundary = {
         {    0,     0},

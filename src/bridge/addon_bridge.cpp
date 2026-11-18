@@ -1,9 +1,8 @@
 #include <napi.h>
 #include <cstdint>
-#include <memory>
 #include <stdexcept>
-#include <string>
 #include <vector>
+#include <algorithm>
 
 #include "api/nesting_api.hpp"
 #include "geometry/geometry_types.hpp"
@@ -13,12 +12,7 @@
 #include "pattern/variant_constraint.hpp"
 #include "utils/logger_setup.hpp"
 
-namespace {
-
-using pmg::geometry::Point64;
-using pmg::pattern::Fabric;
-using pmg::pattern::PatternPiece;
-using pmg::pattern::VariantConstraint;
+namespace pmg::api {
 
 int64_t getInt(const Napi::Object& obj, const char* key, int64_t def) {
     if (!obj.Has(key)) return def;
@@ -42,26 +36,26 @@ Napi::Array requireArray(const Napi::Object& obj, const char* key) {
     return v.As<Napi::Array>();
 }
 
-std::vector<Point64> parsePoints(const Napi::Array& arr) {
-    std::vector<Point64> result;
+std::vector<geometry::Point64> parsePoints(const Napi::Array& arr) {
+    std::vector<geometry::Point64> result;
     result.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
         Napi::Value item = arr.Get(i);
         if (!item.IsObject()) throw std::invalid_argument("point must be an object {x, y}");
         Napi::Object o = item.As<Napi::Object>();
-        result.push_back(Point64{getInt(o, "x", 0), getInt(o, "y", 0)});
+        result.push_back(geometry::Point64{getInt(o, "x", 0), getInt(o, "y", 0)});
     }
     return result;
 }
 
-std::vector<VariantConstraint> parseConstraints(const Napi::Array& arr) {
-    std::vector<VariantConstraint> result;
+std::vector<pattern::VariantConstraint> parseConstraints(const Napi::Array& arr) {
+    std::vector<pattern::VariantConstraint> result;
     result.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
         Napi::Value item = arr.Get(i);
         if (!item.IsObject()) throw std::invalid_argument("constraint must be an object");
         Napi::Object o = item.As<Napi::Object>();
-        VariantConstraint c{};
+        pattern::VariantConstraint c{};
         c.rotationAngle = static_cast<int>(getInt(o, "rotationAngle", 0));
         c.isMirrored = getBool(o, "isMirrored", false);
         c.requiredQuantity = static_cast<int>(getInt(o, "requiredQuantity", 1));
@@ -71,11 +65,11 @@ std::vector<VariantConstraint> parseConstraints(const Napi::Array& arr) {
     return result;
 }
 
-PatternPiece parsePiece(const Napi::Object& o) {
-    std::vector<Point64> points = parsePoints(requireArray(o, "points"));
-    std::vector<VariantConstraint> constraints;
+pattern::PatternPiece parsePiece(const Napi::Object& o) {
+    std::vector<geometry::Point64> points = parsePoints(requireArray(o, "points"));
+    std::vector<pattern::VariantConstraint> constraints;
     if (o.Has("constraints")) constraints = parseConstraints(requireArray(o, "constraints"));
-    return PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
+    return pattern::PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
                         getInt(o, "seamAllowance", 0), getInt(o, "cuttingAllowance", 0),
                         getInt(o, "grainline", 0), true);
 }
@@ -83,15 +77,15 @@ PatternPiece parsePiece(const Napi::Object& o) {
 constexpr int64_t DEFAULT_WIDTH = 1400000; 
 constexpr int64_t DEFAULT_LENGTH = 100000000;
 
-Fabric parseFabric(const Napi::Object& o) {
-    if (o.Has("boundary")) return Fabric(parsePoints(requireArray(o, "boundary")), true);
-    if (o.Has("width") && o.Has("length")) return Fabric(getInt(o, "width", 0), getInt(o, "length", 0), true);
-    return Fabric(DEFAULT_WIDTH, DEFAULT_LENGTH, false);
+pattern::Fabric parseFabric(const Napi::Object& o) {
+    if (o.Has("boundary") && o.Has("grainline")) return pattern::Fabric(parsePoints(requireArray(o, "boundary")), getInt(o, "grainline", 0), true);
+    if (o.Has("width") && o.Has("length")) return pattern::Fabric(getInt(o, "width", 0), getInt(o, "length", 0), true);
+    return pattern::Fabric(DEFAULT_WIDTH, DEFAULT_LENGTH, false);
 }
 
 struct NestingInput {
-    Fabric fabric;
-    std::vector<PatternPiece> pieces;
+    pattern::Fabric fabric;
+    std::vector<pattern::PatternPiece> pieces;
     int64_t algorithm;
 };
 
@@ -101,6 +95,28 @@ NestingInput parseInput(const Napi::CallbackInfo& info) {
 
     int64_t algId = info[2].As<Napi::Number>().Int64Value();
     NestingInput in{parseFabric(info[0].As<Napi::Object>()), {}, algId};
+    Napi::Array arr = info[1].As<Napi::Array>();
+    in.pieces.reserve(arr.Length());
+    for (uint32_t i = 0; i < arr.Length(); ++i) {
+        Napi::Value v = arr.Get(i);
+        if (!v.IsObject()) throw std::invalid_argument("each piece must be an object");
+        in.pieces.push_back(parsePiece(v.As<Napi::Object>()));
+    }
+    return in;
+}
+
+constexpr int64_t METRE_100_IN_MM = 100000;
+constexpr int64_t DEFAULT_ALG_ID = 1;
+
+NestingInput parseWidthInput(const Napi::CallbackInfo& info) {
+    if (info.Length() < 2 || !info[0].IsNumber() || !info[1].IsArray())
+        throw std::invalid_argument("usage: calcMinimum(width: number, pieces: object[])");
+
+    int64_t width = info[0].As<Napi::Number>().Int64Value();
+    if (width <= 0)
+        throw std::invalid_argument("width must be greater than 0");
+    
+    NestingInput in{pattern::Fabric(width, METRE_100_IN_MM, true), {}, DEFAULT_ALG_ID};
     Napi::Array arr = info[1].As<Napi::Array>();
     in.pieces.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
@@ -195,12 +211,72 @@ Napi::Value ExecuteSync(const Napi::CallbackInfo& info) {
     }
 }
 
-} // namespace
+class CalcMinimumWorker : public Napi::AsyncWorker {
+public:
+    CalcMinimumWorker(Napi::Env env, NestingInput input)
+        : Napi::AsyncWorker(env), m_deferred(Napi::Promise::Deferred::New(env)), m_input(std::move(input)) {}
+
+    Napi::Promise Promise() { return m_deferred.Promise(); }
+
+protected:
+    void Execute() override {
+        try {
+            NestingEngineFacade facade(m_input.fabric, m_input.algorithm);
+            m_minLen = facade.calcMinimum(m_input.pieces);
+        } catch (const std::exception& e) {
+            SetError(e.what());
+        }
+    }
+
+    void OnOK() override { 
+        m_deferred.Resolve(Napi::Number::New(Env(), m_minLen)); 
+    }
+
+    void OnError(const Napi::Error& e) override { 
+        m_deferred.Reject(e.Value()); 
+    }
+
+private:
+    Napi::Promise::Deferred m_deferred;
+    NestingInput m_input;
+    int64_t m_minLen{0};
+};
+
+Napi::Value CalcMinimum(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    try {
+        auto* worker = new CalcMinimumWorker(env, parseWidthInput(info));
+        Napi::Promise p = worker->Promise();
+        worker->Queue();
+        return p;
+    } catch (const std::exception& e) {
+        Napi::Promise::Deferred d = Napi::Promise::Deferred::New(env);
+        d.Reject(Napi::Error::New(env, e.what()).Value());
+        return d.Promise();
+    }
+}
+
+Napi::Value CalcMinimumSync(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    try {
+        NestingInput in = parseWidthInput(info);
+        NestingEngineFacade facade(in.fabric, in.algorithm);
+        int64_t result = facade.calcMinimum(in.pieces);
+        return Napi::Number::New(env, result);
+    } catch (const std::exception& e) {
+        Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+}
+
+} // namespace pmg::api
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     try { pmg::logging::initialize(); } catch (const std::exception&) {}
-    exports.Set("execute", Napi::Function::New(env, Execute, "execute"));
-    exports.Set("executeSync", Napi::Function::New(env, ExecuteSync, "executeSync"));
+    exports.Set("execute", Napi::Function::New(env, pmg::api::Execute, "execute"));
+    exports.Set("executeSync", Napi::Function::New(env, pmg::api::ExecuteSync, "executeSync"));
+    exports.Set("calcMinimum", Napi::Function::New(env, pmg::api::CalcMinimum, "calcMinimum"));
+    exports.Set("calcMinimumSync", Napi::Function::New(env, pmg::api::CalcMinimumSync, "calcMinimumSync"));
     return exports;
 }
 

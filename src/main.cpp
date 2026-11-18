@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <iostream>
 
 #include <spdlog/spdlog.h>
 #include <clipper2/clipper.h>
@@ -10,6 +11,7 @@
 #include "utils/timer.hpp"
 #include "utils/config.hpp"
 #include "geometry/geometry_types.hpp"
+#include "geometry/transformations.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
 #include "nesting/nested_item.hpp"
@@ -24,57 +26,50 @@ int main()
 {
     logging::initialize();
 
-    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Starting Pattern Marker Generator...");
+    if constexpr (config::MAIN_DEBUG) {
 
-    std::vector<pattern::VariantConstraint> defaultConstraints = {
-        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
-        // { .rotationAngle = 45, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
-    };
+        if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Starting Pattern Marker Generator...");
 
-    int64_t sa = 10000; 
-    int64_t ca =  5000; 
+        std::vector<geometry::Point64> fabricPts = {
+            {501, 1352},
+            {546, 477},
+            {1540, 213},
+            {1492, 1002},
+            {1012, 1317}
+        };
 
-    std::vector<pattern::PatternPiece> samplePieces = 
-        pmg::samples::getSimpleSamplePieces(defaultConstraints, sa, ca);
+        // std::vector<geometry::Point64> fabricPts = {
+        //     {0, 1686},
+        //     {59, 415},
+        //     {1531, 0},
+        //     {1424, 1211},
+        //     {760, 1638}
+        // };
+        
+        // Verify the result and compatibilty of the algorithm
+        pattern::Fabric fabric(1000, 750, true);
+        // pattern::Fabric fabric(fabricPts, 0, true);
+        nesting::BasicAlgorithm alg(fabric);
+        std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
+        nesting::NestingResult result = alg.execute(piecesToCheck);
 
-    std::vector<geometry::Point64> fabricPts = {
-        {      0,       0},  
-        {4500000,       0},  
-        {4500000, 1500000}, 
-        {      0, 1500000}  
-    };
+        // Verification of results for new version of advanced algorithm with complex pattern
+        // pattern::Fabric fabric(1400, 4500, true);
+        // nesting::AdvancedAlgorithm alg(fabric);
+        // std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
+        // nesting::NestingResult result =  alg.execute(testPieces);
 
-    const std::vector<pmg::geometry::Point64> lShapePts = {
-        {      0,       0},
-        {4000000,       0},
-        {4000000, 1000000},
-        {1000000, 1000000},
-        {1000000, 1500000},
-        {      0, 1500000}
-    };
 
-    pattern::Fabric fabric(fabricPts);
+        if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
+        if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The minmal length of fabric needed is {} mm", result.minLength));
+        if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Execution time: {} ms", result.executionTime));
 
-    nesting::BasicAlgorithm alg(1500000, 4500000);
-    // nesting::BasicAlgorithm alg;
+        if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {}, {} smm {}% Fabric: {} mm, {} smm {}% Waste: {} smm {}%", 
+            result.stats.usableScrapCount, result.stats.usableScrapsArea, result.stats.usableScrapsPercentage,
+            result.stats.remainingFabricLength, result.stats.remainingFabricArea, result.stats.remainingFabricPercentage,
+            result.stats.wasteArea, result.stats.wastePercentage)
+        );
 
-    // nesting::AdvancedAlgorithm alg(1500000, 4500000);
-
-    nesting::NestingResult result =  alg.execute(samplePieces);
-
-    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
-    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The minmal length of fabric needed is {} RMT", static_cast<double>(result.minLength) / 1000.0 ));
-
-    if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("Scraps: {}, {} smm {}% Fabric: {} mm, {} smm {}% Waste: {} smm {}%", 
-        result.stats.usableScrapCount, result.stats.usableScrapsArea, result.stats.usableScrapsPercentage,
-        result.stats.remainingFabricLength, result.stats.remainingFabricArea, result.stats.remainingFabricPercentage,
-        result.stats.wasteArea, result.stats.wastePercentage)
-    );
-
-    if constexpr (config::DEBUG_MODE_DETAILED) {
-        for (const auto& ip : result.positions) {
-            SPDLOG_INFO(std::format("Item no. {} (angle: {}, mirrored: {}, flipped 180: {}) was placed: ({}, {})", ip.id, ip.rotationAngle, ip.isMirrored, ip.isFlipped180, ip.x, ip.y));
-        }
     }
 
     return 0;

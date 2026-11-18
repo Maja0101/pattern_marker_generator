@@ -21,7 +21,11 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         }
     }
 
-    std::vector<geometry::Point64> simplifiedPolygon = geometry::calculations::fromClipperPath(Clipper2Lib::SimplifyPath(geometry::calculations::toClipperPath(m_originalPolygon), 0.1));
+    std::vector<geometry::Point64> simplifiedPolygon = geometry::calculations::fromClipperPath(
+        Clipper2Lib::SimplifyPath(
+            geometry::calculations::toClipperPath(m_originalPolygon), 
+            0.1)
+        );
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : simplifiedPolygon) {
@@ -69,7 +73,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
             std::vector<pmg::geometry::Point64> transformedBoundary;
             transformedBoundary.reserve(offsetPath.size());
 
-            transformedBoundary = geometry::calculations::transformPolygon(offsetPath, m_grainline + req.rotationAngle, req.isMirrored, false);
+            transformedBoundary = geometry::calculations::transformPolygon(offsetPath, m_grainline + req.rotationAngle, req.isMirrored, false, false);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 for (const auto& p : transformedBoundary) {
@@ -84,7 +88,8 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
             }
 
             // Rotate shape by 90 degrees ccw to match the algorithm logic
-            transformedBoundary = geometry::calculations::transformPolygon(transformedBoundary, 270, false, true);
+            const int CCW_90 = 270;
+            transformedBoundary = geometry::calculations::transformPolygon(transformedBoundary, CCW_90, false, true);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 for (const auto& p : transformedBoundary) {
@@ -113,21 +118,12 @@ PatternPiece::PatternPiece(int64_t pieceId,
     initializePatternPieceGeometry(constraints, toBeScaled);
 }
 
-// const PieceVariant* PatternPiece::getVariant(int rotationAngle, bool isMirrored) const noexcept {
-//     for (const auto& variant : m_allowedVariants) {
-//         if (variant.getRotationAngle() == rotationAngle && variant.getIsMirrored() == isMirrored) {
-//             return &variant;
-//         }
-//     }
-//     return nullptr;
-// }
-
 std::string PatternPiece::toString() const
 {
     std::string boundaryStr = std::accumulate(
         std::next(m_originalPolygon.begin()), m_originalPolygon.end(),
         m_originalPolygon.front().toString(),
-        [](std::string a, geometry::Point64 b) {
+        [](std::string const& a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }
     );
@@ -135,7 +131,7 @@ std::string PatternPiece::toString() const
     std::string variantsStr = std::accumulate(
         std::next(m_allowedVariants.begin()), m_allowedVariants.end(),
         m_allowedVariants.front().toString(),
-        [](std::string a, pattern::PieceVariant b) {
+        [](std::string const& a, pattern::PieceVariant const& b) {
             return a + "; " + b.toString();
         }
     );
