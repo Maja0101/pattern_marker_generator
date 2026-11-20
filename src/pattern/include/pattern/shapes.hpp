@@ -95,6 +95,8 @@ public:
     [[nodiscard]] const Clipper2Lib::Path64& getPathForVariant(bool isFlipped) const;
     [[nodiscard]] Clipper2Lib::Path64 getPathForVariantAt(int64_t x, int64_t y, bool isFlipped) const;
     [[nodiscard]] const std::vector<Clipper2Lib::Path64>& getDecomposedShape(bool isFlipped) const;
+    
+    void setIsTwoWay(bool twoWay) { m_isTwoWay = twoWay; }
 
     [[nodiscard]] std::string toString() const override;
 };

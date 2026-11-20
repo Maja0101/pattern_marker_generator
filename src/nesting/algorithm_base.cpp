@@ -24,6 +24,36 @@ NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem
     return bottomLeft.performNesting(items);
 }
 
+void AlgorithmBase::prepareNestingItems(std::vector<pattern::PatternPiece> &patternPieces)
+{
+    if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Preparing the geometry...");
+        
+    timing::Timer timer;
+
+    m_originalItems = geometry::calculations::prepareItems(patternPieces);
+
+    std::vector<pmg::pattern::PieceVariant> allPossibleVariants = geometry::calculations::getAllVariants(patternPieces);
+
+    m_ifpCache = geometry::calculations::calculateIFPCache(m_fabric, allPossibleVariants);
+    m_nfpCache = geometry::calculations::calculateNFPCache(allPossibleVariants);
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("ifp cache: {}, nfp cache: {}", m_ifpCache.size(), m_nfpCache.size()));
+        for (const auto& [key, val] : m_ifpCache) {
+            SPDLOG_INFO(std::format("ifp cache id {}", key));
+        }
+        for (const auto& [key, val] : m_nfpCache) {
+            SPDLOG_INFO(std::format("nfp cache id {} {}", key.variantIdA, key.variantIdB));
+        }
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        for (const auto& item : m_originalItems) {
+            SPDLOG_INFO(item.toString());
+        }
+    }
+}
+
 AlgorithmBase::AlgorithmBase(int64_t width, int64_t length)
     : m_fabric(width, length) {}
 
@@ -43,34 +73,7 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
 
     if constexpr (config::BENCHMARK) t0 = std::chrono::steady_clock::now();
 
-    {
-        if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Preparing the geometry...");
-        
-        timing::Timer timer;
-
-        m_originalItems = geometry::calculations::prepareItems(patternPieces);
-
-        std::vector<pmg::pattern::PieceVariant> allPossibleVariants = geometry::calculations::getAllVariants(patternPieces);
-
-        m_ifpCache = geometry::calculations::calculateIFPCache(m_fabric, allPossibleVariants);
-        m_nfpCache = geometry::calculations::calculateNFPCache(allPossibleVariants);
-
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("ifp cache: {}, nfp cache: {}", m_ifpCache.size(), m_nfpCache.size()));
-            for (const auto& [key, val] : m_ifpCache) {
-                SPDLOG_INFO(std::format("ifp cache id {}", key));
-            }
-            for (const auto& [key, val] : m_nfpCache) {
-                SPDLOG_INFO(std::format("nfp cache id {} {}", key.variantIdA, key.variantIdB));
-            }
-        }
-
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            for (const auto& item : m_originalItems) {
-                SPDLOG_INFO(item.toString());
-            }
-        }
-    }
+    prepareNestingItems(patternPieces);
 
     if constexpr (config::BENCHMARK) t1 = std::chrono::steady_clock::now();
 

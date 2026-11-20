@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <algorithm>
-#include <cmath>
 #include <random>
 
 #include "nesting/algorithm_base.hpp"

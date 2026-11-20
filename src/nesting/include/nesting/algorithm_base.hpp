@@ -26,6 +26,7 @@ protected:
     virtual NestingResult runAlgorithm() = 0;
 
     NestingResult runSingleBottomLeft(std::vector<nesting::NestedItem>& items);
+    virtual void prepareNestingItems(std::vector<pattern::PatternPiece>& patternPieces);
 public:
     explicit AlgorithmBase(int64_t width = 1400000, int64_t length = 100000000);
     explicit AlgorithmBase(pattern::Fabric fabric);
