@@ -43,6 +43,7 @@ struct BenchmarkResult {
     std::string engineName;
     std::size_t pieceCount;
     std::size_t twoWayCount;
+    std::size_t itemCount;
     MetricStats construct;
     MetricStats nestingPreparation;
     MetricStats nesting;
@@ -117,6 +118,8 @@ BenchmarkResult runBenchmark(
         stats.nestingPreparation.record(timings.preparationNs);
         stats.nesting.record(timings.calculationNs);
         stats.calculationTotal.record(timings.totalNs);
+
+        if (iter == 0) stats.itemCount = result.positions.size();
     }
 
     return stats;
@@ -533,7 +536,7 @@ int main() {
     constexpr int seamAllowance = 15;
     constexpr int cuttingAllowance = 5;
 
-    std::cout << "Engine,Size,TwoWay,BuildAvg(us),BuildMin(us),PrepAvg(us),PrepMin(us),CalcAvg(us),CalcMin(us),TotalAvg(us),TotalMin(us)\n";
+    std::cout << "Engine,PieceSize,TwoWay,ItemSize,BuildAvg(us),BuildMin(us),PrepAvg(us),PrepMin(us),CalcAvg(us),CalcMin(us),TotalAvg(us),TotalMin(us)\n";
 
     for (const auto& engine : engines) {
         for (std::size_t ts : testSizes) {
@@ -552,8 +555,8 @@ int main() {
                     ITERATIONS
                 );
 
-                std::cout << std::format("{},{},{},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f}\n",
-                    r.engineName, r.pieceCount, r.twoWayCount,
+                std::cout << std::format("{},{},{},{},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f},{:.3f}\n",
+                    r.engineName, r.pieceCount, r.twoWayCount, r.itemCount,
                     r.construct.avgUs(ITERATIONS), r.construct.minUs(),
                     r.nestingPreparation.avgUs(ITERATIONS), r.nestingPreparation.minUs(),
                     r.nesting.avgUs(ITERATIONS), r.nesting.minUs(),
