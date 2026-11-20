@@ -356,5 +356,40 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::ve
     return nfpCache;
 }
 
+std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCacheForFixedQueue(const std::vector<nesting::NestedItem> &items, size_t allVariantsCount)
+{
+    size_t n = items.size();
+    std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
+    nfpCache.reserve(std::min(allVariantsCount * allVariantsCount, n * (n - 1) / 2));
+
+    for(size_t i = 1; i < n; ++i) {
+        const auto* varB = items[i].getVariant();
+        const auto isFlippedB = items[i].isFlipped();
+        const auto idB = varB->getGlobalId(isFlippedB);
+
+        for(size_t j = 0; j < i; ++j) {
+            const auto* varA = items[j].getVariant();
+            const auto isFlippedA = items[j].isFlipped();
+
+            NFPKey key{ 
+                .variantIdA=varA->getGlobalId(isFlippedA), 
+                .variantIdB=idB
+            };
+
+            if constexpr (config::DEBUG_MODE_DETAILED) {
+                SPDLOG_INFO(std::format("A {} B {}",key.variantIdA, key.variantIdB));
+            }
+
+            if (!nfpCache.contains(key)) {
+                nfpCache.emplace(
+                    key, 
+                    utils::buildNFPfor(*varA,*varB, isFlippedA, isFlippedB)
+                );
+            }
+        } 
+    }
+
+    return nfpCache;
+}
 
 } // namespace pmg::geometry::calculations

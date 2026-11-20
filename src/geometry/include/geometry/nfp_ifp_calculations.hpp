@@ -7,6 +7,7 @@
 
 #include "geometry/nfp_key.hpp"
 #include "pattern/shapes.hpp"
+#include "nesting/nested_item.hpp"
 
 namespace pmg::geometry::calculations::utils {
 
@@ -19,5 +20,6 @@ namespace pmg::geometry::calculations {
 
 std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const pattern::Fabric& fabric, const std::vector<pattern::PieceVariant>& variants); 
 std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::vector<pattern::PieceVariant>& variants);
+std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCacheForFixedQueue(const std::vector<nesting::NestedItem>& items, size_t allVariantsCount);
 
 } // namespace pmg::geometry::calculations
