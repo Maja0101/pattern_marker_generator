@@ -6,7 +6,7 @@
 #include <spdlog/spdlog.h>
 
 #include "utils/config.hpp"
-#include "geometry/svg_exporter.hpp"
+#include "pattern/svg_exporter.hpp"
 #include "geometry/options_calculations.hpp"
 #include "nesting/advanced_algorithm.hpp"
 
@@ -38,7 +38,7 @@ void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<pattern::NestedIt
             best.score = currentScore;
 
             if constexpr (config::DEVELOPMENT) {
-                pmg::geometry::SvgExporter::exportLayout(
+                visualisation::SvgExporter::exportLayout(
                     std::format("debug_output_{}.svg", ++m_svgExport), 
                     m_fabric,
                     m_originalItems,
@@ -153,7 +153,7 @@ pattern::NestingScore AdvancedAlgorithm::checkOneOption()
     best.result = runSingleBottomLeft(m_originalItems);
 
     if constexpr (config::DEVELOPMENT) {
-        pmg::geometry::SvgExporter::exportLayout(
+        visualisation::SvgExporter::exportLayout(
             "debug_output.svg", 
             m_fabric,
             m_originalItems,
@@ -258,7 +258,7 @@ double AdvancedAlgorithm::setInitialTemp(const pattern::NestingScore &currentSco
             bestScore = sampleScore;
             
             if constexpr (config::DEVELOPMENT) {
-                pmg::geometry::SvgExporter::exportLayout(
+                visualisation::SvgExporter::exportLayout(
                     std::format("debug_output_{}.svg", ++m_svgExport), 
                     m_fabric,
                     m_originalItems,
@@ -321,7 +321,7 @@ pattern::NestingScore AdvancedAlgorithm::simulatedAnnealing()
     pattern::NestingScore bestScore = currentScore;
 
     if constexpr (config::DEVELOPMENT) {
-        pmg::geometry::SvgExporter::exportLayout(
+        visualisation::SvgExporter::exportLayout(
             std::format("debug_output_{}.svg", ++m_svgExport), 
             m_fabric,
             m_originalItems,
@@ -372,7 +372,7 @@ pattern::NestingScore AdvancedAlgorithm::simulatedAnnealing()
                     }
 
                     if constexpr (config::DEVELOPMENT) {
-                        pmg::geometry::SvgExporter::exportLayout(
+                        visualisation::SvgExporter::exportLayout(
                             std::format("debug_output_{}.svg", ++m_svgExport), 
                             m_fabric,
                             m_originalItems,

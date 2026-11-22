@@ -1,5 +1,4 @@
 add_library(geometry 
-    svg_exporter.cpp 
     transformations.cpp 
     calculations.cpp
     nfp_ifp_calculations.cpp

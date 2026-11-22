@@ -19,7 +19,7 @@ inline const int DEGREES_360 = 360;
     
 constexpr double DEG_TO_RAD = std::numbers::pi / 180.0;
 
-Point64 getTopLeftCorner(const std::vector<Point64> &polygon) noexcept
+pattern::Point64 getTopLeftCorner(const std::vector<pattern::Point64> &polygon) noexcept
 {
     if (polygon.empty()) return {};
 
@@ -31,10 +31,10 @@ Point64 getTopLeftCorner(const std::vector<Point64> &polygon) noexcept
         maxY = std::max(point.y, maxY);
     }
 
-    return Point64{minX, maxY};
+    return pattern::Point64{minX, maxY};
 }
 
-std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored, bool mirroringInFlippedXAxis) noexcept
+std::vector<pattern::Point64> transformPolygon(const std::vector<pattern::Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored, bool mirroringInFlippedXAxis) noexcept
 {
     if (polygon.empty()) return {};
 
@@ -44,7 +44,7 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
 
     // allocate the transformed polygon
     const size_t SIZE = polygon.size();
-    std::vector<Point64> transformed(SIZE);
+    std::vector<pattern::Point64> transformed(SIZE);
 
     // set minX, minY values 
     // in order to anchor the transformed points back 
@@ -127,7 +127,7 @@ std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int r
     return transformed;
 }
 
-std::vector<Point64> rotateBy180(const std::vector<Point64> &polygon) noexcept
+std::vector<pattern::Point64> rotateBy180(const std::vector<pattern::Point64> &polygon) noexcept
 {
     return transformPolygon(polygon, DEGREES_180, false);
 }

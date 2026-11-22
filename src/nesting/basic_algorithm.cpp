@@ -4,7 +4,7 @@
 
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
-#include "geometry/svg_exporter.hpp"
+#include "pattern/svg_exporter.hpp"
 #include "geometry/nfp_ifp_calculations.hpp"
 #include "geometry/calculations.hpp"
 #include "nesting/basic_algorithm.hpp"
@@ -59,7 +59,7 @@ pattern::NestingResult BasicAlgorithm::runAlgorithm()
     }
 
     if constexpr (config::DEVELOPMENT) {
-        pmg::geometry::SvgExporter::exportLayout(
+        visualisation::SvgExporter::exportLayout(
             "debug_output.svg", 
             m_fabric,
             m_originalItems,

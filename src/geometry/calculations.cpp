@@ -43,7 +43,7 @@ std::array<int, 4> calculatePercentages(const std::array<int64_t, 4>& areas, con
     return results;
 }
 
-int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
+int64_t crossProduct(const pattern::Point64 &a, const pattern::Point64 &b, const pattern::Point64 &c)
 {
     return ((b.x - a.x) * (c.y - b.y)) - ((b.y - a.y) * (c.x - b.x));
 }
@@ -52,7 +52,7 @@ int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
 
 namespace pmg::geometry::calculations {
 
-bool isCyclicShift(const std::vector<Point64> &polygonA, const std::vector<Point64> &polygonB)
+bool isCyclicShift(const std::vector<pattern::Point64> &polygonA, const std::vector<pattern::Point64> &polygonB)
 {
     // Check whether the second polygon is the same as the first polygon
     // even if the starting point does not match
@@ -76,12 +76,12 @@ bool isCyclicShift(const std::vector<Point64> &polygonA, const std::vector<Point
     return false;
 }
 
-Clipper2Lib::Point64 toClipperPoint(const Point64 &point)
+Clipper2Lib::Point64 toClipperPoint(const pattern::Point64 &point)
 {
     return Clipper2Lib::Point64{ point.x, point.y };
 }
 
-Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
+Clipper2Lib::Path64 toClipperPath(const std::vector<pattern::Point64> &polygon)
 {
     Clipper2Lib::Path64 path;
     path.reserve(polygon.size());
@@ -91,9 +91,9 @@ Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
     return path;
 }
 
-std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
+std::vector<pattern::Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
 {
-    std::vector<Point64> polygon;
+    std::vector<pattern::Point64> polygon;
     polygon.reserve(path.size());
     for (const auto& point : path) {
         polygon.push_back({point.x, point.y});
@@ -101,7 +101,7 @@ std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
     return polygon;
 }
 
-std::vector<Point64> calculatePolygonWithAllowance(const std::vector<Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
+std::vector<pattern::Point64> calculatePolygonWithAllowance(const std::vector<pattern::Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
 {
     Clipper2Lib::Paths64 offsetPaths = Clipper2Lib::InflatePaths(
         { toClipperPath(polygon) },

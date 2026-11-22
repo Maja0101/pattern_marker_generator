@@ -7,7 +7,7 @@
 #include "pattern/shapes.hpp"
 #include "pattern/nested_item.hpp"
 #include "pattern/nesting_result.hpp"
-#include "geometry/nfp_key.hpp"
+#include "pattern/nfp_key.hpp"
 
 namespace pmg::nesting {
 
@@ -16,7 +16,7 @@ private:
     pattern::Fabric m_fabric;
 
     std::unordered_map<int64_t, Clipper2Lib::Paths64>& m_ifpCache;
-    std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& m_nfpCache;
+    std::unordered_map<pattern::NFPKey, Clipper2Lib::Paths64>& m_nfpCache;
 
     Clipper2Lib::Paths64 m_placedPiecesPolygons;
     std::vector<Clipper2Lib::Rect64> m_placedPiecesBoxes;
@@ -26,7 +26,7 @@ private:
 public:
     BottomLeft(pattern::Fabric fabric, 
         std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, 
-        std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache);
+        std::unordered_map<pattern::NFPKey, Clipper2Lib::Paths64>& nfpCache);
 
     pattern::NestingResult performNesting(std::vector<pattern::NestedItem>& items);
 };

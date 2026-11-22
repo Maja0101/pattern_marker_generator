@@ -1,24 +1,24 @@
 #include <catch2/catch_amalgamated.hpp>
 
-#include "geometry/geometry_types.hpp"
+#include "pattern/geometry_types.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/nested_item.hpp"
 #include "geometry/options_calculations.hpp"
 
 TEST_CASE("Calculating number of options", "[possibilities][evaluation]") {
-    std::vector<pmg::geometry::Point64> boundary1 = {
+    std::vector<pmg::pattern::Point64> boundary1 = {
         {    0,     0},
         {10000,     0},
         {10000, 10000}
     };
 
-    std::vector<pmg::geometry::Point64> boundary2 = {
+    std::vector<pmg::pattern::Point64> boundary2 = {
         {    0,     0},
         {20000,     0},
         {20000, 20000}
     };
 
-    std::vector<pmg::geometry::Point64> boundary3 = {
+    std::vector<pmg::pattern::Point64> boundary3 = {
         {    0,     0},
         {30000,     0},
         {30000, 30000}

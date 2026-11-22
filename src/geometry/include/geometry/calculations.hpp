@@ -4,7 +4,7 @@
 
 #include <clipper2/clipper.h>
 
-#include "geometry/geometry_types.hpp"
+#include "pattern/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/nested_item.hpp"
 #include "pattern/nesting_result.hpp"
@@ -12,19 +12,19 @@
 
 namespace pmg::geometry::calculations::utils {
 
-int64_t crossProduct(const Point64& a, const Point64& b, const Point64& c);
+int64_t crossProduct(const pattern::Point64& a, const pattern::Point64& b, const pattern::Point64& c);
 
 } // namespace pmg::geometry::calculations::utils
 
 namespace pmg::geometry::calculations {
 
-bool isCyclicShift(const std::vector<Point64>& polygonA, const std::vector<Point64>& polygonB);
+bool isCyclicShift(const std::vector<pattern::Point64>& polygonA, const std::vector<pattern::Point64>& polygonB);
 
-Clipper2Lib::Point64 toClipperPoint(const Point64& point);
-Clipper2Lib::Path64 toClipperPath(const std::vector<Point64>& polygon);
-std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64& path);
+Clipper2Lib::Point64 toClipperPoint(const pattern::Point64& point);
+Clipper2Lib::Path64 toClipperPath(const std::vector<pattern::Point64>& polygon);
+std::vector<pattern::Point64> fromClipperPath(const Clipper2Lib::Path64& path);
 
-std::vector<Point64> calculatePolygonWithAllowance(const std::vector<Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance);
+std::vector<pattern::Point64> calculatePolygonWithAllowance(const std::vector<pattern::Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance);
 Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64& paths, const Clipper2Lib::Point64& point);
 
 Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64& ifpPaths, const std::vector<Clipper2Lib::Paths64>& originalNfps, int64_t epsilon = 1);

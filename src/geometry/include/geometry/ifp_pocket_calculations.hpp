@@ -4,11 +4,11 @@
 
 #include <clipper2/clipper.h>
 
-#include "geometry/geometry_types.hpp"
+#include "pattern/geometry_types.hpp"
 
 namespace pmg::geometry::calculations::utils {
 
-std::vector<Point64> calculateConvexIFP(const std::vector<Point64>& fabricHull, const std::vector<Point64>& variantHull);
-std::vector<Point64> calculateConvexHull(const std::vector<Point64>& polygon);
+std::vector<pattern::Point64> calculateConvexIFP(const std::vector<pattern::Point64>& fabricHull, const std::vector<pattern::Point64>& variantHull);
+std::vector<pattern::Point64> calculateConvexHull(const std::vector<pattern::Point64>& polygon);
 
 } // namespace pmg::geometry::calculations::utils

@@ -4,7 +4,7 @@
 #include <format>
 #include <string>
 
-namespace pmg::geometry {
+namespace pmg::pattern {
 
 struct Point64 {
     int64_t x{0};
@@ -17,4 +17,4 @@ struct Point64 {
     }
 };
 
-} // namespace pmg:geometry
+} // namespace pmg:pattern

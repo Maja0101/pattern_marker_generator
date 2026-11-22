@@ -2,14 +2,14 @@
 #include <clipper2/clipper.h>
 #include <spdlog/spdlog.h>
 
-#include "geometry/geometry_types.hpp"
+#include "pattern/geometry_types.hpp"
 #include "geometry/nfp_ifp_calculations.hpp"
-#include "geometry/nfp_key.hpp"
+#include "pattern/nfp_key.hpp"
 #include "pattern/shapes.hpp"
 
 TEST_CASE("Calculating IFP", "[IFP]") {
     SECTION("Rectangular fabric") {
-        std::vector<pmg::geometry::Point64> fabricPts = {
+        std::vector<pmg::pattern::Point64> fabricPts = {
             {   0,    0},  
             {6000,    0},  
             {6000, 6000}, 
@@ -17,7 +17,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::Fabric fabric(fabricPts, 90);
 
-        std::vector<pmg::geometry::Point64> polygon = {
+        std::vector<pmg::pattern::Point64> polygon = {
             {2000,    0},  
             {4000,    0},  
             {4000, 4000}, 
@@ -40,7 +40,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
     }
 
     SECTION("Piece does not fit inside fabric") {
-        std::vector<pmg::geometry::Point64> fabricPts = {
+        std::vector<pmg::pattern::Point64> fabricPts = {
             {   0,    0},  
             {6000,    0},  
             {6000, 6000}, 
@@ -48,7 +48,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::Fabric fabric(fabricPts, 90);
 
-        std::vector<pmg::geometry::Point64> polygon = {
+        std::vector<pmg::pattern::Point64> polygon = {
             {   0,    0},  
             {7000,    0},  
             {7000, 6000}, 
@@ -64,7 +64,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
     }
 
     SECTION("Irregular convex fabric shape") {
-        std::vector<pmg::geometry::Point64> fabricPts = {
+        std::vector<pmg::pattern::Point64> fabricPts = {
             {   0,     0},  
             {9000,     0},  
             {6000,  6000}, 
@@ -72,7 +72,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::Fabric fabric(fabricPts, 90);
 
-        std::vector<pmg::geometry::Point64> polygon = {
+        std::vector<pmg::pattern::Point64> polygon = {
             {   0,    0},  
             {2000,    0},  
             {2000, 2000}, 
@@ -93,7 +93,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
     }
 
     SECTION("Irregular convex fabric shape and piece") {
-        std::vector<pmg::geometry::Point64> fabricPts = {
+        std::vector<pmg::pattern::Point64> fabricPts = {
             {3000,     0},  
             {6000,     0},  
             {6000,  6000}, 
@@ -102,7 +102,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::Fabric fabric(fabricPts, 90);
 
-        std::vector<pmg::geometry::Point64> polygon = {
+        std::vector<pmg::pattern::Point64> polygon = {
             {2000,     0},  
             {4000,     0},  
             {4000,  4000}, 
@@ -125,7 +125,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
     }
 
     SECTION("Irregular concave fabric shape (one pocket) and piece") {
-        std::vector<pmg::geometry::Point64> fabricPts = {
+        std::vector<pmg::pattern::Point64> fabricPts = {
             {3000,     0},  
             {6000,     0},  
             {6000,  6000}, 
@@ -135,7 +135,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::Fabric fabric(fabricPts, 90);
 
-        std::vector<pmg::geometry::Point64> polygon = {
+        std::vector<pmg::pattern::Point64> polygon = {
             {2000,     0},  
             {4000,     0},  
             {4000,  4000}, 
@@ -158,7 +158,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
     }
 
     SECTION("Irregular concave fabric shape (multiple pockets) and piece") {
-        std::vector<pmg::geometry::Point64> fabricPts = {
+        std::vector<pmg::pattern::Point64> fabricPts = {
             {3000,     0},  
             {6000,     0},  
             {6000,  5000}, 
@@ -174,7 +174,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
         };
         pmg::pattern::Fabric fabric(fabricPts, 90);
 
-        std::vector<pmg::geometry::Point64> polygon = {
+        std::vector<pmg::pattern::Point64> polygon = {
             {1000,     0},  
             {2000,     0},  
             {2000,  2000}, 
@@ -209,7 +209,7 @@ TEST_CASE("Calculating IFP", "[IFP]") {
 
 TEST_CASE("Calculating NFP", "[NFP]") {
     SECTION("Convex shapes") {
-        std::vector<pmg::geometry::Point64> polygon1 = {
+        std::vector<pmg::pattern::Point64> polygon1 = {
             {   0,    0},  
             {4000,    0},  
             {4000, 4000}, 
@@ -217,7 +217,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
         };
         pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, false, 0, 0, polygon1);
 
-        std::vector<pmg::geometry::Point64> polygon2 = {
+        std::vector<pmg::pattern::Point64> polygon2 = {
             {   0,    0},  
             {2000,    0},  
             {2000, 2000}, 
@@ -238,7 +238,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
     }
 
     SECTION("Concave shapes ") {
-        std::vector<pmg::geometry::Point64> polygon1 = {
+        std::vector<pmg::pattern::Point64> polygon1 = {
             {   0,    0},  
             {4000,    0},  
             {4000, 2000}, 
@@ -248,7 +248,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
         };
         pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, false, 0, 0, polygon1);
 
-        std::vector<pmg::geometry::Point64> polygon2 = {
+        std::vector<pmg::pattern::Point64> polygon2 = {
             {1000,    0},  
             {2000,    0},  
             {2000, 2000}, 
@@ -279,7 +279,7 @@ TEST_CASE("Calculating NFP", "[NFP]") {
 }
 
 TEST_CASE("Creating cache for two-way pieces", "[NFP][IFP]") {
-    std::vector<pmg::geometry::Point64> fabricPts = {
+    std::vector<pmg::pattern::Point64> fabricPts = {
         {    0,     0},  
         {60000,     0},  
         {60000, 60000}, 
@@ -287,7 +287,7 @@ TEST_CASE("Creating cache for two-way pieces", "[NFP][IFP]") {
     };
     pmg::pattern::Fabric fabric(fabricPts, 90);
 
-    std::vector<pmg::geometry::Point64> boundary = {
+    std::vector<pmg::pattern::Point64> boundary = {
         {    0,     0},
         {40000,     0},
         {40000, 10000},
@@ -308,7 +308,7 @@ TEST_CASE("Creating cache for two-way pieces", "[NFP][IFP]") {
         }
 
         SECTION("NFP cache") {
-            std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> cache = pmg::geometry::calculations::calculateNFPCache(variants);
+            std::unordered_map<pmg::pattern::NFPKey, Clipper2Lib::Paths64> cache = pmg::geometry::calculations::calculateNFPCache(variants);
             
             REQUIRE(cache.size() == 4);
             REQUIRE(cache.find({ variant1.getGlobalId(false), variant1.getGlobalId(false)}) != cache.end());
@@ -334,7 +334,7 @@ TEST_CASE("Creating cache for two-way pieces", "[NFP][IFP]") {
         }
 
         SECTION("NFP cache") {
-            std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> cache = pmg::geometry::calculations::calculateNFPCache(variants);
+            std::unordered_map<pmg::pattern::NFPKey, Clipper2Lib::Paths64> cache = pmg::geometry::calculations::calculateNFPCache(variants);
             
             REQUIRE(cache.size() == 16);
             REQUIRE(cache.find({ variant1.getGlobalId(false), variant1.getGlobalId(false)}) != cache.end());

@@ -2,6 +2,7 @@ add_library(pattern
     pattern_piece.cpp
     shapes.cpp
     nested_item.cpp
+    svg_exporter.cpp
 )
 
 target_include_directories(pattern PUBLIC

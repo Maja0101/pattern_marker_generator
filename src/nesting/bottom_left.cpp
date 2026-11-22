@@ -89,7 +89,7 @@ bool BottomLeft::findPosition(pattern::NestedItem &item, const std::vector<patte
             SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
         }
 
-        geometry::NFPKey key{ .variantIdA=placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), .variantIdB=varId };
+        pattern::NFPKey key{ .variantIdA=placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), .variantIdB=varId };
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("key {} {}", key.variantIdA, key.variantIdB));
@@ -209,7 +209,7 @@ bool BottomLeft::findPosition(pattern::NestedItem &item, const std::vector<patte
     return true;
 }
 
-BottomLeft::BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache)
+BottomLeft::BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<pattern::NFPKey, Clipper2Lib::Paths64>& nfpCache)
     : m_fabric(std::move(fabric)), m_ifpCache(ifpCache), m_nfpCache(nfpCache) {}
 
 pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedItem> &items)
@@ -247,16 +247,16 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
         minLen = std::max(item.getItemBoundingBoxAtPosition().right, minLen);
 
         
-        geometry::Point64 rawPosition = item.getPosition();
+        pattern::Point64 rawPosition = item.getPosition();
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Raw position point {} for {} {}", rawPosition.toString(), item.getVariant()->getPieceId(), item.getVariant()->getIsMirrored()));
         }
 
-        geometry::Point64 refPoint = item.getVariant()->getReferencePoint();
-        geometry::Point64 fabricRefPoint = m_fabric.getReferencePoint();
+        pattern::Point64 refPoint = item.getVariant()->getReferencePoint();
+        pattern::Point64 fabricRefPoint = m_fabric.getReferencePoint();
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            geometry::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
+            pattern::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
             SPDLOG_INFO(std::format("Without allowances position point {}", positionWithoutAllowances.toString()));
             SPDLOG_INFO(std::format("Fabric reference point {}", fabricRefPoint.toString()));
             SPDLOG_INFO(std::format("Item reference point {}", refPoint.toString()));
@@ -270,7 +270,7 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
             );
         }
 
-        geometry::Point64 deltaPosition{
+        pattern::Point64 deltaPosition{
             (fabricRefPoint.x + rawPosition.y) - refPoint.x, 
             (fabricRefPoint.y - rawPosition.x) - refPoint.y
         };

@@ -1,11 +1,11 @@
 #include <fstream>
 #include <iomanip>
 
-#include "geometry/svg_exporter.hpp"
+#include "pattern/svg_exporter.hpp"
 #include "pattern/nested_item.hpp"
 #include "pattern/shapes.hpp"
 
-namespace pmg::geometry {
+namespace pmg::visualisation {
 
 bool SvgExporter::exportLayout(const std::string& filepath, 
                                const pattern::Fabric& fabric,
@@ -96,4 +96,4 @@ bool SvgExporter::exportLayout(const std::string& filepath,
     return true;
 }
 
-} // namespace pmg::geometry
+} // namespace pmg::visualisation

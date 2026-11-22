@@ -21,7 +21,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         }
     }
 
-    std::vector<geometry::Point64> simplifiedPolygon = geometry::calculations::fromClipperPath(
+    std::vector<pattern::Point64> simplifiedPolygon = geometry::calculations::fromClipperPath(
         Clipper2Lib::SimplifyPath(
             geometry::calculations::toClipperPath(m_originalPolygon), 
             0.1)
@@ -50,7 +50,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         SPDLOG_INFO(std::format("sum allowances {}", static_cast<double>(m_seamAllowance + m_cuttingAllowance)));
     }
 
-    std::vector<geometry::Point64> offsetPath = 
+    std::vector<pattern::Point64> offsetPath = 
         geometry::calculations::calculatePolygonWithAllowance(
             simplifiedPolygon, 
             m_seamAllowance, 
@@ -70,7 +70,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         if (req.requiredQuantity > 0) {
             ++variantId;
 
-            std::vector<pmg::geometry::Point64> transformedBoundary;
+            std::vector<pmg::pattern::Point64> transformedBoundary;
             transformedBoundary.reserve(offsetPath.size());
 
             transformedBoundary = geometry::calculations::transformPolygon(offsetPath, m_grainline + req.rotationAngle, req.isMirrored, false, false);
@@ -81,7 +81,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
                 }
             }
 
-            geometry::Point64 referencePoint = geometry::calculations::getTopLeftCorner(transformedBoundary);
+            pattern::Point64 referencePoint = geometry::calculations::getTopLeftCorner(transformedBoundary);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("reference point {}", referencePoint.toString()));
@@ -105,7 +105,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
 }
 
 PatternPiece::PatternPiece(int64_t pieceId, 
-        std::vector<geometry::Point64> originalPoints, 
+        std::vector<pattern::Point64> originalPoints, 
         const std::vector<VariantConstraint>& constraints,
         int64_t seamAllowance, int64_t cuttingAllowance, 
         int grainline, bool toBeScaled)
@@ -123,7 +123,7 @@ std::string PatternPiece::toString() const
     std::string boundaryStr = std::accumulate(
         std::next(m_originalPolygon.begin()), m_originalPolygon.end(),
         m_originalPolygon.front().toString(),
-        [](std::string const& a, geometry::Point64 b) {
+        [](std::string const& a, pattern::Point64 b) {
             return a + ", " + b.toString();
         }
     );

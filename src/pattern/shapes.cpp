@@ -12,10 +12,10 @@
 namespace pmg::pattern {
 inline constexpr int64_t SCALE = 1000;
 
-Shape::Shape(const std::vector<geometry::Point64> &initalBoundary, bool toBeScaled)
+Shape::Shape(const std::vector<pattern::Point64> &initalBoundary, bool toBeScaled)
     : m_shapePath([&initalBoundary, toBeScaled]() {
         if (toBeScaled) {
-            std::vector<pmg::geometry::Point64> boundary;
+            std::vector<pmg::pattern::Point64> boundary;
             boundary.reserve(initalBoundary.size());
             for (const auto& point : initalBoundary) {
                 boundary.push_back({point.x * SCALE, point.y * SCALE});
@@ -78,7 +78,7 @@ std::string Shape::toString() const
     std::string boundaryStr = std::accumulate(
         std::next(m_boundary.begin()), m_boundary.end(),
         m_boundary.front().toString(),
-        [](std::string const& a, geometry::Point64 b) {
+        [](std::string const& a, pattern::Point64 b) {
             return a + ", " + b.toString();
         }
     );
@@ -86,7 +86,7 @@ std::string Shape::toString() const
     return std::format("boundary: ({})", boundaryStr);
 }
 
-Fabric::InitState Fabric::transformBoundary(const std::vector<geometry::Point64> &initalBoundary, int grainline, bool toBeScaled) {
+Fabric::InitState Fabric::transformBoundary(const std::vector<pattern::Point64> &initalBoundary, int grainline, bool toBeScaled) {
     InitState state;
     
     const int DEGREES_360 = 360;
@@ -153,19 +153,19 @@ Fabric::InitState Fabric::transformBoundary(const std::vector<geometry::Point64>
 Fabric::Fabric(InitState &&state) 
     : Shape(state.boundary), m_grainline(state.grainline), m_referencePoint(std::move(state.referencePoint)) {}
 
-Fabric::Fabric(const std::vector<geometry::Point64> &initalBoundary, int grainline, bool toBeScaled)
+Fabric::Fabric(const std::vector<pattern::Point64> &initalBoundary, int grainline, bool toBeScaled)
     : Fabric(transformBoundary(initalBoundary, grainline, toBeScaled)) {}
 
 Fabric::Fabric(int64_t width, int64_t length, bool toBeScaled)
     : Shape(width, length, toBeScaled), m_grainline(0), 
-      m_referencePoint(geometry::Point64{m_shapeBoundingBox.top, m_shapeBoundingBox.right}) {}
+      m_referencePoint(pattern::Point64{m_shapeBoundingBox.top, m_shapeBoundingBox.right}) {}
 
 void PieceVariant::initializeVariantGeometry()
 {
     m_isConvex = geometry::calculations::checkConvexity(m_boundary);
 
     if (m_isTwoWay) {
-        std::vector<pmg::geometry::Point64> rotatedBoundary = geometry::calculations::rotateBy180(m_boundary);
+        std::vector<pmg::pattern::Point64> rotatedBoundary = geometry::calculations::rotateBy180(m_boundary);
         if constexpr (config::DEBUG_MODE_DETAILED) {
             for (const auto& point : m_boundary) {
                 SPDLOG_INFO(std::format("boundary point {}", point.toString()));
@@ -191,7 +191,7 @@ void PieceVariant::initializeVariantGeometry()
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO("decomposing");
         }
-        std::vector<std::vector<pmg::geometry::Point64>> subShapes = geometry::calculations::hertelMehlhornAlgorithm(m_boundary);
+        std::vector<std::vector<pmg::pattern::Point64>> subShapes = geometry::calculations::hertelMehlhornAlgorithm(m_boundary);
 
         for (const auto& subShape : subShapes) {
             m_decomposedShape.push_back(geometry::calculations::toClipperPath(subShape));
@@ -206,7 +206,7 @@ void PieceVariant::initializeVariantGeometry()
 PieceVariant::PieceVariant(int variantId, int64_t pieceId, 
     int rotationAngle, bool isMirrored, int requiredQuantity, bool twoWayAllowed, 
     int64_t seamAllowance, int64_t cuttingAllowance, 
-    const std::vector<geometry::Point64> &initalBoundary, geometry::Point64 referencePoint)
+    const std::vector<pattern::Point64> &initalBoundary, pattern::Point64 referencePoint)
     : Shape(initalBoundary), m_pieceId(pieceId), m_variantId(variantId), 
       m_rotationAngle(rotationAngle), m_isMirrored(isMirrored), 
       m_requiredQuantity(requiredQuantity), m_isTwoWay(twoWayAllowed),
@@ -236,7 +236,7 @@ int64_t PieceVariant::getGlobalId(bool isFlipped) const
     );
 }
 
-const std::vector<geometry::Point64> &PieceVariant::getBoundaryForVariant(bool isFlipped) const
+const std::vector<pattern::Point64> &PieceVariant::getBoundaryForVariant(bool isFlipped) const
 {
     if (m_isTwoWay && isFlipped) {
         return m_flippedBoundary;
@@ -283,7 +283,7 @@ std::string PieceVariant::toString() const
     std::string boundaryStr = std::accumulate(
         std::next(m_boundary.begin()), m_boundary.end(),
         m_boundary.front().toString(),
-        [](std::string const& a, geometry::Point64 b) {
+        [](std::string const& a, pattern::Point64 b) {
             return a + ", " + b.toString();
         }
     );

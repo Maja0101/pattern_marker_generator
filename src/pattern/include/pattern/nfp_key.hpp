@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <functional>
 
-namespace pmg::geometry {
+namespace pmg::pattern {
 
 struct NFPKey {
     int64_t variantIdA;
@@ -13,11 +13,11 @@ struct NFPKey {
     bool operator==(const NFPKey& other) const = default;
 };
 
-} // namespace pmg::geometry 
+} // namespace pmg::pattern 
 
 template<>
-struct std::hash<pmg::geometry::NFPKey> {
-    std::size_t operator()(const pmg::geometry::NFPKey& k) const noexcept {
+struct std::hash<pmg::pattern::NFPKey> {
+    std::size_t operator()(const pmg::pattern::NFPKey& k) const noexcept {
         std::size_t h1 = std::hash<int64_t>{}(k.variantIdA);
         std::size_t h2 = std::hash<int64_t>{}(k.variantIdB);
         return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2)); // formula for combining hash values

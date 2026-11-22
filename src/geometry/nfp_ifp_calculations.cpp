@@ -193,8 +193,8 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
 
     // Detailed calculation for irregular fabric
     
-    std::vector<Point64> fabricHull = utils::calculateConvexHull(fabric.getBoundary());
-    std::vector<Point64> variantHull = utils::calculateConvexHull(variant.getBoundaryForVariant(isFlipped));
+    std::vector<pattern::Point64> fabricHull = utils::calculateConvexHull(fabric.getBoundary());
+    std::vector<pattern::Point64> variantHull = utils::calculateConvexHull(variant.getBoundaryForVariant(isFlipped));
     
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : fabricHull) {
@@ -316,7 +316,7 @@ std::unordered_map<int64_t, Clipper2Lib::Paths64> calculateIFPCache(const patter
     return ifpCache;
 }
 
-std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::vector<pattern::PieceVariant> &variants)
+std::unordered_map<pattern::NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::vector<pattern::PieceVariant> &variants)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Number of variants: {}", variants.size()));
@@ -338,7 +338,7 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::ve
         }
     }
 
-    std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
+    std::unordered_map<pattern::NFPKey, Clipper2Lib::Paths64> nfpCache;
     nfpCache.reserve(states.size() * states.size());
 
     for (const auto& a : states) {
@@ -347,7 +347,7 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::ve
                 SPDLOG_INFO(std::format("Variants no. {} {}", a.globalId, b.globalId));
             }
             nfpCache.try_emplace(
-                NFPKey{ .variantIdA=a.globalId, .variantIdB=b.globalId },
+                pattern::NFPKey{ .variantIdA=a.globalId, .variantIdB=b.globalId },
                 utils::buildNFPfor(variants[a.idx],variants[b.idx], a.isFlipped, b.isFlipped)
             );
         }
@@ -356,10 +356,10 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::ve
     return nfpCache;
 }
 
-std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCacheForFixedQueue(const std::vector<pattern::NestedItem> &items, size_t allVariantsCount)
+std::unordered_map<pattern::NFPKey, Clipper2Lib::Paths64> calculateNFPCacheForFixedQueue(const std::vector<pattern::NestedItem> &items, size_t allVariantsCount)
 {
     size_t n = items.size();
-    std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;
+    std::unordered_map<pattern::NFPKey, Clipper2Lib::Paths64> nfpCache;
     nfpCache.reserve(std::min(allVariantsCount * allVariantsCount, n * (n - 1) / 2));
 
     for(size_t i = 1; i < n; ++i) {
@@ -371,7 +371,7 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCacheForFixedQueue(
             const auto* varA = items[j].getVariant();
             const auto isFlippedA = items[j].isFlipped();
 
-            NFPKey key{ 
+            pattern::NFPKey key{ 
                 .variantIdA=varA->getGlobalId(isFlippedA), 
                 .variantIdB=idB
             };

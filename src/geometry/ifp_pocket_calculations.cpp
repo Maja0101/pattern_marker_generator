@@ -16,7 +16,7 @@ struct HalfPlane {
     int64_t c;
 };
 
-int64_t dot(int64_t a, int64_t b, const Point64 &p) {
+int64_t dot(int64_t a, int64_t b, const pattern::Point64 &p) {
     return (a * p.x) + (b * p.y);
 }
 
@@ -29,7 +29,7 @@ int64_t divToNearest(__int128_t a, __int128_t b) {
     return (b >= 0) ? static_cast<int64_t>((a + b / 2) / b) : static_cast<int64_t>((a - b / 2) / b);
 }
 
-Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
+pattern::Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
     __int128_t det = (static_cast<__int128_t>(h1.a) * h2.b) - (static_cast<__int128_t>(h2.a) * h1.b);
 
     __int128_t x = (static_cast<__int128_t>(h1.b) * h2.c) - (static_cast<__int128_t>(h2.b) * h1.c);
@@ -45,15 +45,15 @@ Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
     };
 }
 
-std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, const std::vector<Point64> &variantHull) {
+std::vector<pattern::Point64> calculateConvexIFP(const std::vector<pattern::Point64> &fabricHull, const std::vector<pattern::Point64> &variantHull) {
     // Calculate half planes for two convex hulls and find points of intersection to get IFP for convex hulls
     
     size_t n = fabricHull.size();
     std::vector<HalfPlane> halfPlanes;
 
     for (size_t i = 0; i < n; ++i) {
-        Point64 pointA = fabricHull[i];
-        Point64 pointB = fabricHull[(i + 1) % n];
+        pattern::Point64 pointA = fabricHull[i];
+        pattern::Point64 pointB = fabricHull[(i + 1) % n];
 
         int64_t dx = pointB.x - pointA.x;
         int64_t dy = pointB.y - pointA.y;
@@ -63,7 +63,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
 
         int64_t c = -((nx * pointA.x) + (ny * pointA.y));
 
-        Point64 point = variantHull[0];
+        pattern::Point64 point = variantHull[0];
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("i {} A {} {} B {} {} d {} {} n {} {} c {} point {} {}", i, pointA.x, pointA.y, pointB.x, pointB.y, dx, dy, nx, ny, c, point.x, point.y));
@@ -103,7 +103,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         }
 
         while(activePlanes.size() >= 2) {
-            Point64 prevIntersection = intersect(activePlanes[activePlanes.size() - 2], activePlanes.back());
+            pattern::Point64 prevIntersection = intersect(activePlanes[activePlanes.size() - 2], activePlanes.back());
             
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("previous intersection {} {}", prevIntersection.x, prevIntersection.y));
@@ -126,13 +126,13 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
         activePlanes.push_back(currPlane);
     }
 
-    std::vector<Point64> ifpVertices;
+    std::vector<pattern::Point64> ifpVertices;
     size_t activeN = activePlanes.size();
 
     for (size_t i = 0; i < activeN; ++i) {
         const auto& h1 = activePlanes[i];
         const auto& h2 = activePlanes[(i + 1) % activeN];
-        Point64 intersection = intersect(h1, h2);
+        pattern::Point64 intersection = intersect(h1, h2);
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("i {} h1 {} {} {} h2 {} {} {}", i, h1.a, h1.b, h1.c, h2.a, h2.b, h2.c));
@@ -149,18 +149,18 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
     return ifpVertices;
 }
 
-std::vector<Point64> calculateConvexHull(const std::vector<Point64> &polygon) {
+std::vector<pattern::Point64> calculateConvexHull(const std::vector<pattern::Point64> &polygon) {
     // Andrew's monotone chain convex hull algorithm
     
     auto n = static_cast<int>(polygon.size());
     if (n <= 3) return polygon;
 
     // Sort the point in the polygon lexicographically
-    std::vector<Point64> sorted = polygon;
+    std::vector<pattern::Point64> sorted = polygon;
     std::ranges::sort(sorted);
 
     // Prepare the output vector
-    std::vector<Point64> hull;
+    std::vector<pattern::Point64> hull;
     hull.reserve(2UL*n);
     
     // Build lower hull

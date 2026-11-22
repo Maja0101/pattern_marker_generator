@@ -3,12 +3,12 @@
 #include <catch2/catch_amalgamated.hpp>
 
 #include "geometry/transformations.hpp"
-#include "geometry/geometry_types.hpp"
+#include "pattern/geometry_types.hpp"
 #include "point64_test_utils.hpp"
 
 TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
     // L shape 
-    const std::vector<pmg::geometry::Point64> polygon = {
+    const std::vector<pmg::pattern::Point64> polygon = {
         {    0,     0},
         {30000,     0},
         {30000, 10000},
@@ -21,7 +21,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 0 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 0, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {    0,     0},
                 {30000,     0},
                 {30000, 10000},
@@ -33,7 +33,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 90 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 90, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {    0, 30000}, 
                 {    0,     0}, 
                 {10000,     0}, 
@@ -45,7 +45,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 180 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 180, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {30000, 40000},
                 {    0, 40000},
                 {    0, 30000},
@@ -57,7 +57,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 270 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 270, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {40000,     0},
                 {40000, 30000},
                 {30000, 30000},
@@ -71,7 +71,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 540 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 540, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {30000, 40000},
                 {    0, 40000},
                 {    0, 30000},
@@ -83,7 +83,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // -90 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, -90, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {40000,     0},
                 {40000, 30000},
                 {30000, 30000},
@@ -97,7 +97,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 0 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 0, true) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {    0,     0},
                 {10000,     0},
                 {10000, 30000},
@@ -109,7 +109,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 90 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 90, true, true, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {    0, 30000},
                 {    0, 20000},
                 {30000, 20000},
@@ -121,7 +121,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 180 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 180, true) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {30000, 40000},
                 {20000, 40000},
                 {20000, 10000},
@@ -133,7 +133,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
         // 270 deg
         REQUIRE(
             pmg::geometry::calculations::transformPolygon(polygon, 270, true, true, false) == 
-            std::vector<pmg::geometry::Point64>{
+            std::vector<pmg::pattern::Point64>{
                 {40000,     0},
                 {40000, 10000},
                 {10000, 10000},
@@ -145,7 +145,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
 
     SECTION("No flipping, custom rotation") {
         // 30 deg
-        std::vector<pmg::geometry::Point64> expected = {
+        std::vector<pmg::pattern::Point64> expected = {
             {    0, 15000},
             {25981,     0},
             {30981,  8660},
@@ -153,8 +153,8 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
             {28660, 44641},
             {20000, 49641}
         };
-        std::vector<pmg::geometry::Point64> result = pmg::geometry::calculations::transformPolygon(polygon, 30, false);
-        REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
+        std::vector<pmg::pattern::Point64> result = pmg::geometry::calculations::transformPolygon(polygon, 30, false);
+        REQUIRE(pmg::pattern::polygonsSimilar(result, expected, 1));
 
         // 45 deg
         expected = {
@@ -166,7 +166,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
             {28284, 49497}
         };
         result = pmg::geometry::calculations::transformPolygon(polygon, 45, false);
-        REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
+        REQUIRE(pmg::pattern::polygonsSimilar(result, expected, 1));
 
         // 60 deg
         expected = {
@@ -178,12 +178,12 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
             {34641, 45981}
         };
         result = pmg::geometry::calculations::transformPolygon(polygon, 60, false);
-        REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
+        REQUIRE(pmg::pattern::polygonsSimilar(result, expected, 1));
     }
 
     SECTION("Flipping, custom rotation") {
         // 30 deg
-        std::vector<pmg::geometry::Point64> expected = {
+        std::vector<pmg::pattern::Point64> expected = {
             {20000,     0}, 
             {28660,  5000}, 
             {13660, 30981}, 
@@ -191,8 +191,8 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
             {25981, 49641}, 
             {    0, 34641}
         };
-        std::vector<pmg::geometry::Point64> result = pmg::geometry::calculations::transformPolygon(polygon, 30, true);
-        REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
+        std::vector<pmg::pattern::Point64> result = pmg::geometry::calculations::transformPolygon(polygon, 30, true);
+        REQUIRE(pmg::pattern::polygonsSimilar(result, expected, 1));
 
         // 45 deg
         expected = {
@@ -204,7 +204,7 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
             {    0, 28284}
         };
         result = pmg::geometry::calculations::transformPolygon(polygon, 45, true);
-        REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
+        REQUIRE(pmg::pattern::polygonsSimilar(result, expected, 1));
         
         // 60 deg
         expected = {
@@ -216,6 +216,6 @@ TEST_CASE("Flipping and rotating the shapes", "[trigonometry]") {
             {    0, 20000}
         };
         result = pmg::geometry::calculations::transformPolygon(polygon, 60, true);
-        REQUIRE(pmg::geometry::polygonsSimilar(result, expected, 1));
+        REQUIRE(pmg::pattern::polygonsSimilar(result, expected, 1));
     }
 }

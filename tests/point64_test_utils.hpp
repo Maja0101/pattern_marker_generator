@@ -3,9 +3,9 @@
 #include <vector>
 #include <ostream>
 
-#include "geometry/geometry_types.hpp"
+#include "pattern/geometry_types.hpp"
 
-namespace pmg::geometry {
+namespace pmg::pattern {
 
 inline bool pointsSimiliar(const Point64& a, const Point64& b, int64_t maxDelta = 1) {
     return std::abs(a.x - b.x) <= maxDelta && std::abs(a.y - b.y) <= maxDelta;
@@ -24,4 +24,4 @@ inline std::ostream& operator<<(std::ostream& os, const Point64& p) {
     return os;
 }
 
-} // namespace pmg::geometry    
+} // namespace pmg::pattern    

@@ -5,12 +5,14 @@
 #include <string>
 
 namespace pmg::pattern {
-    class NestedItem;
-    class Fabric;
+
+class NestedItem;
+class Fabric;
+
 }
 
-namespace pmg::geometry {
-
+namespace pmg::visualisation {
+    
 class SvgExporter {
 public:
     static bool exportLayout(const std::string& filepath, 
@@ -20,4 +22,4 @@ public:
                              int64_t includedCuttingAllowance); 
 };
 
-} // namespace pmg::geometry
+} // namespace pmg::visualisation
