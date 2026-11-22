@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "geometry/options_calculations.hpp"
+#include "geometry_calculations/options_calculations.hpp"
 #include "utils/config.hpp"
 
 namespace pmg::geometry::calculations {

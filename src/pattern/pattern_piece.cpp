@@ -5,10 +5,11 @@
 #include <clipper2/clipper.h>
 #include <spdlog/spdlog.h>
 
-#include "geometry/transformations.hpp"
-#include "geometry/calculations.hpp"
+#include "geometry_preparation/transformations.hpp"
+#include "geometry_preparation/initialization.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "utils/config.hpp"
+#include "common/helpers.hpp"
 
 namespace pmg::pattern {
 inline constexpr int64_t SCALE = 1000;
@@ -21,9 +22,9 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         }
     }
 
-    std::vector<pattern::Point64> simplifiedPolygon = geometry::calculations::fromClipperPath(
+    std::vector<geometry::Point64> simplifiedPolygon = geometry::fromClipperPath(
         Clipper2Lib::SimplifyPath(
-            geometry::calculations::toClipperPath(m_originalPolygon), 
+            geometry::toClipperPath(m_originalPolygon), 
             0.1)
         );
 
@@ -50,8 +51,8 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         SPDLOG_INFO(std::format("sum allowances {}", static_cast<double>(m_seamAllowance + m_cuttingAllowance)));
     }
 
-    std::vector<pattern::Point64> offsetPath = 
-        geometry::calculations::calculatePolygonWithAllowance(
+    std::vector<geometry::Point64> offsetPath = 
+        geometry::preparation::calculatePolygonWithAllowance(
             simplifiedPolygon, 
             m_seamAllowance, 
             m_cuttingAllowance
@@ -70,10 +71,10 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
         if (req.requiredQuantity > 0) {
             ++variantId;
 
-            std::vector<pmg::pattern::Point64> transformedBoundary;
+            std::vector<geometry::Point64> transformedBoundary;
             transformedBoundary.reserve(offsetPath.size());
 
-            transformedBoundary = geometry::calculations::transformPolygon(offsetPath, m_grainline + req.rotationAngle, req.isMirrored, false, false);
+            transformedBoundary = geometry::transformPolygon(offsetPath, m_grainline + req.rotationAngle, req.isMirrored, false, false);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 for (const auto& p : transformedBoundary) {
@@ -81,7 +82,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
                 }
             }
 
-            pattern::Point64 referencePoint = geometry::calculations::getTopLeftCorner(transformedBoundary);
+            geometry::Point64 referencePoint = geometry::preparation::getTopLeftCorner(transformedBoundary);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 SPDLOG_INFO(std::format("reference point {}", referencePoint.toString()));
@@ -89,7 +90,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
 
             // Rotate shape by 90 degrees ccw to match the algorithm logic
             const int CCW_90 = 270;
-            transformedBoundary = geometry::calculations::transformPolygon(transformedBoundary, CCW_90, false, true);
+            transformedBoundary = geometry::transformPolygon(transformedBoundary, CCW_90, false, true);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 for (const auto& p : transformedBoundary) {
@@ -105,7 +106,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
 }
 
 PatternPiece::PatternPiece(int64_t pieceId, 
-        std::vector<pattern::Point64> originalPoints, 
+        std::vector<geometry::Point64> originalPoints, 
         const std::vector<VariantConstraint>& constraints,
         int64_t seamAllowance, int64_t cuttingAllowance, 
         int grainline, bool toBeScaled)
@@ -123,7 +124,7 @@ std::string PatternPiece::toString() const
     std::string boundaryStr = std::accumulate(
         std::next(m_originalPolygon.begin()), m_originalPolygon.end(),
         m_originalPolygon.front().toString(),
-        [](std::string const& a, pattern::Point64 b) {
+        [](std::string const& a, geometry::Point64 b) {
             return a + ", " + b.toString();
         }
     );

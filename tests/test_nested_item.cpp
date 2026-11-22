@@ -2,10 +2,10 @@
 
 #include "pattern/nested_item.hpp"
 #include "pattern/shapes.hpp"
-#include "pattern/geometry_types.hpp"
+#include "common/geometry_types.hpp"
 
 TEST_CASE("NestedItem accessing path and bounding box", "[path][rect]") {
-    std::vector<pmg::pattern::Point64> testBoundaryPts = {
+    std::vector<pmg::geometry::Point64> testBoundaryPts = {
         {15000,     0}, 
         {65000,  5000}, 
         {65000, 30000}, 

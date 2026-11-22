@@ -2,7 +2,7 @@
 
 #include "nesting/bottom_left.hpp"
 #include "pattern/shapes.hpp"
-#include "geometry/nfp_ifp_calculations.hpp"
+#include "geometry_calculations/nfp_ifp_calculations.hpp"
 #include "pattern/nfp_key.hpp"
 
 TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
@@ -19,7 +19,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
     };
 
     SECTION("Regular fabric") {
-        std::vector<pmg::pattern::Point64> fabricPts = {
+        std::vector<pmg::geometry::Point64> fabricPts = {
             {    0,     0},
             {20000,     0},
             {20000, 20000},
@@ -39,7 +39,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
         }
 
         SECTION("One piece to place") {
-            std::vector<pmg::pattern::Point64> variantPts = {
+            std::vector<pmg::geometry::Point64> variantPts = {
                 {2500,    0},
                 {5000,    0},
                 {5000, 5000},
@@ -67,19 +67,19 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
 
         SECTION("Multiple pieces to place") {
             SECTION("Rectangle shapes") {
-                std::vector<pmg::pattern::Point64> rectanglePts = {
+                std::vector<pmg::geometry::Point64> rectanglePts = {
                     {   0,    0},  
                     {4000,    0},  
                     {4000, 2000}, 
                     {   0, 2000}  
                 };
-                std::vector<pmg::pattern::Point64> tallRectPts = {
+                std::vector<pmg::geometry::Point64> tallRectPts = {
                     {   0,     0},  
                     {2000,     0},  
                     {2000, 18000}, 
                     {   0, 18000}  
                 };
-                std::vector<pmg::pattern::Point64> smallRectPts = {
+                std::vector<pmg::geometry::Point64> smallRectPts = {
                     {   0,    0},  
                     {2000,    0},  
                     {2000, 1000}, 
@@ -124,12 +124,12 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
             }
 
             SECTION("Irregular shapes") {
-                std::vector<pmg::pattern::Point64> firstTrainglePts = {
+                std::vector<pmg::geometry::Point64> firstTrainglePts = {
                     {    0,    0},  
                     {10000,    0},  
                     {    0, 5000}
                 };
-                std::vector<pmg::pattern::Point64> secondTrainglePts = {
+                std::vector<pmg::geometry::Point64> secondTrainglePts = {
                     {10000,    0},  
                     {10000, 5000},  
                     {    0, 5000}
@@ -165,7 +165,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
             }
 
             SECTION("Hole filling") {
-                std::vector<pmg::pattern::Point64> invVShape = {
+                std::vector<pmg::geometry::Point64> invVShape = {
                     {    0,    0},  
                     { 4000,    0},  
                     { 4000, 6000},
@@ -175,7 +175,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                     { 2000, 2000},
                     {    0, 2000}
                 };
-                std::vector<pmg::pattern::Point64> rectShape = {
+                std::vector<pmg::geometry::Point64> rectShape = {
                     {   0,    0},  
                     {2000,    0},  
                     {2000, 1000}, 
@@ -218,13 +218,13 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
         }
 
         SECTION("Impossible to find placement") {
-            std::vector<pmg::pattern::Point64> squarePts = {
+            std::vector<pmg::geometry::Point64> squarePts = {
                 {   0,      0},  
                 { 9000,     0},  
                 { 9000,  9000}, 
                 {    0,  9000}  
             };
-            std::vector<pmg::pattern::Point64> rectanglePts = {
+            std::vector<pmg::geometry::Point64> rectanglePts = {
                 {   0,      0},  
                 {15000,     0},  
                 {15000,  9000}, 

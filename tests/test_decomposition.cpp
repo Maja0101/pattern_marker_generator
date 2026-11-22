@@ -1,26 +1,26 @@
 #include <catch2/catch_amalgamated.hpp>
 
-#include "pattern/geometry_types.hpp"
-#include "geometry/decomposition_calculations.hpp"
+#include "common/geometry_types.hpp"
+#include "geometry_preparation/decomposition.hpp"
 
 TEST_CASE("Decomposing shapes", "[HertelMehlhorn]") {
     SECTION("Convex shape") {
-        std::vector<pmg::pattern::Point64> polygon = {
+        std::vector<pmg::geometry::Point64> polygon = {
                 {   0,    0},  
                 {4200,    0},  
                 {4200, 1700}, 
                 {   0, 1700}  
         };
 
-        auto result = pmg::geometry::calculations::hertelMehlhornAlgorithm(polygon);
+        auto result = pmg::geometry::preparation::hertelMehlhornAlgorithm(polygon);
 
-        std::vector<std::vector<pmg::pattern::Point64>> expected = { polygon };
+        std::vector<std::vector<pmg::geometry::Point64>> expected = { polygon };
 
         REQUIRE(result == expected);
     }
 
     SECTION("Simple concave shape") {
-        std::vector<pmg::pattern::Point64> polygon = {
+        std::vector<pmg::geometry::Point64> polygon = {
                 {   0,    0},  
                 {4000,    0},  
                 {4000, 4000}, 
@@ -28,9 +28,9 @@ TEST_CASE("Decomposing shapes", "[HertelMehlhorn]") {
                 {   0, 4000}, 
         };
 
-        auto result = pmg::geometry::calculations::hertelMehlhornAlgorithm(polygon);
+        auto result = pmg::geometry::preparation::hertelMehlhornAlgorithm(polygon);
 
-        std::vector<std::vector<pmg::pattern::Point64>> expected = { 
+        std::vector<std::vector<pmg::geometry::Point64>> expected = { 
             {
                 {   0, 4000},  
                 {   0,    0},  
@@ -48,7 +48,7 @@ TEST_CASE("Decomposing shapes", "[HertelMehlhorn]") {
     }
 
     SECTION("Concave shape") {
-        std::vector<pmg::pattern::Point64> polygon = {
+        std::vector<pmg::geometry::Point64> polygon = {
                 {2000,    0},  
                 {4000,    0},  
                 {4000, 4000}, 
@@ -57,9 +57,9 @@ TEST_CASE("Decomposing shapes", "[HertelMehlhorn]") {
                 {2000, 2000}
         };
 
-        auto result = pmg::geometry::calculations::hertelMehlhornAlgorithm(polygon);
+        auto result = pmg::geometry::preparation::hertelMehlhornAlgorithm(polygon);
 
-        std::vector<std::vector<pmg::pattern::Point64>> expected = { 
+        std::vector<std::vector<pmg::geometry::Point64>> expected = { 
             {
                 {2000,    0},  
                 {4000,    0},  

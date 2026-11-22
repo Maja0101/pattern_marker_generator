@@ -2,7 +2,9 @@
 add_subdirectory(utils)
 add_subdirectory(nesting)
 add_subdirectory(pattern)
-add_subdirectory(geometry)
+add_subdirectory(geometry_calculations)
+add_subdirectory(geometry_preparation)
+add_subdirectory(common)
 
 add_library(facade STATIC
 	api/nesting_api.cpp 
@@ -14,7 +16,9 @@ target_link_libraries(facade PUBLIC
 	utils
 	nesting
 	pattern
-	geometry
+	calculations
+    preparation
+    common
 )
 
 target_include_directories(facade PUBLIC

@@ -6,7 +6,7 @@
 namespace pmg::pattern {
 
 NestedItem::NestedItem(PieceVariant* variant) noexcept
-    : m_position(Point64()), m_variantRef(variant) {}
+    : m_position(geometry::Point64()), m_variantRef(variant) {}
 
 Clipper2Lib::Path64 NestedItem::getItemPathAtPosition(int64_t x, int64_t y) const
 {
@@ -55,11 +55,11 @@ bool NestedItem::flip180()
     return false;
 }
 
-Point64 NestedItem::getPositionForItemWithoutAllowances() const
+geometry::Point64 NestedItem::getPositionForItemWithoutAllowances() const
 {
     if (!isLocked()) return {};
 
-    return Point64{
+    return geometry::Point64{
         m_position.x + m_variantRef->getAllowancesDistance(),
         m_position.y + m_variantRef->getAllowancesDistance()
     };

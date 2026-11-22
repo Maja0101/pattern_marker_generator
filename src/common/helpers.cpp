@@ -1,16 +1,32 @@
-#include <algorithm>
-#include <cmath>
-#include <cstdint>
-#include <vector>
-#include <limits>
-#include <numbers>
+#include "common/helpers.hpp"
 
-#include <spdlog/spdlog.h>
+namespace pmg::geometry {
 
-#include "geometry/transformations.hpp"
-#include "utils/config.hpp"
+int64_t crossProduct(const Point64 &a, const Point64 &b, const Point64 &c)
+{
+    return ((b.x - a.x) * (c.y - b.y)) - ((b.y - a.y) * (c.x - b.x));
+}
 
-namespace pmg::geometry::calculations {
+Clipper2Lib::Path64 toClipperPath(const std::vector<Point64> &polygon)
+{
+    Clipper2Lib::Path64 path;
+    path.reserve(polygon.size());
+    for (const auto& point : polygon) {
+        path.emplace_back(point.x, point.y);
+    }
+    return path;
+}
+
+std::vector<Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
+{
+    std::vector<Point64> polygon;
+    polygon.reserve(path.size());
+    for (const auto& point : path) {
+        polygon.push_back({point.x, point.y});
+    }
+    return polygon;
+}
+
 inline const int DEGREES_0 = 0;
 inline const int DEGREES_90 = 90;
 inline const int DEGREES_180 = 180;
@@ -19,22 +35,7 @@ inline const int DEGREES_360 = 360;
     
 constexpr double DEG_TO_RAD = std::numbers::pi / 180.0;
 
-pattern::Point64 getTopLeftCorner(const std::vector<pattern::Point64> &polygon) noexcept
-{
-    if (polygon.empty()) return {};
-
-    int64_t minX = std::numeric_limits<int64_t>::max();
-    int64_t maxY = std::numeric_limits<int64_t>::min();
-
-    for (const auto& point : polygon) {
-        minX = std::min(point.x, minX);
-        maxY = std::max(point.y, maxY);
-    }
-
-    return pattern::Point64{minX, maxY};
-}
-
-std::vector<pattern::Point64> transformPolygon(const std::vector<pattern::Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored, bool mirroringInFlippedXAxis) noexcept
+std::vector<Point64> transformPolygon(const std::vector<Point64> &polygon, int rotationAngle, bool isMirrored, bool toBeAnchored, bool mirroringInFlippedXAxis) noexcept
 {
     if (polygon.empty()) return {};
 
@@ -44,7 +45,7 @@ std::vector<pattern::Point64> transformPolygon(const std::vector<pattern::Point6
 
     // allocate the transformed polygon
     const size_t SIZE = polygon.size();
-    std::vector<pattern::Point64> transformed(SIZE);
+    std::vector<Point64> transformed(SIZE);
 
     // set minX, minY values 
     // in order to anchor the transformed points back 
@@ -106,15 +107,7 @@ std::vector<pattern::Point64> transformPolygon(const std::vector<pattern::Point6
     }
 
     if (toBeAnchored) {
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("minX {}, minY {}", minX, minY));
-        }
-
         for (size_t i = 0; i < SIZE; ++i) {
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("curr x {}, y {}", transformed[i].x, transformed[i].y));
-                SPDLOG_INFO(std::format("anchored x {}, y {}", transformed[i].x - minX, transformed[i].y - minY));
-            }
             transformed[i].x -= minX;
             transformed[i].y -= minY;
         }
@@ -127,31 +120,4 @@ std::vector<pattern::Point64> transformPolygon(const std::vector<pattern::Point6
     return transformed;
 }
 
-std::vector<pattern::Point64> rotateBy180(const std::vector<pattern::Point64> &polygon) noexcept
-{
-    return transformPolygon(polygon, DEGREES_180, false);
-}
-
-std::vector<Clipper2Lib::Path64> rotatePathsBy180(const std::vector<Clipper2Lib::Path64> &paths, int64_t offsetX, int64_t offsetY) noexcept
-{
-    std::vector<Clipper2Lib::Path64> rotated;
-    rotated.reserve(paths.size());
-
-    for (const auto& path : paths) {
-        Clipper2Lib::Path64 rotatedPath;
-        rotatedPath.reserve(path.size());
-
-        for (const auto& point : path) {
-            rotatedPath.emplace_back(
-                (-point.x + offsetX),
-                (-point.y + offsetY)
-            );
-        }
-
-        rotated.push_back(rotatedPath);
-    }
-
-    return rotated;
-}
-
-} // namespace pmg::geometry::calculations
+} // namespace pmg::geometry

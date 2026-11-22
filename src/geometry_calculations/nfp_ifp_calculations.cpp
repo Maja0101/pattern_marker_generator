@@ -1,9 +1,10 @@
 #include <spdlog/spdlog.h>
 
-#include "geometry/nfp_ifp_calculations.hpp"
-#include "geometry/ifp_pocket_calculations.hpp"
-#include "geometry/calculations.hpp"
+#include "geometry_calculations/nfp_ifp_calculations.hpp"
+#include "geometry_calculations/ifp_pocket_calculations.hpp"
+#include "geometry_calculations/calculations.hpp"
 #include "utils/config.hpp"
+#include "common/helpers.hpp"
 
 namespace pmg::geometry::calculations::utils {
 
@@ -193,8 +194,8 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
 
     // Detailed calculation for irregular fabric
     
-    std::vector<pattern::Point64> fabricHull = utils::calculateConvexHull(fabric.getBoundary());
-    std::vector<pattern::Point64> variantHull = utils::calculateConvexHull(variant.getBoundaryForVariant(isFlipped));
+    std::vector<Point64> fabricHull = utils::calculateConvexHull(fabric.getBoundary());
+    std::vector<Point64> variantHull = utils::calculateConvexHull(variant.getBoundaryForVariant(isFlipped));
     
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : fabricHull) {

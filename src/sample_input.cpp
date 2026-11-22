@@ -1,7 +1,7 @@
 #include <spdlog/spdlog.h>
 
 #include "sample_input.hpp"
-#include "pattern/geometry_types.hpp"
+#include "common/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 
 namespace pmg::samples {
@@ -15,7 +15,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
     std::vector<pattern::PatternPiece> patternPieces;
     patternPieces.reserve(8);
 
-    std::vector<pattern::Point64> shape1 = {
+    std::vector<geometry::Point64> shape1 = {
         {285, 202},
         {297, 14},
         {467, 13},
@@ -28,7 +28,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
     patternPieces.emplace_back(1, shape1, constraints1, sa, ca, 0, true);
 
-    std::vector<pattern::Point64> shape2 = {
+    std::vector<geometry::Point64> shape2 = {
         {158, 497},
         {175, 337},
         {229, 309},
@@ -50,7 +50,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
     patternPieces.emplace_back(2, shape2, constraints2, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape3 = {
+    std::vector<geometry::Point64> shape3 = {
         {152, 499},
         {115, 476},
         {58, 452},
@@ -67,7 +67,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
     patternPieces.emplace_back(3, shape3, constraints3, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape4 = {
+    std::vector<geometry::Point64> shape4 = {
         {614, 508},
         {591, 506},
         {556, 497},
@@ -93,7 +93,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
     patternPieces.emplace_back(4, shape4, constraints4, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape5 = {
+    std::vector<geometry::Point64> shape5 = {
         {610, 513},
         {611, 458},
         {622, 337},
@@ -110,7 +110,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
     patternPieces.emplace_back(5, shape5, constraints5, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape6 = {
+    std::vector<geometry::Point64> shape6 = {
         {397, 453},
         {382, 451},
         {367, 436},
@@ -131,7 +131,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
     patternPieces.emplace_back(6, shape6, constraints6, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape7 = {
+    std::vector<geometry::Point64> shape7 = {
         {439, 436},
         {433, 434},
         {435, 310},
@@ -152,7 +152,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck()
 
     patternPieces.emplace_back(7, shape7, constraints7, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape8 = {
+    std::vector<geometry::Point64> shape8 = {
         {347, 435},
         {317, 423},
         {295, 423},
@@ -185,7 +185,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck2()
     std::vector<pattern::PatternPiece> patternPieces;
     patternPieces.reserve(6);
 
-    std::vector<pattern::Point64> shape7 = {
+    std::vector<geometry::Point64> shape7 = {
         {109, 321},
         {34, 312},
         {30, 10},
@@ -206,7 +206,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck2()
 
     patternPieces.emplace_back(7, shape7, constraints7, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape8 = {
+    std::vector<geometry::Point64> shape8 = {
         {370, 473},
         {384, 436},
         {386, 399},
@@ -233,7 +233,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck2()
 
     patternPieces.emplace_back(8, shape8, constraints8, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape9 = {
+    std::vector<geometry::Point64> shape9 = {
         {235, 479},
         {173, 502},
         {165, 492},
@@ -258,7 +258,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck2()
 
     patternPieces.emplace_back(9, shape9, constraints9, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape10 = {
+    std::vector<geometry::Point64> shape10 = {
         {499, 329},
         {445, 308},
         {457, 254},
@@ -280,7 +280,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck2()
 
     patternPieces.emplace_back(10, shape10, constraints10, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape11 = {
+    std::vector<geometry::Point64> shape11 = {
         {165, 321},
         {180, 262},
         {188, 194},
@@ -304,7 +304,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck2()
 
     patternPieces.emplace_back(11, shape11, constraints11, sa, ca, g, true);
 
-    std::vector<pattern::Point64> shape12 = {
+    std::vector<geometry::Point64> shape12 = {
         {358, 325},
         {335, 312},
         {314, 304},
@@ -338,7 +338,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
     int ca = 5;
     int g = 0;
 
-    std::vector<pattern::Point64> shape34 = {
+    std::vector<geometry::Point64> shape34 = {
         {1130, 655},
         {1157, 537},
         {1218, 434},
@@ -359,7 +359,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 5, .isMirrored = true, .requiredQuantity = 1, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape35 = {
+    std::vector<geometry::Point64> shape35 = {
         {1221, 1334},
         {1193, 1319},
         {1138, 1262},
@@ -382,7 +382,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape36 = {
+    std::vector<geometry::Point64> shape36 = {
         {872, 656},
         {885, 597},
         {883, 538},
@@ -404,7 +404,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 1, .isMirrored = true, .requiredQuantity = 1, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape37 = {
+    std::vector<geometry::Point64> shape37 = {
         {293, 749},
         {255, 752},
         {244, 711},
@@ -424,7 +424,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 6, .isMirrored = false, .requiredQuantity = 1, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape38 = {
+    std::vector<geometry::Point64> shape38 = {
         {122, 1411},
         {108, 1375},
         {69, 1342},
@@ -444,7 +444,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape39 = {
+    std::vector<geometry::Point64> shape39 = {
         {454, 1059},
         {305, 1026},
         {328, 882},
@@ -459,7 +459,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 8, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape40 = {
+    std::vector<geometry::Point64> shape40 = {
         {1409, 1226},
         {1417, 610},
         {1443, 50},
@@ -478,7 +478,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 2, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape41 = {
+    std::vector<geometry::Point64> shape41 = {
         {223, 1501},
         {232, 1349},
         {779, 1377},
@@ -497,7 +497,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 270+4, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape42 = {
+    std::vector<geometry::Point64> shape42 = {
         {495, 712},
         {447, 712},
         {425, 725},
@@ -517,7 +517,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 3, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape43 = {
+    std::vector<geometry::Point64> shape43 = {
         {897, 1203},
         {880, 1163},
         {848, 1147},
@@ -537,7 +537,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 6, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape44 = {
+    std::vector<geometry::Point64> shape44 = {
         {254, 1119},
         {254, 1086},
         {304, 1062},
@@ -554,7 +554,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 360-5, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape45 = {
+    std::vector<geometry::Point64> shape45 = {
         {547, 1171},
         {477, 1159},
         {476, 1008},
@@ -571,7 +571,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 2, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape46 = {
+    std::vector<geometry::Point64> shape46 = {
         {811, 1199},
         {674, 1193},
         {677, 913},
@@ -587,7 +587,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 2, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape47 = {
+    std::vector<geometry::Point64> shape47 = {
         {1036, 1366},
         {966, 1337},
         {979, 1277},
@@ -605,7 +605,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 1, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape48 = {
+    std::vector<geometry::Point64> shape48 = {
         {276, 811},
         {286, 776},
         {475, 785},
@@ -620,7 +620,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 180+17, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
     };
 
-    std::vector<pattern::Point64> shape49 = {
+    std::vector<geometry::Point64> shape49 = {
         {445, 1231},
         {430, 1211},
         {402, 1199},
@@ -637,7 +637,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape50 = {
+    std::vector<geometry::Point64> shape50 = {
         {898, 1380},
         {650, 1341},
         {536, 1339},
@@ -656,7 +656,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 90+4, .isMirrored = true, .requiredQuantity = 1, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape51 = {
+    std::vector<geometry::Point64> shape51 = {
         {77, 826},
         {67, 789},
         {133, 770},
@@ -673,7 +673,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 6, .isMirrored = true, .requiredQuantity = 2, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape52 = {
+    std::vector<geometry::Point64> shape52 = {
         {206, 1180},
         {206, 1138},
         {353, 1143},
@@ -686,7 +686,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 1, .isMirrored = true, .requiredQuantity = 0, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape53 = {
+    std::vector<geometry::Point64> shape53 = {
         {246, 839},
         {237, 858},
         {151, 865},
@@ -701,7 +701,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 180, .isMirrored = true, .requiredQuantity = 2, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape54 = {
+    std::vector<geometry::Point64> shape54 = {
         {284, 1039},
         {297, 875},
         {246, 871},
@@ -714,7 +714,7 @@ std::vector<pattern::PatternPiece> getTestPieces()
         { .rotationAngle = 5, .isMirrored = true, .requiredQuantity = 0, .twoWay = true }
     };
 
-    std::vector<pattern::Point64> shape55 = {
+    std::vector<geometry::Point64> shape55 = {
         {218, 1081},
         {181, 1095},
         {168, 1017},

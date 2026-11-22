@@ -11,6 +11,6 @@ target_include_directories(nesting PUBLIC
 
 target_link_libraries(nesting PUBLIC 
     pattern 
-    geometry
+    calculations
     utils
 )

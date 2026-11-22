@@ -2,12 +2,12 @@
 #include <clipper2/clipper.h>
 
 #include "pattern/shapes.hpp"
-#include "geometry/calculations.hpp"
+#include "geometry_calculations/calculations.hpp"
 #include "pattern/nesting_result.hpp"
 
 TEST_CASE("Calculating score for nesting result", "[evaluation]") {
     SECTION("Regular fabric") {
-        std::vector<pmg::pattern::Point64> fabricPts = {
+        std::vector<pmg::geometry::Point64> fabricPts = {
             {      0,      0},  
             {1000000,      0},  
             {1000000, 500000}, 
@@ -266,7 +266,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
     }
 
     SECTION("Irregular fabric") {
-        std::vector<pmg::pattern::Point64> fabricPts = {
+        std::vector<pmg::geometry::Point64> fabricPts = {
             {      0,      0},  
             { 400000,      0},  
             {1000000, 300000}, 

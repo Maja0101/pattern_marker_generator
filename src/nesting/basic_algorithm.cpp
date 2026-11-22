@@ -5,8 +5,8 @@
 #include "utils/config.hpp"
 #include "utils/timer.hpp"
 #include "pattern/svg_exporter.hpp"
-#include "geometry/nfp_ifp_calculations.hpp"
-#include "geometry/calculations.hpp"
+#include "geometry_calculations/nfp_ifp_calculations.hpp"
+#include "geometry_calculations/calculations.hpp"
 #include "nesting/basic_algorithm.hpp"
 
 namespace pmg::nesting {

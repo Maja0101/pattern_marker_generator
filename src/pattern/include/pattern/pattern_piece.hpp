@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "pattern/geometry_types.hpp"
+#include "common/geometry_types.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/variant_constraint.hpp"
 
@@ -12,7 +12,7 @@ namespace pmg::pattern {
 class PatternPiece {
 private:
     int64_t m_id;
-    std::vector<pattern::Point64> m_originalPolygon;
+    std::vector<geometry::Point64> m_originalPolygon;
     std::vector<PieceVariant> m_allowedVariants;
     int64_t m_seamAllowance;
     int64_t m_cuttingAllowance;
@@ -21,7 +21,7 @@ private:
     void initializePatternPieceGeometry(const std::vector<VariantConstraint>& constraints, bool toBeScaled);
 public:
     PatternPiece(int64_t pieceId, 
-                std::vector<pattern::Point64> originalPoints, 
+                std::vector<geometry::Point64> originalPoints, 
                 const std::vector<VariantConstraint>& constraints,
                 int64_t seamAllowance = 0, int64_t cuttingAllowance = 0,
                 int grainline = 0, bool toBeScaled = false);

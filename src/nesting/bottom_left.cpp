@@ -4,8 +4,8 @@
 #include <spdlog/spdlog.h>
 
 #include "utils/config.hpp"
-#include "geometry/calculations.hpp"
-#include "geometry/transformations.hpp"
+#include "geometry_calculations/calculations.hpp"
+#include "geometry_preparation/transformations.hpp"
 #include "nesting/bottom_left.hpp"
 
 namespace pmg::nesting {
@@ -247,16 +247,16 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
         minLen = std::max(item.getItemBoundingBoxAtPosition().right, minLen);
 
         
-        pattern::Point64 rawPosition = item.getPosition();
+        geometry::Point64 rawPosition = item.getPosition();
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Raw position point {} for {} {}", rawPosition.toString(), item.getVariant()->getPieceId(), item.getVariant()->getIsMirrored()));
         }
 
-        pattern::Point64 refPoint = item.getVariant()->getReferencePoint();
-        pattern::Point64 fabricRefPoint = m_fabric.getReferencePoint();
+        geometry::Point64 refPoint = item.getVariant()->getReferencePoint();
+        geometry::Point64 fabricRefPoint = m_fabric.getReferencePoint();
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
-            pattern::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
+            geometry::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
             SPDLOG_INFO(std::format("Without allowances position point {}", positionWithoutAllowances.toString()));
             SPDLOG_INFO(std::format("Fabric reference point {}", fabricRefPoint.toString()));
             SPDLOG_INFO(std::format("Item reference point {}", refPoint.toString()));
@@ -270,7 +270,7 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
             );
         }
 
-        pattern::Point64 deltaPosition{
+        geometry::Point64 deltaPosition{
             (fabricRefPoint.x + rawPosition.y) - refPoint.x, 
             (fabricRefPoint.y - rawPosition.x) - refPoint.y
         };
@@ -279,9 +279,7 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
             SPDLOG_INFO(std::format("Delta point {}", deltaPosition.toString()));
         }
 
-        const int GRAINLINE_CCW = 360 - m_fabric.getGrainline();
-
-        deltaPosition = geometry::calculations::transformPolygon({ deltaPosition }, GRAINLINE_CCW, false, false)[0];
+        deltaPosition = geometry::calculations::rotatePointCcwBy(deltaPosition, m_fabric.getGrainline());
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Delta point after grainline rotation {}", deltaPosition.toString()));

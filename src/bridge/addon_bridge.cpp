@@ -5,12 +5,11 @@
 #include <algorithm>
 
 #include "api/nesting_api.hpp"
-#include "pattern/geometry_types.hpp"
+#include "common/geometry_types.hpp"
 #include "pattern/nesting_result.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/variant_constraint.hpp"
-#include "utils/logger_setup.hpp"
 
 namespace pmg::api {
 
@@ -36,14 +35,14 @@ Napi::Array requireArray(const Napi::Object& obj, const char* key) {
     return v.As<Napi::Array>();
 }
 
-std::vector<pattern::Point64> parsePoints(const Napi::Array& arr) {
-    std::vector<pattern::Point64> result;
+std::vector<geometry::Point64> parsePoints(const Napi::Array& arr) {
+    std::vector<geometry::Point64> result;
     result.reserve(arr.Length());
     for (uint32_t i = 0; i < arr.Length(); ++i) {
         Napi::Value item = arr.Get(i);
         if (!item.IsObject()) throw std::invalid_argument("point must be an object {x, y}");
         Napi::Object o = item.As<Napi::Object>();
-        result.push_back(pattern::Point64{getInt(o, "x", 0), getInt(o, "y", 0)});
+        result.push_back(geometry::Point64{getInt(o, "x", 0), getInt(o, "y", 0)});
     }
     return result;
 }
@@ -66,7 +65,7 @@ std::vector<pattern::VariantConstraint> parseConstraints(const Napi::Array& arr)
 }
 
 pattern::PatternPiece parsePiece(const Napi::Object& o) {
-    std::vector<pattern::Point64> points = parsePoints(requireArray(o, "points"));
+    std::vector<geometry::Point64> points = parsePoints(requireArray(o, "points"));
     std::vector<pattern::VariantConstraint> constraints;
     if (o.Has("constraints")) constraints = parseConstraints(requireArray(o, "constraints"));
     return pattern::PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
@@ -272,7 +271,6 @@ Napi::Value CalcMinimumSync(const Napi::CallbackInfo& info) {
 } // namespace pmg::api
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    try { pmg::logging::initialize(); } catch (const std::exception&) {}
     exports.Set("execute", Napi::Function::New(env, pmg::api::Execute, "execute"));
     exports.Set("executeSync", Napi::Function::New(env, pmg::api::ExecuteSync, "executeSync"));
     exports.Set("calcMinimum", Napi::Function::New(env, pmg::api::CalcMinimum, "calcMinimum"));

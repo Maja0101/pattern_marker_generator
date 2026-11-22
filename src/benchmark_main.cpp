@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "utils/timer.hpp"
-#include "pattern/geometry_types.hpp"
+#include "common/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/nested_item.hpp"
@@ -54,7 +54,7 @@ BenchmarkResult runBenchmark(
     std::string_view engineName,
     nesting::AlgorithmBase& engine,
     std::span<int64_t> ids,
-    std::span<std::vector<pattern::Point64>> shapes,
+    std::span<std::vector<geometry::Point64>> shapes,
     std::span<std::vector<pattern::VariantConstraint>> constraints,
     std::size_t twoWayCount,
     int seamAllowance, 
@@ -133,7 +133,7 @@ std::vector<int64_t> getBenchIds() {
     };
 }
 
-std::vector<std::vector<pattern::Point64>> getBenchShapes() {
+std::vector<std::vector<geometry::Point64>> getBenchShapes() {
     return {
         {
             {1221, 1334},
@@ -498,16 +498,16 @@ int main() {
 
     // Prepare input data
     std::vector<int64_t> ids = pmg::bench::getBenchIds();
-    std::vector<std::vector<pmg::pattern::Point64>> shapes = pmg::bench::getBenchShapes();
+    std::vector<std::vector<pmg::geometry::Point64>> shapes = pmg::bench::getBenchShapes();
     std::vector<std::vector<pmg::pattern::VariantConstraint>> constraints = pmg::bench::getBenchConstraints();
 
     std::span<int64_t> fullIds{ids};
-    std::span<std::vector<pmg::pattern::Point64>> fullShapes{shapes};
+    std::span<std::vector<pmg::geometry::Point64>> fullShapes{shapes};
     std::span<std::vector<pmg::pattern::VariantConstraint>> fullConstraints{constraints};
 
     constexpr int64_t width = 1500;
     constexpr int64_t height = 4500;
-    const std::vector<pmg::pattern::Point64> boundary = {
+    const std::vector<pmg::geometry::Point64> boundary = {
         {1005, 4575}, 
         { 586, 4184}, 
         { 166, 4294}, 

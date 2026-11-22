@@ -5,23 +5,24 @@
 
 #include <spdlog/spdlog.h>
 
-#include "geometry/decomposition_calculations.hpp"
-#include "geometry/calculations.hpp"
+#include "geometry_preparation/decomposition.hpp"
+#include "common/helpers.hpp"
+#include "common/geometry_types.hpp"
 #include "utils/config.hpp"
 
 namespace mapbox::util {
     template <>
-    struct nth<0, pmg::pattern::Point64> {
-        static auto get(const pmg::pattern::Point64& p) { return p.x; }
+    struct nth<0, pmg::geometry::Point64> {
+        static auto get(const pmg::geometry::Point64& p) { return p.x; }
     };
     
     template <>
-    struct nth<1, pmg::pattern::Point64> {
-        static auto get(const pmg::pattern::Point64& p) { return p.y; }
+    struct nth<1, pmg::geometry::Point64> {
+        static auto get(const pmg::geometry::Point64& p) { return p.y; }
     };
 } // namespace mapbox::util
 
-namespace pmg::geometry::calculations::utils {
+namespace pmg::geometry::preparation::utils {
 
 struct Edge {
     int u;
@@ -41,16 +42,16 @@ struct HalfEdge {
     bool active = true;
 };
 
-bool isConvex(const pattern::Point64 &a, const pattern::Point64 &b, const pattern::Point64 &c)
+bool isConvex(const Point64 &a, const Point64 &b, const Point64 &c)
 {
     return crossProduct(a, b, c) >= 0;
 }
 
-} // namespace pmg::geometry::calculations::utils
+} // namespace pmg::geometry::preparation::utils
 
 template<>
-struct std::hash<pmg::geometry::calculations::utils::Edge> {
-    std::size_t operator()(const pmg::geometry::calculations::utils::Edge& e) const noexcept {
+struct std::hash<pmg::geometry::preparation::utils::Edge> {
+    std::size_t operator()(const pmg::geometry::preparation::utils::Edge& e) const noexcept {
       const std::uint64_t IDX_COMBINED = 
             (static_cast<std::uint64_t>(static_cast<std::uint32_t>(e.u)) << 32) |
             static_cast<std::uint32_t>(e.v);
@@ -59,20 +60,20 @@ struct std::hash<pmg::geometry::calculations::utils::Edge> {
     }
 };
 
-namespace pmg::geometry::calculations {
+namespace pmg::geometry::preparation {
 
-bool checkConvexity(const std::vector<pattern::Point64> &polygon)
+bool checkConvexity(const std::vector<Point64> &polygon)
 {
     const size_t N = polygon.size();
     if (N < 3) return false;
     if (N == 3) return true;
 
     for (size_t i = 0; i < N; ++i) {
-        const pattern::Point64& p1 = polygon[i];
-        const pattern::Point64& p2 = polygon[(i + 1) % N];
-        const pattern::Point64& p3 = polygon[(i + 2) % N];
+        const Point64& p1 = polygon[i];
+        const Point64& p2 = polygon[(i + 1) % N];
+        const Point64& p3 = polygon[(i + 2) % N];
 
-        if (!geometry::calculations::utils::isConvex(p1, p2, p3)) {
+        if (!utils::isConvex(p1, p2, p3)) {
             return false;
         }
     }
@@ -80,7 +81,7 @@ bool checkConvexity(const std::vector<pattern::Point64> &polygon)
     return true;
 }
 
-std::vector<std::vector<pattern::Point64>> hertelMehlhornAlgorithm(const std::vector<pattern::Point64> &polygon)
+std::vector<std::vector<Point64>> hertelMehlhornAlgorithm(const std::vector<Point64> &polygon)
 {
     const size_t N = polygon.size();
     if (N < 3) return {};
@@ -88,7 +89,7 @@ std::vector<std::vector<pattern::Point64>> hertelMehlhornAlgorithm(const std::ve
     if (checkConvexity(polygon)) return { polygon };
 
     // Triangulate the polygon
-    std::vector<std::vector<pattern::Point64>> input = { polygon };
+    std::vector<std::vector<Point64>> input = { polygon };
     std::vector<uint32_t> indexes = mapbox::earcut<uint32_t>(input);
     const size_t TRIANGLES_COUNT = indexes.size() / 3;
 
@@ -113,7 +114,7 @@ std::vector<std::vector<pattern::Point64>> hertelMehlhornAlgorithm(const std::ve
         auto idx2 = static_cast<int>(indexes[(t * 3) + 2]);
 
         // Make sure the vertixes are counterclockwise
-        if (utils::crossProduct(polygon[idx0], polygon[idx1], polygon[idx2]) < 0) {
+        if (crossProduct(polygon[idx0], polygon[idx1], polygon[idx2]) < 0) {
             std::swap(idx1, idx2);
         }
 
@@ -197,13 +198,13 @@ std::vector<std::vector<pattern::Point64>> hertelMehlhornAlgorithm(const std::ve
     }
 
     // Construct the decomposed polygon
-    std::vector<std::vector<pattern::Point64>> result;
+    std::vector<std::vector<Point64>> result;
     std::vector<bool> visited(halfEdges.size(), false);
 
     for (size_t i = 0; i < halfEdges.size(); ++i) {
         if (!halfEdges[i].active || visited[i]) continue;
 
-        std::vector<pattern::Point64> poly;
+        std::vector<Point64> poly;
         auto currEdgeIdx = static_cast<int>(i);
 
         while (!visited[currEdgeIdx]) {
@@ -231,4 +232,4 @@ std::vector<std::vector<pattern::Point64>> hertelMehlhornAlgorithm(const std::ve
     return result;
 }
 
-} // namespace pmg::geometry::calculations
+} // namespace pmg::geometry::preparation

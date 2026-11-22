@@ -1,12 +1,13 @@
 #include <catch2/catch_amalgamated.hpp>
 
 #include "pattern/shapes.hpp"
-#include "pattern/geometry_types.hpp"
-#include "geometry/calculations.hpp"
+#include "common/geometry_types.hpp"
+#include "common/helpers.hpp"
+#include "geometry_calculations/calculations.hpp"
 
 TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]") {
     SECTION("Concave shape geometry initialization") {
-        std::vector<pmg::pattern::Point64> boundary = {
+        std::vector<pmg::geometry::Point64> boundary = {
             {    0,     0},
             {40000,     0},
             {40000, 10000},
@@ -38,8 +39,8 @@ TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]"
             REQUIRE(testVariant.getGlobalId(true) == 4097);
             REQUIRE(testVariant.getBoundaryForVariant(false) == boundary);
             REQUIRE(testVariant.getBoundaryForVariant(true) == boundary);
-            REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::calculations::toClipperPath(boundary));
-            REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::calculations::toClipperPath(boundary));
+            REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::toClipperPath(boundary));
+            REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::toClipperPath(boundary));
             REQUIRE(testVariant.getDecomposedShape(false) == expectedDecomposedShape);
             REQUIRE(testVariant.getDecomposedShape(true) == expectedDecomposedShape);
         }
@@ -47,7 +48,7 @@ TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]"
         SECTION("Valid geometry initialization with two-way piece") {
             pmg::pattern::PieceVariant testVariant(1, 1, 0, false, 1, true, 0, 0, boundary);
 
-            std::vector<pmg::pattern::Point64> expectedFlippedBoundary = {
+            std::vector<pmg::geometry::Point64> expectedFlippedBoundary = {
                 {40000, 50000},
                 {    0, 50000},
                 {    0, 40000},
@@ -76,15 +77,15 @@ TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]"
             REQUIRE(testVariant.getGlobalId(true) == -9223372036854771711);
             REQUIRE(testVariant.getBoundaryForVariant(false) == boundary);
             REQUIRE(testVariant.getBoundaryForVariant(true) == expectedFlippedBoundary);
-            REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::calculations::toClipperPath(boundary));
-            REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::calculations::toClipperPath(expectedFlippedBoundary));
+            REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::toClipperPath(boundary));
+            REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::toClipperPath(expectedFlippedBoundary));
             REQUIRE(testVariant.getDecomposedShape(false) == expectedDecomposedShape);
             REQUIRE(testVariant.getDecomposedShape(true) == expectedFlippedDecomposedShape);
         }
     }
 
     SECTION("Valid geometry initialization with two-way piece that is symmetrical") {
-        std::vector<pmg::pattern::Point64> boundary = {
+        std::vector<pmg::geometry::Point64> boundary = {
             {    0,     0},
             {40000,     0},
             {40000, 10000},
@@ -98,9 +99,9 @@ TEST_CASE("Geometry initialization with two-way pieces", "[path][rect][two-way]"
         REQUIRE(testVariant.getGlobalId(true) == 4097);
         REQUIRE(testVariant.getBoundaryForVariant(false) == boundary);
         REQUIRE(testVariant.getBoundaryForVariant(true) == boundary);
-        REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::calculations::toClipperPath(boundary));
-        REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::calculations::toClipperPath(boundary));
-        REQUIRE(testVariant.getDecomposedShape(false)[0] == pmg::geometry::calculations::toClipperPath(boundary));
-        REQUIRE(testVariant.getDecomposedShape(true)[0] == pmg::geometry::calculations::toClipperPath(boundary));
+        REQUIRE(testVariant.getPathForVariant(false) == pmg::geometry::toClipperPath(boundary));
+        REQUIRE(testVariant.getPathForVariant(true) == pmg::geometry::toClipperPath(boundary));
+        REQUIRE(testVariant.getDecomposedShape(false)[0] == pmg::geometry::toClipperPath(boundary));
+        REQUIRE(testVariant.getDecomposedShape(true)[0] == pmg::geometry::toClipperPath(boundary));
     }
 }

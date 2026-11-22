@@ -7,7 +7,7 @@
 
 #include "utils/config.hpp"
 #include "pattern/svg_exporter.hpp"
-#include "geometry/options_calculations.hpp"
+#include "geometry_calculations/options_calculations.hpp"
 #include "nesting/advanced_algorithm.hpp"
 
 namespace pmg::nesting {

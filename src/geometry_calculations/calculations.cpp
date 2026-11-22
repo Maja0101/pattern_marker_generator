@@ -7,9 +7,10 @@
 
 #include <spdlog/spdlog.h>
 
+#include "common/helpers.hpp"
 #include "utils/config.hpp"
-#include "geometry/calculations.hpp"
-#include "geometry/ifp_pocket_calculations.hpp"
+#include "geometry_calculations/calculations.hpp"
+#include "geometry_calculations/ifp_pocket_calculations.hpp"
 
 namespace pmg::geometry::calculations::utils {
 
@@ -43,74 +44,13 @@ std::array<int, 4> calculatePercentages(const std::array<int64_t, 4>& areas, con
     return results;
 }
 
-int64_t crossProduct(const pattern::Point64 &a, const pattern::Point64 &b, const pattern::Point64 &c)
-{
-    return ((b.x - a.x) * (c.y - b.y)) - ((b.y - a.y) * (c.x - b.x));
-}
-
 } // namespace pmg::geometry::calculations::utils
 
 namespace pmg::geometry::calculations {
 
-bool isCyclicShift(const std::vector<pattern::Point64> &polygonA, const std::vector<pattern::Point64> &polygonB)
-{
-    // Check whether the second polygon is the same as the first polygon
-    // even if the starting point does not match
-
-    if (polygonA.size() != polygonB.size()) return false;
-    if (polygonA.empty()) return true;
-
-    for (auto it = std::ranges::find(polygonA, polygonB[0]); 
-         it != polygonA.end(); 
-         it = std::ranges::find(it + 1, polygonA.end(), polygonB[0])) {
-
-        const auto SPLIT = std::distance(polygonA.begin(), it);
-        const auto TAIL_LEN = polygonA.size() - SPLIT;
-
-        if (std::ranges::equal(it, polygonA.end(), polygonB.begin(), polygonB.begin() + TAIL_LEN) &&
-            std::ranges::equal(polygonA.begin(), it, polygonB.begin() + TAIL_LEN, polygonB.end())) {
-                return true;
-            }
-    }
-
-    return false;
-}
-
-Clipper2Lib::Point64 toClipperPoint(const pattern::Point64 &point)
+Clipper2Lib::Point64 toClipperPoint(const Point64 &point)
 {
     return Clipper2Lib::Point64{ point.x, point.y };
-}
-
-Clipper2Lib::Path64 toClipperPath(const std::vector<pattern::Point64> &polygon)
-{
-    Clipper2Lib::Path64 path;
-    path.reserve(polygon.size());
-    for (const auto& point : polygon) {
-        path.emplace_back(point.x, point.y);
-    }
-    return path;
-}
-
-std::vector<pattern::Point64> fromClipperPath(const Clipper2Lib::Path64 &path)
-{
-    std::vector<pattern::Point64> polygon;
-    polygon.reserve(path.size());
-    for (const auto& point : path) {
-        polygon.push_back({point.x, point.y});
-    }
-    return polygon;
-}
-
-std::vector<pattern::Point64> calculatePolygonWithAllowance(const std::vector<pattern::Point64>& polygon, int64_t seamAllowance, int64_t cuttingAllowance)
-{
-    Clipper2Lib::Paths64 offsetPaths = Clipper2Lib::InflatePaths(
-        { toClipperPath(polygon) },
-        static_cast<double>(seamAllowance + cuttingAllowance),
-        Clipper2Lib::JoinType::Miter,
-        Clipper2Lib::EndType::Polygon
-    );
-
-    return fromClipperPath(offsetPaths[0]);
 }
 
 Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64 &paths, const Clipper2Lib::Point64 &point)
@@ -124,6 +64,11 @@ Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64 &paths, const Cli
     }
     return result;
 }
+
+Point64 rotatePointCcwBy(const Point64 &point, int angle) {
+    const int GRAINLINE_CCW = 360 - angle;
+    return transformPolygon({ point }, GRAINLINE_CCW, false, false)[0];
+};
 
 Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64 &ifpPaths, const std::vector<Clipper2Lib::Paths64> &originalNfps, int64_t epsilon)
 {

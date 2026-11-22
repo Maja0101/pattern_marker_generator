@@ -10,8 +10,8 @@
 #include "utils/logger_setup.hpp"
 #include "utils/timer.hpp"
 #include "utils/config.hpp"
-#include "pattern/geometry_types.hpp"
-#include "geometry/transformations.hpp"
+#include "common/geometry_types.hpp"
+#include "geometry_preparation/transformations.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/nested_item.hpp"
@@ -30,7 +30,7 @@ int main()
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Starting Pattern Marker Generator...");
 
-        std::vector<pattern::Point64> fabricPts = {
+        std::vector<geometry::Point64> fabricPts = {
             {501, 1352},
             {546, 477},
             {1540, 213},
@@ -38,7 +38,7 @@ int main()
             {1012, 1317}
         };
 
-        // std::vector<pattern::Point64> fabricPts = {
+        // std::vector<geometry::Point64> fabricPts = {
         //     {0, 1686},
         //     {59, 415},
         //     {1531, 0},

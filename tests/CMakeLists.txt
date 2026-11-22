@@ -36,7 +36,7 @@ if(TEST_FILES)
   target_link_libraries(unit_tests PRIVATE 
     nesting 
     pattern
-    geometry
+    calculations
     Clipper2
   )
   

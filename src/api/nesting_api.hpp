@@ -16,7 +16,6 @@ namespace pmg::nesting
     class AlgorithmBase;
 } // namespace pmg::nesting
 
-
 class NestingEngineFacade {
 private:
     std::unique_ptr<pmg::nesting::AlgorithmBase> m_engine;

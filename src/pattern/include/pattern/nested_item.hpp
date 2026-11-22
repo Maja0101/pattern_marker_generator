@@ -1,20 +1,20 @@
 #pragma once
 
-#include "pattern/geometry_types.hpp"
+#include "common/geometry_types.hpp"
 #include "pattern/shapes.hpp"
 
 namespace pmg::pattern {
 
 class NestedItem {
 private:
-    Point64 m_position;
+    geometry::Point64 m_position;
     PieceVariant* m_variantRef;
     bool m_isLocked{false};
     bool m_isFlipped{false};
 public:
     explicit NestedItem(PieceVariant* variant) noexcept;
     
-    [[nodiscard]] Point64 getPosition() const noexcept { return m_position; }
+    [[nodiscard]] geometry::Point64 getPosition() const noexcept { return m_position; }
     [[nodiscard]] const PieceVariant* getVariant() const noexcept { return m_variantRef; }
     [[nodiscard]] bool isLocked() const noexcept { return m_isLocked; }
     [[nodiscard]] bool isFlipped() const noexcept { return m_isFlipped; }
@@ -29,7 +29,7 @@ public:
     bool resetPosition();
     bool flip180();
 
-    [[nodiscard]] Point64 getPositionForItemWithoutAllowances() const;
+    [[nodiscard]] geometry::Point64 getPositionForItemWithoutAllowances() const;
 
     [[nodiscard]] std::string toString() const;
 
