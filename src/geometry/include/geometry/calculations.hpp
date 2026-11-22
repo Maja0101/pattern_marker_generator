@@ -6,8 +6,8 @@
 
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
-#include "nesting/nested_item.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nested_item.hpp"
+#include "pattern/nesting_result.hpp"
 #include "pattern/shapes.hpp"
 
 namespace pmg::geometry::calculations::utils {
@@ -29,10 +29,10 @@ Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64& paths, const Cli
 
 Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64& ifpPaths, const std::vector<Clipper2Lib::Paths64>& originalNfps, int64_t epsilon = 1);
 
-std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece>& patternPieces);
+std::vector<pattern::NestedItem> prepareItems(std::vector<pattern::PatternPiece>& patternPieces);
 std::vector<pattern::PieceVariant> getAllVariants(std::vector<pattern::PatternPiece>& patternPieces);
 
 double calculateSolidity(const Clipper2Lib::Path64& scrapPath);
-nesting::NestingStats evaluate(const Clipper2Lib::Paths64& allPlacedItems, const pattern::Fabric& fabric, int64_t maxRightPoint);
+pattern::NestingStats evaluate(const Clipper2Lib::Paths64& allPlacedItems, const pattern::Fabric& fabric, int64_t maxRightPoint);
 
 } // namespace pmg::geometry::calculations

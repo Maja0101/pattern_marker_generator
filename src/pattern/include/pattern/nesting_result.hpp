@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace pmg::nesting {
+namespace pmg::pattern {
 
 struct ItemPlacement {
     int64_t id;

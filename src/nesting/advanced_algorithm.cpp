@@ -12,10 +12,10 @@
 
 namespace pmg::nesting {
 
-void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<nesting::NestedItem> &items, size_t index, NestingScore &best)
+void AdvancedAlgorithm::evaluateDifferentRotations(std::vector<pattern::NestedItem> &items, size_t index, pattern::NestingScore &best)
 {
     if (index == items.size()) {
-        NestingResult currentResult = runSingleBottomLeft(items);
+        pattern::NestingResult currentResult = runSingleBottomLeft(items);
 
         if (double currentScore = currentResult.wasSuccessful ? geometry::calculations::calculateNestingScore(currentResult.stats) : -1.0; currentScore > best.score) {
 
@@ -100,9 +100,9 @@ void AdvancedAlgorithm::undoMove(const utils::Move &m)
     }
 }
 
-NestingScore AdvancedAlgorithm::fullSearch()
+pattern::NestingScore AdvancedAlgorithm::fullSearch()
 {
-    NestingScore best;
+    pattern::NestingScore best;
     best.score = -1.0;
 
     if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running Full Search...");
@@ -110,7 +110,7 @@ NestingScore AdvancedAlgorithm::fullSearch()
 
     do {
         evaluateDifferentRotations(m_originalItems, 0, best);
-    } while (std::ranges::next_permutation(m_originalItems, [](const NestedItem& a, const NestedItem&b) {
+    } while (std::ranges::next_permutation(m_originalItems, [](const pattern::NestedItem& a, const pattern::NestedItem&b) {
         return a.getVariant()->getGlobalId(false) < b.getVariant()->getGlobalId(false);
     }).found);
 
@@ -121,9 +121,9 @@ NestingScore AdvancedAlgorithm::fullSearch()
     return best;
 }
 
-NestingScore AdvancedAlgorithm::checkOneOption()
+pattern::NestingScore AdvancedAlgorithm::checkOneOption()
 {
-    NestingScore best;
+    pattern::NestingScore best;
     best.score = -1.0;
 
     if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running Smart Single Bottom Left...");
@@ -144,7 +144,7 @@ NestingScore AdvancedAlgorithm::checkOneOption()
         ++currIdxCount;
     }
 
-    std::ranges::sort(m_originalItems, [](const NestedItem&a, const NestedItem& b) {
+    std::ranges::sort(m_originalItems, [](const pattern::NestedItem&a, const pattern::NestedItem& b) {
         auto aBounds = a.getItemBoundingBoxAtPosition();
         auto bBounds = b.getItemBoundingBoxAtPosition();
         return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);
@@ -162,16 +162,16 @@ NestingScore AdvancedAlgorithm::checkOneOption()
         );
     }
 
-    return NestingScore();
+    return best;
 }
 
-NestingScore AdvancedAlgorithm::evaluate()
+pattern::NestingScore AdvancedAlgorithm::evaluate()
 {
     constexpr double FAILED_SCORE = -100.0;
 
-    NestingResult res = runSingleBottomLeft(m_originalItems);
+    pattern::NestingResult res = runSingleBottomLeft(m_originalItems);
 
-    return NestingScore{
+    return pattern::NestingScore{
         .result = res,
         .score = res.wasSuccessful ? geometry::calculations::calculateNestingScore(res.stats) : FAILED_SCORE
     };
@@ -187,7 +187,7 @@ void AdvancedAlgorithm::resetAllPositions()
 bool AdvancedAlgorithm::checkAllIdentical()
 {
     return std::all_of(m_originalItems.begin() + 1, m_originalItems.end(),
-            [&](const NestedItem& item) { return item == m_originalItems[0]; });
+            [&](const pattern::NestedItem& item) { return item == m_originalItems[0]; });
 }
 
 size_t AdvancedAlgorithm::pickBiasedIndex(size_t n, double exponent)
@@ -241,7 +241,7 @@ bool AdvancedAlgorithm::pickValidMove(size_t n, bool identical, utils::Move &out
     return false;
 }
 
-double AdvancedAlgorithm::setInitialTemp(const NestingScore &currentScore, NestingScore &bestScore, std::vector<NestedItem> &bestItems, size_t n, bool identical)
+double AdvancedAlgorithm::setInitialTemp(const pattern::NestingScore &currentScore, pattern::NestingScore &bestScore, std::vector<pattern::NestedItem> &bestItems, size_t n, bool identical)
 {
     double temp = 1.5;
     double totalDrop = 0.0;
@@ -252,7 +252,7 @@ double AdvancedAlgorithm::setInitialTemp(const NestingScore &currentScore, Nesti
         if (!pickValidMove(n, identical, sampleMove, 1.5)) continue;
 
         applyMove(sampleMove);
-        NestingScore sampleScore = evaluate();
+        pattern::NestingScore sampleScore = evaluate();
 
         if (sampleScore.result.wasSuccessful && sampleScore.score > bestScore.score) {
             bestScore = sampleScore;
@@ -291,7 +291,7 @@ double AdvancedAlgorithm::setInitialTemp(const NestingScore &currentScore, Nesti
 }
 
 
-NestingScore AdvancedAlgorithm::simulatedAnnealing()
+pattern::NestingScore AdvancedAlgorithm::simulatedAnnealing()
 {
     if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running Simulated Annealing...");
     m_svgExport = 0;
@@ -300,7 +300,7 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
     if (n == 0) return {};
 
     // Initial solution - sort by height
-    std::ranges::sort(m_originalItems, [](const NestedItem& a, const NestedItem& b) {
+    std::ranges::sort(m_originalItems, [](const pattern::NestedItem& a, const pattern::NestedItem& b) {
         auto aBounds = a.getItemBoundingBoxAtPosition();
         auto bBounds = b.getItemBoundingBoxAtPosition();
         return (aBounds.bottom - aBounds.top) > (bBounds.bottom - bBounds.top);
@@ -317,8 +317,8 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
 
     bool identical = checkAllIdentical();
 
-    NestingScore currentScore = evaluate();
-    NestingScore bestScore = currentScore;
+    pattern::NestingScore currentScore = evaluate();
+    pattern::NestingScore bestScore = currentScore;
 
     if constexpr (config::DEVELOPMENT) {
         pmg::geometry::SvgExporter::exportLayout(
@@ -331,7 +331,7 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
     }
 
     resetAllPositions();
-    std::vector<NestedItem> bestItems = m_originalItems;
+    std::vector<pattern::NestedItem> bestItems = m_originalItems;
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("Initial score {}", bestScore.score));
@@ -356,7 +356,7 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
             }
 
             applyMove(move);
-            NestingScore candidateScore = evaluate();
+            pattern::NestingScore candidateScore = evaluate();
             double deltaE = candidateScore.score - currentScore.score;
 
             // Positive delta meand better result
@@ -412,9 +412,9 @@ NestingScore AdvancedAlgorithm::simulatedAnnealing()
     return bestScore;
 }
 
-NestingResult AdvancedAlgorithm::runAlgorithm()
+pattern::NestingResult AdvancedAlgorithm::runAlgorithm()
 {
-    std::ranges::sort(m_originalItems, [](const NestedItem&a, const NestedItem& b) {
+    std::ranges::sort(m_originalItems, [](const pattern::NestedItem&a, const pattern::NestedItem& b) {
         return a.getVariant()->getGlobalId(false) < b.getVariant()->getGlobalId(false);
     });
 

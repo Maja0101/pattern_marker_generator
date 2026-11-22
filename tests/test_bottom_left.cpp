@@ -12,7 +12,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
         bool locked;
     };
 
-    auto checkNestedItem = [](const pmg::nesting::NestedItem& item, ExpectedItem expected) {
+    auto checkNestedItem = [](const pmg::pattern::NestedItem& item, ExpectedItem expected) {
         CHECK(item.getPosition().x == expected.x);
         CHECK(item.getPosition().y == expected.y);
         CHECK(item.isLocked() == expected.locked);
@@ -32,7 +32,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
             std::unordered_map<pmg::geometry::NFPKey, Clipper2Lib::Paths64> nfpEmptyCache;
             pmg::nesting::BottomLeft bottomLeft(fabric, ifpEmptyCache, nfpEmptyCache);
 
-            std::vector<pmg::nesting::NestedItem> items;
+            std::vector<pmg::pattern::NestedItem> items;
 
             REQUIRE(bottomLeft.performNesting(items).wasSuccessful);
             REQUIRE(items.empty());
@@ -50,7 +50,7 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
 
             pmg::pattern::PieceVariant variant(1, 1, 0, false, 1, false, 0, 0, variantPts);
 
-            std::vector<pmg::nesting::NestedItem> items = { pmg::nesting::NestedItem(&variant) };
+            std::vector<pmg::pattern::NestedItem> items = { pmg::pattern::NestedItem(&variant) };
             std::vector<pmg::pattern::PieceVariant> variants = { variant };
 
             std::unordered_map<int64_t, Clipper2Lib::Paths64> ifpCache = pmg::geometry::calculations::calculateIFPCache(fabric, variants);;
@@ -90,10 +90,10 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                 pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, false, 0, 0, tallRectPts);
                 pmg::pattern::PieceVariant variant3(3, 3, 0, false, 1, false, 0, 0, smallRectPts);
 
-                std::vector<pmg::nesting::NestedItem> items = { 
-                    pmg::nesting::NestedItem(&variant1), 
-                    pmg::nesting::NestedItem(&variant2),
-                    pmg::nesting::NestedItem(&variant3)
+                std::vector<pmg::pattern::NestedItem> items = { 
+                    pmg::pattern::NestedItem(&variant1), 
+                    pmg::pattern::NestedItem(&variant2),
+                    pmg::pattern::NestedItem(&variant3)
                 };
 
                 std::vector<pmg::pattern::PieceVariant> variants = { variant1, variant2, variant3 };
@@ -138,9 +138,9 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                 pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, false, 0, 0, firstTrainglePts);
                 pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, false, 0, 0, secondTrainglePts);
 
-                std::vector<pmg::nesting::NestedItem> items = { 
-                    pmg::nesting::NestedItem(&variant1), 
-                    pmg::nesting::NestedItem(&variant2)
+                std::vector<pmg::pattern::NestedItem> items = { 
+                    pmg::pattern::NestedItem(&variant1), 
+                    pmg::pattern::NestedItem(&variant2)
                 };
 
                 std::vector<pmg::pattern::PieceVariant> variants = { variant1, variant2 };
@@ -185,9 +185,9 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
                 pmg::pattern::PieceVariant variant1(1, 1, 0, false, 1, false, 0, 0, invVShape);
                 pmg::pattern::PieceVariant variant2(2, 2, 0, false, 1, false, 0, 0, rectShape);
 
-                std::vector<pmg::nesting::NestedItem> items = { 
-                    pmg::nesting::NestedItem(&variant1), 
-                    pmg::nesting::NestedItem(&variant2)
+                std::vector<pmg::pattern::NestedItem> items = { 
+                    pmg::pattern::NestedItem(&variant1), 
+                    pmg::pattern::NestedItem(&variant2)
                 };
 
                 std::vector<pmg::pattern::PieceVariant> variants = { variant1, variant2 };
@@ -234,11 +234,11 @@ TEST_CASE("Nesting pieces with Bottom Left", "[BottomLeft]") {
             pmg::pattern::PieceVariant variantSquare(1, 1, 0, false, 1, false, 0, 0, squarePts);
             pmg::pattern::PieceVariant variantRect(2, 2, 0, false, 1, false, 0, 0, rectanglePts);
 
-            std::vector<pmg::nesting::NestedItem> items = { 
-                pmg::nesting::NestedItem(&variantSquare), 
-                pmg::nesting::NestedItem(&variantSquare), 
-                pmg::nesting::NestedItem(&variantSquare), 
-                pmg::nesting::NestedItem(&variantRect)
+            std::vector<pmg::pattern::NestedItem> items = { 
+                pmg::pattern::NestedItem(&variantSquare), 
+                pmg::pattern::NestedItem(&variantSquare), 
+                pmg::pattern::NestedItem(&variantSquare), 
+                pmg::pattern::NestedItem(&variantRect)
             };
 
             std::vector<pmg::pattern::PieceVariant> variants = { variantSquare, variantRect };

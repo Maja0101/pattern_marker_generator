@@ -1,5 +1,4 @@
 add_library(nesting 
-    nested_item.cpp
     bottom_left.cpp
     algorithm_base.cpp
     basic_algorithm.cpp

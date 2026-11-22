@@ -8,7 +8,7 @@ class BasicAlgorithm : public AlgorithmBase {
 private:
     void sortItems();
 protected:
-    NestingResult runAlgorithm() override;
+    pattern::NestingResult runAlgorithm() override;
     void prepareNestingItems(std::vector<pattern::PatternPiece>& patternPieces) override;
 public:
     using AlgorithmBase::AlgorithmBase;

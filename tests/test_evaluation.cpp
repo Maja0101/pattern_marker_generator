@@ -3,7 +3,7 @@
 
 #include "pattern/shapes.hpp"
 #include "geometry/calculations.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nesting_result.hpp"
 
 TEST_CASE("Calculating score for nesting result", "[evaluation]") {
     SECTION("Regular fabric") {
@@ -38,7 +38,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             };
             int64_t maxRightPoint = 1000000;
             
-            pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+            pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 0);
             REQUIRE(result.usableScrapsArea == 0);
@@ -59,7 +59,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             Clipper2Lib::Paths64 placedItems;
             int64_t maxRightPoint = 0;
             
-            pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+            pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 0);
             REQUIRE(result.usableScrapsArea == 0);
@@ -93,7 +93,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             };
             int64_t maxRightPoint = 400000;
             
-            pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+            pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 0);
             REQUIRE(result.usableScrapsArea == 0);
@@ -127,7 +127,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             };
             int64_t maxRightPoint = 600000;
             
-            pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+            pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
             REQUIRE(result.usableScrapCount == 1);
             REQUIRE(result.usableScrapsArea == 40000);
@@ -174,7 +174,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 };
                 int64_t maxRightPoint = 1000000;
                 
-                pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+                pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
                 REQUIRE(result.usableScrapCount == 2);
                 REQUIRE(result.usableScrapsArea == 200000);
@@ -210,7 +210,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 };
                 int64_t maxRightPoint = 1000000;
                 
-                pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+                pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
                 REQUIRE(result.usableScrapCount == 0);
                 REQUIRE(result.usableScrapsArea == 0);
@@ -246,7 +246,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
                 };
                 int64_t maxRightPoint = 600000;
                 
-                pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+                pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
                 REQUIRE(result.usableScrapCount == 1);
                 REQUIRE(result.usableScrapsArea == 120000);
@@ -285,7 +285,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
         };
         int64_t maxRightPoint = 400000;
         
-        pmg::nesting::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
+        pmg::pattern::NestingStats result = pmg::geometry::calculations::evaluate(placedItems, fabric, maxRightPoint);
 
         REQUIRE(result.usableScrapCount == 0);
         REQUIRE(result.usableScrapsArea == 0);

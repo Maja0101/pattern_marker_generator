@@ -1,6 +1,6 @@
 #include <catch2/catch_amalgamated.hpp>
 
-#include "nesting/nested_item.hpp"
+#include "pattern/nested_item.hpp"
 #include "pattern/shapes.hpp"
 #include "geometry/geometry_types.hpp"
 
@@ -16,7 +16,7 @@ TEST_CASE("NestedItem accessing path and bounding box", "[path][rect]") {
 
     pmg::pattern::PieceVariant testVariant(1, 1, 0, false, 1, false, 0, 0, testBoundaryPts);
 
-    pmg::nesting::NestedItem testItem(&testVariant);
+    pmg::pattern::NestedItem testItem(&testVariant);
 
     int64_t offset = 1000;
 

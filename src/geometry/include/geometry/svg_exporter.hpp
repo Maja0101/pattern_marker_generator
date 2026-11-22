@@ -4,11 +4,8 @@
 #include <vector>
 #include <string>
 
-namespace pmg::nesting {
-    class NestedItem;
-}
-
 namespace pmg::pattern {
+    class NestedItem;
     class Fabric;
 }
 
@@ -18,7 +15,7 @@ class SvgExporter {
 public:
     static bool exportLayout(const std::string& filepath, 
                              const pattern::Fabric& fabric,
-                             const std::vector<nesting::NestedItem>& items,
+                             const std::vector<pattern::NestedItem>& items,
                              int64_t includedSeamAllowance, 
                              int64_t includedCuttingAllowance); 
 };

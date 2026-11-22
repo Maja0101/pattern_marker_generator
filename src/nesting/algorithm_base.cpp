@@ -17,7 +17,7 @@ void AlgorithmBase::reset()
     m_originalItems.clear();
 }
 
-NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<nesting::NestedItem> &items)
+pattern::NestingResult AlgorithmBase::runSingleBottomLeft(std::vector<pattern::NestedItem> &items)
 {
     BottomLeft bottomLeft(m_fabric, m_ifpCache, m_nfpCache);
 
@@ -60,7 +60,7 @@ AlgorithmBase::AlgorithmBase(int64_t width, int64_t length)
 AlgorithmBase::AlgorithmBase(pattern::Fabric fabric)
     : m_fabric(std::move(fabric)) {}
 
-NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces, timing::PhaseTimings* timings)
+pattern::NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &patternPieces, timing::PhaseTimings* timings)
 {
     reset();
     
@@ -77,7 +77,7 @@ NestingResult AlgorithmBase::execute(std::vector<pattern::PatternPiece> &pattern
 
     if constexpr (config::BENCHMARK) t1 = std::chrono::steady_clock::now();
 
-    NestingResult result;
+    pattern::NestingResult result;
     {
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Nesting...");
         timing::Timer timer;

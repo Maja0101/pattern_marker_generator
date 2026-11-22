@@ -2,14 +2,14 @@
 #include <iomanip>
 
 #include "geometry/svg_exporter.hpp"
-#include "nesting/nested_item.hpp"
+#include "pattern/nested_item.hpp"
 #include "pattern/shapes.hpp"
 
 namespace pmg::geometry {
 
 bool SvgExporter::exportLayout(const std::string& filepath, 
                                const pattern::Fabric& fabric,
-                               const std::vector<nesting::NestedItem>& items,
+                               const std::vector<pattern::NestedItem>& items,
                                int64_t includedSeamAllowance, 
                                int64_t includedCuttingAllowance)
 {

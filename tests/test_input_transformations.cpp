@@ -7,7 +7,7 @@
 #include "pattern/pattern_piece.hpp"
 #include "pattern/variant_constraint.hpp"
 #include "nesting/basic_algorithm.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nesting_result.hpp"
 #include "point64_test_utils.hpp"
 
 TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
@@ -94,7 +94,7 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         
         pmg::nesting::BasicAlgorithm alg(fabric);
 
-        pmg::nesting::NestingResult result = alg.execute(pieces);
+        pmg::pattern::NestingResult result = alg.execute(pieces);
 
         REQUIRE(result.wasSuccessful);
         REQUIRE(result.positions.size() == 3);
@@ -151,7 +151,7 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         
         pmg::nesting::BasicAlgorithm alg(fabric);
 
-        pmg::nesting::NestingResult result = alg.execute(pieces);
+        pmg::pattern::NestingResult result = alg.execute(pieces);
 
         REQUIRE(result.wasSuccessful);
         REQUIRE(result.positions.size() == 2);

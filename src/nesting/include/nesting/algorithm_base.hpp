@@ -7,8 +7,8 @@
 
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
-#include "nesting/nested_item.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nested_item.hpp"
+#include "pattern/nesting_result.hpp"
 #include "geometry/nfp_key.hpp"
 #include "utils/phase_timings.hpp"
 
@@ -19,13 +19,13 @@ private:
     void reset();
 protected:
     pattern::Fabric m_fabric;
-    std::vector<nesting::NestedItem> m_originalItems;
+    std::vector<pattern::NestedItem> m_originalItems;
     std::unordered_map<int64_t, Clipper2Lib::Paths64> m_ifpCache; 
     std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64> m_nfpCache; 
 
-    virtual NestingResult runAlgorithm() = 0;
+    virtual pattern::NestingResult runAlgorithm() = 0;
 
-    NestingResult runSingleBottomLeft(std::vector<nesting::NestedItem>& items);
+    pattern::NestingResult runSingleBottomLeft(std::vector<pattern::NestedItem>& items);
     virtual void prepareNestingItems(std::vector<pattern::PatternPiece>& patternPieces);
 public:
     explicit AlgorithmBase(int64_t width = 1400000, int64_t length = 100000000);
@@ -35,7 +35,7 @@ public:
     const std::unordered_map<int64_t, Clipper2Lib::Paths64>& getIFPCache() const { return m_ifpCache; };
     const std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& getNFPCache() const { return m_nfpCache; };
 
-    NestingResult execute(std::vector<pattern::PatternPiece>& patternPieces, timing::PhaseTimings* timings = nullptr);
+    pattern::NestingResult execute(std::vector<pattern::PatternPiece>& patternPieces, timing::PhaseTimings* timings = nullptr);
 };
 
 } // namespace pmg::nesting

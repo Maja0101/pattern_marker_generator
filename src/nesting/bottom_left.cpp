@@ -11,7 +11,7 @@
 namespace pmg::nesting {
 inline constexpr int64_t SCALE = 1000;
 
-void BottomLeft::sortCandidatePoints(std::vector<Clipper2Lib::Point64> &candidatePoints, const NestedItem &currentItem, double jumpRatio)
+void BottomLeft::sortCandidatePoints(std::vector<Clipper2Lib::Point64> &candidatePoints, const pattern::NestedItem &currentItem, double jumpRatio)
 {
     // Sort first by x and y where x is more important than y 
     // Gurading against small changes in x but big y value being picked as the best solution
@@ -47,7 +47,7 @@ void BottomLeft::sortCandidatePoints(std::vector<Clipper2Lib::Point64> &candidat
         });
 }
 
-bool BottomLeft::findPosition(NestedItem &item, const std::vector<NestedItem> &items)
+bool BottomLeft::findPosition(pattern::NestedItem &item, const std::vector<pattern::NestedItem> &items)
 {
     int64_t varId = item.getVariant()->getGlobalId(item.isFlipped());
 
@@ -84,7 +84,7 @@ bool BottomLeft::findPosition(NestedItem &item, const std::vector<NestedItem> &i
     originalNFPs.reserve(items.size());
 
     // Subtract NFPs of all placed items
-    for (const auto& placedPiece : items | std::views::take_while(&NestedItem::isLocked)) {
+    for (const auto& placedPiece : items | std::views::take_while(&pattern::NestedItem::isLocked)) {
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Checking {} {} {} {}", placedPiece.getVariant()->getIsTwoWay(), placedPiece.isFlipped(), placedPiece.getVariant()->getGlobalId(placedPiece.isFlipped()), placedPiece.isLocked()));
         }
@@ -212,7 +212,7 @@ bool BottomLeft::findPosition(NestedItem &item, const std::vector<NestedItem> &i
 BottomLeft::BottomLeft(pattern::Fabric fabric, std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache)
     : m_fabric(std::move(fabric)), m_ifpCache(ifpCache), m_nfpCache(nfpCache) {}
 
-NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
+pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedItem> &items)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Starting nesting");
@@ -224,12 +224,12 @@ NestingResult BottomLeft::performNesting(std::vector<NestedItem> &items)
         }
     }
 
-    NestingResult result;
+    pattern::NestingResult result;
 
     int64_t minLen = 0;
 
     for (size_t i = 0; i < items.size(); ++i) {
-        NestedItem& item = items[i];
+        pattern::NestedItem& item = items[i];
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Nesting item no. {} {} {}", i, item.getVariant()->getIsTwoWay(), item.isFlipped()));

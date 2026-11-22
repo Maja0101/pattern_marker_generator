@@ -2,7 +2,7 @@
 
 #include "geometry/geometry_types.hpp"
 #include "pattern/shapes.hpp"
-#include "nesting/nested_item.hpp"
+#include "pattern/nested_item.hpp"
 #include "geometry/options_calculations.hpp"
 
 TEST_CASE("Calculating number of options", "[possibilities][evaluation]") {
@@ -29,10 +29,10 @@ TEST_CASE("Calculating number of options", "[possibilities][evaluation]") {
         pmg::pattern::PieceVariant variant2(2, 1, 0, false, 1, false, 0, 0, boundary2);
         pmg::pattern::PieceVariant variant3(3, 1, 0, false, 1, false, 0, 0, boundary3);
 
-        std::vector<pmg::nesting::NestedItem> items = { 
-            pmg::nesting::NestedItem(&variant1),
-            pmg::nesting::NestedItem(&variant2),
-            pmg::nesting::NestedItem(&variant3)
+        std::vector<pmg::pattern::NestedItem> items = { 
+            pmg::pattern::NestedItem(&variant1),
+            pmg::pattern::NestedItem(&variant2),
+            pmg::pattern::NestedItem(&variant3)
         };
 
         REQUIRE_FALSE(pmg::geometry::calculations::numberOfOptionsWithinLimit(items, 5));
@@ -43,10 +43,10 @@ TEST_CASE("Calculating number of options", "[possibilities][evaluation]") {
         pmg::pattern::PieceVariant variant2(2, 1, 0, false, 1, true, 0, 0, boundary2);
         pmg::pattern::PieceVariant variant3(3, 1, 0, false, 1, true, 0, 0, boundary3);
 
-        std::vector<pmg::nesting::NestedItem> items = { 
-            pmg::nesting::NestedItem(&variant1),
-            pmg::nesting::NestedItem(&variant2),
-            pmg::nesting::NestedItem(&variant3)
+        std::vector<pmg::pattern::NestedItem> items = { 
+            pmg::pattern::NestedItem(&variant1),
+            pmg::pattern::NestedItem(&variant2),
+            pmg::pattern::NestedItem(&variant3)
         };
 
         REQUIRE_FALSE(pmg::geometry::calculations::numberOfOptionsWithinLimit(items, 7));
@@ -57,10 +57,10 @@ TEST_CASE("Calculating number of options", "[possibilities][evaluation]") {
         pmg::pattern::PieceVariant variant2(2, 1, 0, false, 1, true, 0, 0, boundary2);
         pmg::pattern::PieceVariant variant3(3, 1, 0, false, 1, true, 0, 0, boundary3);
 
-        std::vector<pmg::nesting::NestedItem> items = { 
-            pmg::nesting::NestedItem(&variant1),
-            pmg::nesting::NestedItem(&variant2),
-            pmg::nesting::NestedItem(&variant3)
+        std::vector<pmg::pattern::NestedItem> items = { 
+            pmg::pattern::NestedItem(&variant1),
+            pmg::pattern::NestedItem(&variant2),
+            pmg::pattern::NestedItem(&variant3)
         };
 
         REQUIRE_FALSE(pmg::geometry::calculations::numberOfOptionsWithinLimit(items, 10));
@@ -71,10 +71,10 @@ TEST_CASE("Calculating number of options", "[possibilities][evaluation]") {
         pmg::pattern::PieceVariant variant2(2, 1, 0, false, 1, true, 0, 0, boundary2);
         pmg::pattern::PieceVariant variant3(3, 1, 0, false, 1, true, 0, 0, boundary3);
 
-        std::vector<pmg::nesting::NestedItem> items = { 
-            pmg::nesting::NestedItem(&variant1),
-            pmg::nesting::NestedItem(&variant2),
-            pmg::nesting::NestedItem(&variant3)
+        std::vector<pmg::pattern::NestedItem> items = { 
+            pmg::pattern::NestedItem(&variant1),
+            pmg::pattern::NestedItem(&variant2),
+            pmg::pattern::NestedItem(&variant3)
         };
 
         REQUIRE(pmg::geometry::calculations::numberOfOptionsWithinLimit(items, 50));
@@ -85,10 +85,10 @@ TEST_CASE("Calculating number of options", "[possibilities][evaluation]") {
         pmg::pattern::PieceVariant variant2(2, 1, 0, false, 2, false, 0, 0, boundary2);
         pmg::pattern::PieceVariant variant3(3, 1, 0, false, 2, false, 0, 0, boundary3);
 
-        std::vector<pmg::nesting::NestedItem> items = { 
-            pmg::nesting::NestedItem(&variant1),
-            pmg::nesting::NestedItem(&variant2),
-            pmg::nesting::NestedItem(&variant3)
+        std::vector<pmg::pattern::NestedItem> items = { 
+            pmg::pattern::NestedItem(&variant1),
+            pmg::pattern::NestedItem(&variant2),
+            pmg::pattern::NestedItem(&variant3)
         };
 
         REQUIRE(pmg::geometry::calculations::numberOfOptionsWithinLimit(items, 6));

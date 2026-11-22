@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "nesting/nesting_result.hpp"
+#include "pattern/nesting_result.hpp"
 
 namespace pmg::pattern {
     class PatternPiece;
@@ -24,6 +24,6 @@ public:
     NestingEngineFacade(const pmg::pattern::Fabric& fabric, int64_t algId);
     ~NestingEngineFacade();
 
-    pmg::nesting::NestingResult execute(std::vector<pmg::pattern::PatternPiece>& patternPieces);
+    pmg::pattern::NestingResult execute(std::vector<pmg::pattern::PatternPiece>& patternPieces);
     int64_t calcMinimum(std::vector<pmg::pattern::PatternPiece>& patternPieces);
 };

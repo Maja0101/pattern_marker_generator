@@ -6,7 +6,7 @@
 
 #include "api/nesting_api.hpp"
 #include "geometry/geometry_types.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nesting_result.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/variant_constraint.hpp"
@@ -127,7 +127,7 @@ NestingInput parseWidthInput(const Napi::CallbackInfo& info) {
     return in;
 }
 
-Napi::Object toJs(Napi::Env env, const pmg::nesting::NestingResult& r) {
+Napi::Object toJs(Napi::Env env, const pmg::pattern::NestingResult& r) {
     Napi::Object out = Napi::Object::New(env);
     out.Set("wasSuccessful", r.wasSuccessful);
     out.Set("minLength", r.minLength);
@@ -182,7 +182,7 @@ protected:
 private:
     Napi::Promise::Deferred m_deferred;
     NestingInput m_input;
-    pmg::nesting::NestingResult m_result{};
+    pmg::pattern::NestingResult m_result{};
 };
 
 Napi::Value Execute(const Napi::CallbackInfo& info) {

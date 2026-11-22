@@ -5,8 +5,8 @@
 #include <clipper2/clipper.h>
 
 #include "pattern/shapes.hpp"
-#include "nesting/nested_item.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nested_item.hpp"
+#include "pattern/nesting_result.hpp"
 #include "geometry/nfp_key.hpp"
 
 namespace pmg::nesting {
@@ -21,14 +21,14 @@ private:
     Clipper2Lib::Paths64 m_placedPiecesPolygons;
     std::vector<Clipper2Lib::Rect64> m_placedPiecesBoxes;
 
-    void sortCandidatePoints(std::vector<Clipper2Lib::Point64>& candidatePoints, const NestedItem& currentItem, double jumpRatio = 0.25);
-    bool findPosition(NestedItem& item, const std::vector<NestedItem>& items);
+    void sortCandidatePoints(std::vector<Clipper2Lib::Point64>& candidatePoints, const pattern::NestedItem& currentItem, double jumpRatio = 0.25);
+    bool findPosition(pattern::NestedItem& item, const std::vector<pattern::NestedItem>& items);
 public:
     BottomLeft(pattern::Fabric fabric, 
         std::unordered_map<int64_t, Clipper2Lib::Paths64>& ifpCache, 
         std::unordered_map<geometry::NFPKey, Clipper2Lib::Paths64>& nfpCache);
 
-    NestingResult performNesting(std::vector<NestedItem>& items);
+    pattern::NestingResult performNesting(std::vector<pattern::NestedItem>& items);
 };
 
 } // namespace pmg::nesting

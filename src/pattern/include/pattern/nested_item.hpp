@@ -3,7 +3,7 @@
 #include "geometry/geometry_types.hpp"
 #include "pattern/shapes.hpp"
 
-namespace pmg::nesting {
+namespace pmg::pattern {
 
 class NestedItem {
 private:

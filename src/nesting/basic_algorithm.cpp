@@ -12,7 +12,7 @@
 namespace pmg::nesting {
 void BasicAlgorithm::sortItems()
 {
-    std::ranges::stable_sort(m_originalItems, [](const NestedItem& a, const NestedItem& b) {
+    std::ranges::stable_sort(m_originalItems, [](const pattern::NestedItem& a, const pattern::NestedItem& b) {
         auto aBounds = a.getItemBoundingBoxAtPosition();
         auto bBounds = b.getItemBoundingBoxAtPosition();
 
@@ -34,7 +34,7 @@ void BasicAlgorithm::sortItems()
     });
 }
 
-NestingResult BasicAlgorithm::runAlgorithm()
+pattern::NestingResult BasicAlgorithm::runAlgorithm()
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO("Items in queue");
@@ -44,7 +44,7 @@ NestingResult BasicAlgorithm::runAlgorithm()
         SPDLOG_INFO("End of queue");
     }
 
-    NestingResult result;
+    pattern::NestingResult result;
 
     if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Running single Bottom Left Fill...");
     

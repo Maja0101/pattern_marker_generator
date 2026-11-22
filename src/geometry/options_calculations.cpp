@@ -7,7 +7,7 @@
 
 namespace pmg::geometry::calculations {
 
-bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, uint64_t limit)
+bool numberOfOptionsWithinLimit(const std::vector<pattern::NestedItem> &items, uint64_t limit)
 {
     // Check number of permutations
     // Items with the same globalId are treated as equal
@@ -98,7 +98,7 @@ bool numberOfOptionsWithinLimit(const std::vector<nesting::NestedItem> &items, u
     return total <= limit;
 }
 
-double calculateNestingScore(const nesting::NestingStats &stats, const utils::ScoringWeights &w)
+double calculateNestingScore(const pattern::NestingStats &stats, const utils::ScoringWeights &w)
 {
     // Remaining fabric subscore
     double lengthRatioPcs = (stats.totalFabricLength > 0) ? (static_cast<double>(stats.remainingFabricLength) / static_cast<double>(stats.totalFabricLength)) * 100.0 : 0.0;

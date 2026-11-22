@@ -1,9 +1,9 @@
 #include <format>
 #include <string>
 
-#include "nesting/nested_item.hpp"
+#include "pattern/nested_item.hpp"
 
-namespace pmg::nesting {
+namespace pmg::pattern {
 
 NestedItem::NestedItem(pattern::PieceVariant* variant) noexcept
     : m_position(geometry::Point64()), m_variantRef(variant) {}
@@ -80,4 +80,4 @@ std::string NestedItem::toString() const
                             m_variantRef->toString());
 }
 
-} // namespace pmg::nesting
+} // namespace pmg::pattern

@@ -148,7 +148,7 @@ Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2
     return point;
 }
 
-std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece> &patternPieces)
+std::vector<pattern::NestedItem> prepareItems(std::vector<pattern::PatternPiece> &patternPieces)
 {
     size_t total = 0;
     for (auto& piece : patternPieces) {
@@ -157,7 +157,7 @@ std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece>
         }
     }
 
-    std::vector<nesting::NestedItem> items;
+    std::vector<pattern::NestedItem> items;
     items.reserve(total);
 
     for (auto& piece : patternPieces) {
@@ -172,7 +172,7 @@ std::vector<nesting::NestedItem> prepareItems(std::vector<pattern::PatternPiece>
                 SPDLOG_INFO(variant.toString());
             }
 
-            items.insert(items.end(), variant.getRequiredQuantity(), nesting::NestedItem(&variant));
+            items.insert(items.end(), variant.getRequiredQuantity(), pattern::NestedItem(&variant));
         }
     }
 
@@ -237,9 +237,9 @@ double calculateSolidity(const Clipper2Lib::Path64 &scrapPath)
     return std::min(1.0, std::max(0.0, solidity));
 }
 
-nesting::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const pattern::Fabric &fabric, int64_t maxRightPoint)
+pattern::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const pattern::Fabric &fabric, int64_t maxRightPoint)
 {
-    nesting::NestingStats result;
+    pattern::NestingStats result;
 
     constexpr int SCALE = 1000; // converstion from internal units to mm
     constexpr int PCS_SCALE = 100; // multiplier for calculating percenatges 

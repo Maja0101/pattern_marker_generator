@@ -14,10 +14,10 @@
 #include "geometry/transformations.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
-#include "nesting/nested_item.hpp"
+#include "pattern/nested_item.hpp"
 #include "nesting/basic_algorithm.hpp"
 #include "nesting/advanced_algorithm.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nesting_result.hpp"
 #include "sample_input.hpp"
 
 using namespace pmg;
@@ -51,13 +51,13 @@ int main()
         // pattern::Fabric fabric(fabricPts, 0, true);
         nesting::BasicAlgorithm alg(fabric);
         std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
-        nesting::NestingResult result = alg.execute(piecesToCheck);
+        pattern::NestingResult result = alg.execute(piecesToCheck);
 
         // Verification of results for new version of advanced algorithm with complex pattern
         // pattern::Fabric fabric(1400, 4500, true);
         // nesting::AdvancedAlgorithm alg(fabric);
         // std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
-        // nesting::NestingResult result =  alg.execute(testPieces);
+        // pattern::NestingResult result =  alg.execute(testPieces);
 
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));

@@ -356,7 +356,7 @@ std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCache(const std::ve
     return nfpCache;
 }
 
-std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCacheForFixedQueue(const std::vector<nesting::NestedItem> &items, size_t allVariantsCount)
+std::unordered_map<NFPKey, Clipper2Lib::Paths64> calculateNFPCacheForFixedQueue(const std::vector<pattern::NestedItem> &items, size_t allVariantsCount)
 {
     size_t n = items.size();
     std::unordered_map<NFPKey, Clipper2Lib::Paths64> nfpCache;

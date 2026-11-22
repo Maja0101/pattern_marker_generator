@@ -15,7 +15,7 @@ NestingEngineFacade::NestingEngineFacade(const pmg::pattern::Fabric &fabric, int
 
 NestingEngineFacade::~NestingEngineFacade() = default;
 
-pmg::nesting::NestingResult NestingEngineFacade::execute(std::vector<pmg::pattern::PatternPiece> &patternPieces)
+pmg::pattern::NestingResult NestingEngineFacade::execute(std::vector<pmg::pattern::PatternPiece> &patternPieces)
 {
     return m_engine->execute(patternPieces);
 }

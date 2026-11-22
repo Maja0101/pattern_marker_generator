@@ -32,22 +32,22 @@ private:
     std::uniform_real_distribution<double> m_probDist;
     std::uniform_int_distribution<size_t> m_idxDist;
 
-    void evaluateDifferentRotations(std::vector<nesting::NestedItem>& items, size_t index, NestingScore& best);
+    void evaluateDifferentRotations(std::vector<pattern::NestedItem>& items, size_t index, pattern::NestingScore& best);
     void applyMove(const utils::Move& m);
     void undoMove(const utils::Move& m);
 
-    NestingScore fullSearch();
-    NestingScore checkOneOption();
+    pattern::NestingScore fullSearch();
+    pattern::NestingScore checkOneOption();
 
-    NestingScore evaluate();
+    pattern::NestingScore evaluate();
     void resetAllPositions();
     bool checkAllIdentical();
     size_t pickBiasedIndex(size_t n, double exponent);
     bool pickValidMove(size_t n, bool identical, utils::Move& outMove, double biasExponent);
-    double setInitialTemp(const NestingScore& currentScore, NestingScore& bestScore, std::vector<NestedItem>& bestItems, size_t n, bool identical);
-    NestingScore simulatedAnnealing();
+    double setInitialTemp(const pattern::NestingScore& currentScore, pattern::NestingScore& bestScore, std::vector<pattern::NestedItem>& bestItems, size_t n, bool identical);
+    pattern::NestingScore simulatedAnnealing();
 protected:
-    NestingResult runAlgorithm() override;
+    pattern::NestingResult runAlgorithm() override;
 public:
     explicit AdvancedAlgorithm(int64_t width, int64_t length);
     explicit AdvancedAlgorithm(pattern::Fabric fabric);

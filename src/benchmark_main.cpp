@@ -13,10 +13,10 @@
 #include "geometry/geometry_types.hpp"
 #include "pattern/pattern_piece.hpp"
 #include "pattern/shapes.hpp"
-#include "nesting/nested_item.hpp"
+#include "pattern/nested_item.hpp"
 #include "nesting/basic_algorithm.hpp"
 #include "nesting/advanced_algorithm.hpp"
-#include "nesting/nesting_result.hpp"
+#include "pattern/nesting_result.hpp"
 #include "sample_input.hpp"
 
 namespace pmg::bench {
@@ -112,7 +112,7 @@ BenchmarkResult runBenchmark(
         stats.construct.record(std::chrono::duration<double, std::nano>(end - start).count());
 
         timing::PhaseTimings timings{};
-        pmg::nesting::NestingResult result = engine.execute(pieces, &timings);
+        pmg::pattern::NestingResult result = engine.execute(pieces, &timings);
         doNotOptimize(result);
 
         stats.nestingPreparation.record(timings.preparationNs);
