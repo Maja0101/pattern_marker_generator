@@ -45,10 +45,18 @@ int main()
         //     {1424, 1211},
         //     {760, 1638}
         // };
+
+        // std::vector<geometry::Point64> fabricPts = {
+        //     {593, 1582},
+        //     {640, 574},
+        //     {1808, 245},
+        //     {1723, 1205},
+        //     {1196, 1545}
+        // };
         
         // Verify the result and compatibilty of the algorithm
-        pattern::Fabric fabric(1000, 750, true);
-        // pattern::Fabric fabric(fabricPts, 0, true);
+        // pattern::Fabric fabric(1000, 750, true);
+        pattern::Fabric fabric(fabricPts, 0, true);
         nesting::BasicAlgorithm alg(fabric);
         std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
         pattern::NestingResult result = alg.execute(piecesToCheck);

@@ -125,7 +125,7 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
             {100, 100},
             {700, 300},
             {700,   0},
-            {  0,   0}
+            {100,   0}
         };
 
         const std::vector<pmg::geometry::Point64> longRectangle = {

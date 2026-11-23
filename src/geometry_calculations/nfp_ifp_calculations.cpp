@@ -144,6 +144,27 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         SPDLOG_INFO(std::format("Variants no. {} {}", variant.getPieceId(), variant.getGlobalId(isFlipped)));
     }
 
+    const Clipper2Lib::Rect64& variantBounds = variant.getBoundingBox();
+
+    int64_t minX = fabricBounds.left - variantBounds.left;
+    int64_t maxX = fabricBounds.right - variantBounds.right;
+    int64_t minY = fabricBounds.top - variantBounds.top; // top - min in clipper
+    int64_t maxY = fabricBounds.bottom - variantBounds.bottom;
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("x: {} - {} y: {} - {}", minX, maxX, minY, maxY));
+    }
+
+    // IFP empty when variant bigger than fabric
+    if (minX > maxX || minY > maxY) {
+        
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO("IFP empty, variant to big");
+        }
+
+        return Clipper2Lib::Paths64{};
+    }
+
     if (isAARectangle(fabricPath, fabricBounds)) {
         
         if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -151,27 +172,6 @@ Clipper2Lib::Paths64 buildIFPfor(const pattern::Fabric &fabric, const pattern::P
         }
 
         // Fast IFP calculation for rectangular fabric
-        const Clipper2Lib::Rect64& variantBounds = variant.getBoundingBox();
-
-        int64_t minX = fabricBounds.left - variantBounds.left;
-        int64_t maxX = fabricBounds.right - variantBounds.right;
-        int64_t minY = fabricBounds.top - variantBounds.top; // top - min in clipper
-        int64_t maxY = fabricBounds.bottom - variantBounds.bottom;
-
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            SPDLOG_INFO(std::format("x: {} - {} y: {} - {}", minX, maxX, minY, maxY));
-        }
-
-        // IFP empty when variant bigger than fabric
-        if (minX > maxX || minY > maxY) {
-            
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO("IFP empty, variant to big");
-            }
-
-            return Clipper2Lib::Paths64{};
-        }
-
         Clipper2Lib::Path64 ifp = {
             {minX, minY},
             {maxX, minY},

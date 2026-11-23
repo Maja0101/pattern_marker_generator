@@ -332,6 +332,143 @@ std::vector<pattern::PatternPiece> getPiecesToCheck2()
     return patternPieces;
 }
 
+std::vector<pattern::PatternPiece> getPiecesToCheck3()
+{
+    int sa = 5;
+    int ca = 20;
+    int g = 0;
+
+    std::vector<pattern::PatternPiece> patternPieces;
+    patternPieces.reserve(5);
+
+    std::vector<geometry::Point64> shape1 = {
+        {20319, 17152},
+        {18134, 15986},
+        {16787, 14420},
+        {16752, 12891},
+        {17453, 11332},
+        {17334, 9322},
+        {18767, 7688},
+        {18160, 5412},
+        {16934, 1966},
+        {18025, 1128},
+        {18937, 1128},
+        {22104, 2841},
+        {22032, 5389},
+        {21341, 10341},
+        {21413, 12929},
+        {20689, 14316},
+        {21886, 15877},
+        {20976, 16387}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints1 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    patternPieces.emplace_back(1, shape1, constraints1, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape2 = {
+        {2585, 17262},
+        {1857, 16352},
+        {947, 15914},
+        {1675, 10925},
+        {1275, 5317},
+        {6373, 4114},
+        {5899, 8884},
+        {6299, 13145},
+        {6190, 14492},
+        {4952, 15949}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints2 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    patternPieces.emplace_back(2, shape2, constraints2, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape3 = {
+        {13657, 2294},
+        {13145, 9031},
+        {13145, 12782},
+        {13620, 18209},
+        {11989, 17755},
+        {9941, 18172},
+        {8959, 18428},
+        {8959, 16315},
+        {9578, 11216},
+        {9650, 6592},
+        {9468, 4079},
+        {8921, 4042},
+        {8921, 3460},
+        {8921, 4042},
+        {9431, 4042},
+        {9468, 3495}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints3 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    patternPieces.emplace_back(3, shape3, constraints3, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape4 = {
+        {15696, 1747},
+        {16752, 1747},
+        {16752, 2038},
+        {17334, 1747},
+        {17297, 2694},
+        {16971, 2185},
+        {13764, 2366},
+        {16971, 1966},
+        {16715, 2038},
+        {16242, 13220},
+        {16787, 15514},
+        {18134, 17734},
+        {17699, 19081},
+        {17699, 21048},
+        {15986, 21013},
+        {15477, 19265},
+        {14239, 17918},
+        {14020, 16678},
+        {14057, 2476}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints4 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    patternPieces.emplace_back(4, shape4, constraints4, sa, ca, g, true);
+
+    std::vector<geometry::Point64> shape5 = {
+        {5098, 22432},
+        {5098, 19847},
+        {4479, 17771},
+        {5826, 15805},
+        {6483, 13873},
+        {6664, 7502},
+        {6336, 5026},
+        {5461, 5245},
+        {5280, 6918},
+        {4479, 6846},
+        {4479, 4516},
+        {7865, 3604},
+        {8959, 3604},
+        {9031, 13182},
+        {8593, 18025},
+        {7211, 19591},
+        {6627, 22505}
+    };
+
+    std::vector<pattern::VariantConstraint> constraints5 = {
+        { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
+    };
+
+    patternPieces.emplace_back(5, shape5, constraints5, sa, ca, g, true);
+
+    return patternPieces;
+}
+
 std::vector<pattern::PatternPiece> getTestPieces()
 {
     int sa = 15;
