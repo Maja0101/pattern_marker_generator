@@ -3,6 +3,7 @@ add_library(nesting
     algorithm_base.cpp
     basic_algorithm.cpp
     advanced_algorithm.cpp
+    stats_recalculation.cpp
 )
 
 target_include_directories(nesting PUBLIC

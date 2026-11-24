@@ -17,6 +17,7 @@
 #include "pattern/nested_item.hpp"
 #include "nesting/basic_algorithm.hpp"
 #include "nesting/advanced_algorithm.hpp"
+#include "nesting/stats_recalculation.hpp"
 #include "pattern/nesting_result.hpp"
 #include "sample_input.hpp"
 
@@ -56,16 +57,16 @@ int main()
         
         // Verify the result and compatibilty of the algorithm
         // pattern::Fabric fabric(1000, 750, true);
-        pattern::Fabric fabric(fabricPts, 0, true);
-        nesting::BasicAlgorithm alg(fabric);
-        std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
-        pattern::NestingResult result = alg.execute(piecesToCheck);
+        // pattern::Fabric fabric(fabricPts, 0, true);
+        // nesting::BasicAlgorithm alg(fabric);
+        // std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
+        // pattern::NestingResult result = alg.execute(piecesToCheck);
 
         // Verification of results for new version of advanced algorithm with complex pattern
-        // pattern::Fabric fabric(1400, 4500, true);
-        // nesting::AdvancedAlgorithm alg(fabric);
-        // std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
-        // pattern::NestingResult result =  alg.execute(testPieces);
+        pattern::Fabric fabric(1400, 4500, true);
+        nesting::BasicAlgorithm alg(fabric);
+        std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
+        pattern::NestingResult result =  alg.execute(testPieces);
 
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
@@ -77,6 +78,21 @@ int main()
             result.stats.remainingFabricLength, result.stats.remainingFabricArea, result.stats.remainingFabricPercentage,
             result.stats.wasteArea, result.stats.wastePercentage)
         );
+        
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            for (const auto& p : result.positions) {
+                SPDLOG_INFO(std::format("{} {} {} {} ({}, {})", p.id, p.rotationAngle, p.isMirrored, p.isFlipped180, p.x, p.y));
+            }
+        }
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            pattern::NestingStats newStats = nesting::checkStatsFor(fabric, testPieces, result.positions);
+            SPDLOG_INFO(std::format("Scraps: {}, {} smm {}% Fabric: {} mm, {} smm {}% Waste: {} smm {}%", 
+                newStats.usableScrapCount, newStats.usableScrapsArea, newStats.usableScrapsPercentage,
+                newStats.remainingFabricLength, newStats.remainingFabricArea, newStats.remainingFabricPercentage,
+                newStats.wasteArea, newStats.wastePercentage)
+            );
+        } 
 
     }
 

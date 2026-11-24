@@ -252,9 +252,15 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
             SPDLOG_INFO(std::format("Raw position point {} for {} {}", rawPosition.toString(), item.getVariant()->getPieceId(), item.getVariant()->getIsMirrored()));
         }
 
+        
         geometry::Point64 refPoint = item.getVariant()->getReferencePoint();
         geometry::Point64 fabricRefPoint = m_fabric.getReferencePoint();
         
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("{} {}: {} {} {}",
+                item.getVariant()->getPieceId(), item.getVariant()->getIsMirrored(),
+                rawPosition.toString(), fabricRefPoint.toString(), refPoint.toString()));
+        }
         if constexpr (config::DEBUG_MODE_DETAILED) {
             geometry::Point64 positionWithoutAllowances = item.getPositionForItemWithoutAllowances();
             SPDLOG_INFO(std::format("Without allowances position point {}", positionWithoutAllowances.toString()));

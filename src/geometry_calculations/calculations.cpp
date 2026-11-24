@@ -11,6 +11,7 @@
 #include "utils/config.hpp"
 #include "geometry_calculations/calculations.hpp"
 #include "geometry_calculations/ifp_pocket_calculations.hpp"
+#include "pattern/svg_exporter.hpp"
 
 namespace pmg::geometry::calculations::utils {
 
@@ -68,6 +69,10 @@ Clipper2Lib::Paths64 transaltePaths(const Clipper2Lib::Paths64 &paths, const Cli
 Point64 rotatePointCcwBy(const Point64 &point, int angle) {
     const int GRAINLINE_CCW = 360 - angle;
     return transformPolygon({ point }, GRAINLINE_CCW, false, false)[0];
+}
+Point64 rotatePointCwBy(const Point64 &point, int angle)
+{
+    return transformPolygon({ point }, angle, false, false)[0];
 };
 
 Clipper2Lib::Point64 snapToBoundaries(Clipper2Lib::Point64 point, const Clipper2Lib::Paths64 &ifpPaths, const std::vector<Clipper2Lib::Paths64> &originalNfps, int64_t epsilon)
@@ -331,6 +336,67 @@ pattern::NestingStats evaluate(const Clipper2Lib::Paths64 &allPlacedItems, const
     }
 
     return result;
+}
+
+pattern::NestingStats recalculateStats(const pattern::Fabric &fabric, std::vector<pattern::NestedItem> &nestedItems, const std::vector<pattern::ItemPlacement> &newPlacements)
+{
+    const int SCALE = 1000;
+    Clipper2Lib::Paths64 placedItemsPaths;
+
+    size_t n = newPlacements.size();
+    int64_t minLen = 0;
+    for (size_t i = 0; i < n; ++i) {
+        geometry::Point64 unrotated = rotatePointCwBy(
+            geometry::Point64{newPlacements[i].x* SCALE, newPlacements[i].y* SCALE}, 
+            fabric.getGrainline()
+        );
+
+        geometry::Point64 fabricRefPoint = fabric.getReferencePoint();
+        geometry::Point64 refPoint = nestedItems[i].getVariant()->getReferencePoint();
+
+        Point64 rawPosition{
+            (fabricRefPoint.y - refPoint.y) - unrotated.y,
+            unrotated.x - (fabricRefPoint.x - refPoint.x)
+        };
+
+        if constexpr (config::DEBUG_MODE_DETAILED) {
+            SPDLOG_INFO(std::format("{} {} {}; {} {} {} {} {}", 
+                unrotated.toString(),
+                fabricRefPoint.toString(),
+                refPoint.toString(),
+                nestedItems[i].getVariant()->getPieceId(), 
+                nestedItems[i].getVariant()->getRotationAngle(), 
+                nestedItems[i].getVariant()->getIsMirrored(), 
+                nestedItems[i].isFlipped(), rawPosition.toString()
+            ));
+        }
+
+        placedItemsPaths.push_back(nestedItems[i].getItemPathAtPosition(rawPosition.x, rawPosition.y));
+        nestedItems[i].lockInPosition(rawPosition.x, rawPosition.y);
+        minLen = std::max(nestedItems[i].getItemBoundingBoxAtPosition().right, minLen);
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("{} {}", newPlacements.size(), nestedItems.size()));
+        for (size_t i = 0; i < nestedItems.size(); ++i) {
+            SPDLOG_INFO(std::format("ip: {} {} {} {} ({}, {}); ni: {} {} {} {} {}", 
+                newPlacements[i].id, newPlacements[i].rotationAngle, newPlacements[i].isMirrored, newPlacements[i].isFlipped180, newPlacements[i].x, newPlacements[i].y,
+                nestedItems[i].getVariant()->getPieceId(), nestedItems[i].getVariant()->getRotationAngle(), nestedItems[i].getVariant()->getIsMirrored(), nestedItems[i].isFlipped(), nestedItems[i].getPosition().toString()
+            ));
+        }
+    }
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        visualisation::SvgExporter::exportLayout(
+            "recreated_layout.svg", 
+            fabric,
+            nestedItems,
+            nestedItems[0].getVariant()->getSeamAllowance(),
+            nestedItems[0].getVariant()->getCuttingAllowance()
+        );
+    }
+
+    return geometry::calculations::evaluate(placedItemsPaths, fabric, minLen);
 }
 
 } // namespace pmg::geometry::calculations
