@@ -66,7 +66,7 @@ int main()
         pattern::Fabric fabric(1400, 4500, true);
         nesting::BasicAlgorithm alg(fabric);
         std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
-        pattern::NestingResult result =  alg.execute(testPieces);
+        pattern::NestingResult result = alg.execute(testPieces);
 
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));

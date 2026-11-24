@@ -27,6 +27,7 @@ if(TEST_FILES)
     test_two_way.cpp
     test_options.cpp
     test_input_transformations.cpp
+    test_stats_recalculation.cpp
   )
 
   # Specify include directories to use when compiling 
