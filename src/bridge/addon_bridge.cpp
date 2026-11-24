@@ -126,22 +126,68 @@ NestingInput parseWidthInput(const Napi::CallbackInfo& info) {
     return in;
 }
 
+pmg::pattern::ItemPlacement parsePlacement(const Napi::Object& o) {
+    pmg::pattern::ItemPlacement p{};
+    p.id = getInt(o, "id", 0);
+    p.rotationAngle = static_cast<int>(getInt(o, "rotationAngle", 0));
+    p.isMirrored = getBool(o, "isMirrored", false);
+    p.isFlipped180 = getBool(o, "isFlipped180", false);
+    p.x = getInt(o, "x", 0);
+    p.y = getInt(o, "y", 0);
+    return p;
+}
+
+struct StatsInput {
+    pattern::Fabric fabric;
+    std::vector<pattern::PatternPiece> pieces;
+    std::vector<pattern::ItemPlacement> placements;
+};
+
+StatsInput parseStatsInput(const Napi::CallbackInfo& info) {
+    if (info.Length() < 3 || !info[0].IsObject() || !info[1].IsArray() || !info[2].IsArray())
+        throw std::invalid_argument("usage: calculateStatsFor(fabric: object, patternPieces: object[], itemPlacements: object[])");
+
+    StatsInput in{parseFabric(info[0].As<Napi::Object>()), {}, {}};
+
+    Napi::Array piecesArr = info[1].As<Napi::Array>();
+    in.pieces.reserve(piecesArr.Length());
+    for (uint32_t i = 0; i < piecesArr.Length(); ++i) {
+        Napi::Value v = piecesArr.Get(i);
+        if (!v.IsObject()) throw std::invalid_argument("each piece must be an object");
+        in.pieces.push_back(parsePiece(v.As<Napi::Object>()));
+    }
+
+    Napi::Array placementsArr = info[2].As<Napi::Array>();
+    in.placements.reserve(placementsArr.Length());
+    for (uint32_t i = 0; i < placementsArr.Length(); ++i) {
+        Napi::Value v = placementsArr.Get(i);
+        if (!v.IsObject()) throw std::invalid_argument("each placement must be an object");
+        in.placements.push_back(parsePlacement(v.As<Napi::Object>()));
+    }
+
+    return in;
+}
+
+Napi::Object statsToJs(Napi::Env env, const decltype(pmg::pattern::NestingResult::stats)& s) {
+    Napi::Object stats = Napi::Object::New(env);
+    stats.Set("usableScrapCount", s.usableScrapCount);
+    stats.Set("usableScrapsArea", s.usableScrapsArea);
+    stats.Set("usableScrapsPercentage", s.usableScrapsPercentage);
+    stats.Set("remainingFabricLength", s.remainingFabricLength);
+    stats.Set("remainingFabricArea", s.remainingFabricArea);
+    stats.Set("remainingFabricPercentage", s.remainingFabricPercentage);
+    stats.Set("wasteArea", s.wasteArea);
+    stats.Set("wastePercentage", s.wastePercentage);
+    return stats;
+}
+
 Napi::Object toJs(Napi::Env env, const pmg::pattern::NestingResult& r) {
     Napi::Object out = Napi::Object::New(env);
     out.Set("wasSuccessful", r.wasSuccessful);
     out.Set("minLength", r.minLength);
     out.Set("executionTime", r.executionTime);
 
-    Napi::Object stats = Napi::Object::New(env);
-    stats.Set("usableScrapCount", r.stats.usableScrapCount);
-    stats.Set("usableScrapsArea", r.stats.usableScrapsArea);
-    stats.Set("usableScrapsPercentage", r.stats.usableScrapsPercentage);
-    stats.Set("remainingFabricLength", r.stats.remainingFabricLength);
-    stats.Set("remainingFabricArea", r.stats.remainingFabricArea);
-    stats.Set("remainingFabricPercentage", r.stats.remainingFabricPercentage);
-    stats.Set("wasteArea", r.stats.wasteArea);
-    stats.Set("wastePercentage", r.stats.wastePercentage);
-    out.Set("stats", stats);
+    out.Set("stats", statsToJs(env, r.stats));
 
     Napi::Array positions = Napi::Array::New(env, r.positions.size());
     for (size_t i = 0; i < r.positions.size(); ++i) {
@@ -268,6 +314,62 @@ Napi::Value CalcMinimumSync(const Napi::CallbackInfo& info) {
     }
 }
 
+class CalculateStatsWorker : public Napi::AsyncWorker {
+public:
+    CalculateStatsWorker(Napi::Env env, StatsInput input)
+        : Napi::AsyncWorker(env), m_deferred(Napi::Promise::Deferred::New(env)), m_input(std::move(input)) {}
+
+    Napi::Promise Promise() { return m_deferred.Promise(); }
+
+protected:
+    void Execute() override {
+        try {
+            m_stats = calculateStatsFor(m_input.fabric, m_input.pieces, m_input.placements);
+        } catch (const std::exception& e) {
+            SetError(e.what());
+        }
+    }
+
+    void OnOK() override {
+        m_deferred.Resolve(statsToJs(Env(), m_stats));
+    }
+
+    void OnError(const Napi::Error& e) override {
+        m_deferred.Reject(e.Value());
+    }
+
+private:
+    Napi::Promise::Deferred m_deferred;
+    StatsInput m_input;
+    decltype(pmg::pattern::NestingResult::stats) m_stats{};
+};
+
+Napi::Value CalculateStatsFor(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    try {
+        auto* worker = new CalculateStatsWorker(env, parseStatsInput(info));
+        Napi::Promise p = worker->Promise();
+        worker->Queue();
+        return p;
+    } catch (const std::exception& e) {
+        Napi::Promise::Deferred d = Napi::Promise::Deferred::New(env);
+        d.Reject(Napi::Error::New(env, e.what()).Value());
+        return d.Promise();
+    }
+}
+
+Napi::Value CalculateStatsForSync(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    try {
+        StatsInput in = parseStatsInput(info);
+        auto stats = calculateStatsFor(in.fabric, in.pieces, in.placements);
+        return statsToJs(env, stats);
+    } catch (const std::exception& e) {
+        Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+}
+
 } // namespace pmg::api
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
@@ -275,6 +377,8 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set("executeSync", Napi::Function::New(env, pmg::api::ExecuteSync, "executeSync"));
     exports.Set("calcMinimum", Napi::Function::New(env, pmg::api::CalcMinimum, "calcMinimum"));
     exports.Set("calcMinimumSync", Napi::Function::New(env, pmg::api::CalcMinimumSync, "calcMinimumSync"));
+    exports.Set("calculateStatsFor", Napi::Function::New(env, pmg::api::CalculateStatsFor, "calculateStatsFor"));
+    exports.Set("calculateStatsForSync", Napi::Function::New(env, pmg::api::CalculateStatsForSync, "calculateStatsForSync"));
     return exports;
 }
 

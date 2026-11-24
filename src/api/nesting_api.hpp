@@ -11,10 +11,11 @@ namespace pmg::pattern {
     class Fabric;
 } // namespace pmg::pattern
 
-namespace pmg::nesting
-{
+namespace pmg::nesting {
     class AlgorithmBase;
 } // namespace pmg::nesting
+
+namespace pmg::api {
 
 class NestingEngineFacade {
 private:
@@ -26,3 +27,11 @@ public:
     pmg::pattern::NestingResult execute(std::vector<pmg::pattern::PatternPiece>& patternPieces);
     int64_t calcMinimum(std::vector<pmg::pattern::PatternPiece>& patternPieces);
 };
+
+pmg::pattern::NestingStats calculateStatsFor(
+    const pmg::pattern::Fabric& fabric,
+    std::vector<pmg::pattern::PatternPiece>& patternPieces,
+    const std::vector<pmg::pattern::ItemPlacement>& itemPlacements
+);
+
+} // namespace pmg::api

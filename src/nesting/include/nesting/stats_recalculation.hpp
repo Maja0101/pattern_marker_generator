@@ -11,7 +11,7 @@ namespace pmg::nesting {
 pattern::NestingStats checkStatsFor(
     const pattern::Fabric& fabric, 
     std::vector<pattern::PatternPiece>& patternPieces,
-    std::vector<pattern::ItemPlacement> newPlacements
+    const std::vector<pattern::ItemPlacement> newPlacements
 ); 
 
 } // namespace pmg::nesting 

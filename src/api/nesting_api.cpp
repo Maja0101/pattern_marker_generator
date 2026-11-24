@@ -2,8 +2,11 @@
 #include "nesting/algorithm_base.hpp"
 #include "nesting/basic_algorithm.hpp"
 #include "nesting/advanced_algorithm.hpp"
+#include "nesting/stats_recalculation.hpp"
 #include "pattern/shapes.hpp"
 #include "pattern/pattern_piece.hpp"
+
+namespace pmg::api {
 
 NestingEngineFacade::NestingEngineFacade(const pmg::pattern::Fabric &fabric, int64_t algId)
     : m_engine([&]() -> std::unique_ptr<pmg::nesting::AlgorithmBase> {
@@ -24,3 +27,10 @@ int64_t NestingEngineFacade::calcMinimum(std::vector<pmg::pattern::PatternPiece>
 {
     return m_engine->execute(patternPieces).minLength;
 }
+
+pmg::pattern::NestingStats calculateStatsFor(const pmg::pattern::Fabric &fabric, std::vector<pmg::pattern::PatternPiece> &patternPieces, const std::vector<pmg::pattern::ItemPlacement> &itemPlacements)
+{
+    return pmg::nesting::checkStatsFor(fabric, patternPieces, itemPlacements);
+}
+
+} // namespace pmg::api

@@ -7,14 +7,13 @@
 
 #include "nesting/stats_recalculation.hpp"
 #include "geometry_calculations/calculations.hpp"
-#include "utils/config.hpp"
 
 namespace pmg::nesting {
 
 pattern::NestingStats checkStatsFor(
     const pattern::Fabric &fabric, 
     std::vector<pattern::PatternPiece> &patternPieces, 
-    std::vector<pattern::ItemPlacement> newPlacements)
+    const std::vector<pattern::ItemPlacement> newPlacements)
 {
     std::vector<pattern::NestedItem> nestedItems(geometry::calculations::prepareItems(patternPieces));
     
