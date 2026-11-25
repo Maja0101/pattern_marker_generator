@@ -359,7 +359,7 @@ pattern::NestingScore AdvancedAlgorithm::simulatedAnnealing()
             pattern::NestingScore candidateScore = evaluate();
             double deltaE = candidateScore.score - currentScore.score;
 
-            // Positive delta meand better result
+            // Positive delta mean better result
             if (deltaE > 0.0 || m_probDist(m_rng) < std::exp(deltaE / temp)) {
                 currentScore = candidateScore;
                 if (currentScore.result.wasSuccessful && currentScore.score > bestScore.score) {

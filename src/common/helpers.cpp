@@ -1,3 +1,5 @@
+#include <numbers>
+
 #include "common/helpers.hpp"
 
 namespace pmg::geometry {

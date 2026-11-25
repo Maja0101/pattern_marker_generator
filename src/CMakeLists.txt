@@ -52,7 +52,7 @@ if(CMAKE_JS_VERSION)
     set_target_properties(pmg_engine PROPERTIES PREFIX "" SUFFIX ".node")
 
     if(MSVC)
-        target_compile_options(pmg_engine PRIVATE /EHsc)
+        target_compile_options(pmg_engine PRIVATE /utf-8 /EHsc)
     else()
         target_compile_options(pmg_engine PRIVATE -fexceptions)
     endif()
