@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 #include "api/nesting_api.hpp"
 #include "common/geometry_types.hpp"
@@ -13,12 +14,26 @@
 
 namespace pmg::api {
 
+constexpr int64_t COORD_SCALE = 1000;
+
 int64_t getInt(const Napi::Object& obj, const char* key, int64_t def) {
     if (!obj.Has(key)) return def;
     Napi::Value v = obj.Get(key);
     if (v.IsUndefined() || v.IsNull()) return def;
     if (!v.IsNumber()) throw std::invalid_argument(std::string("'") + key + "' must be a number");
     return v.As<Napi::Number>().Int64Value();
+}
+
+double getNumber(const Napi::Object& obj, const char* key, double def) {
+    if (!obj.Has(key)) return def;
+    Napi::Value v = obj.Get(key);
+    if (v.IsUndefined() || v.IsNull()) return def;
+    if (!v.IsNumber()) throw std::invalid_argument(std::string("'") + key + "' must be a number");
+    return v.As<Napi::Number>().DoubleValue();
+}
+
+int64_t toScaledCoord(double value) {
+    return static_cast<int64_t>(std::llround(value * static_cast<double>(COORD_SCALE)));
 }
 
 bool getBool(const Napi::Object& obj, const char* key, bool def) {
@@ -42,7 +57,7 @@ std::vector<geometry::Point64> parsePoints(const Napi::Array& arr) {
         Napi::Value item = arr.Get(i);
         if (!item.IsObject()) throw std::invalid_argument("point must be an object {x, y}");
         Napi::Object o = item.As<Napi::Object>();
-        result.push_back(geometry::Point64{getInt(o, "x", 0), getInt(o, "y", 0)});
+        result.push_back(geometry::Point64{toScaledCoord(getNumber(o, "x", 0.0)), toScaledCoord(getNumber(o, "y", 0.0))});
     }
     return result;
 }
@@ -68,16 +83,18 @@ pattern::PatternPiece parsePiece(const Napi::Object& o) {
     std::vector<geometry::Point64> points = parsePoints(requireArray(o, "points"));
     std::vector<pattern::VariantConstraint> constraints;
     if (o.Has("constraints")) constraints = parseConstraints(requireArray(o, "constraints"));
+    const int64_t seamAllowance = getInt(o, "seamAllowance", 0) * COORD_SCALE;
+    const int64_t cuttingAllowance = getInt(o, "cuttingAllowance", 0) * COORD_SCALE;
     return pattern::PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
-                        getInt(o, "seamAllowance", 0), getInt(o, "cuttingAllowance", 0),
-                        getInt(o, "grainline", 0), true);
+                        seamAllowance, cuttingAllowance,
+                        getInt(o, "grainline", 0), false);
 }
 
 constexpr int64_t DEFAULT_WIDTH = 1400000; 
 constexpr int64_t DEFAULT_LENGTH = 100000000;
 
 pattern::Fabric parseFabric(const Napi::Object& o) {
-    if (o.Has("boundary") && o.Has("grainline")) return pattern::Fabric(parsePoints(requireArray(o, "boundary")), getInt(o, "grainline", 0), true);
+    if (o.Has("boundary") && o.Has("grainline")) return pattern::Fabric(parsePoints(requireArray(o, "boundary")), getInt(o, "grainline", 0), false);
     if (o.Has("width") && o.Has("length")) return pattern::Fabric(getInt(o, "width", 0), getInt(o, "length", 0), true);
     return pattern::Fabric(DEFAULT_WIDTH, DEFAULT_LENGTH, false);
 }
@@ -132,8 +149,8 @@ pmg::pattern::ItemPlacement parsePlacement(const Napi::Object& o) {
     p.rotationAngle = static_cast<int>(getInt(o, "rotationAngle", 0));
     p.isMirrored = getBool(o, "isMirrored", false);
     p.isFlipped180 = getBool(o, "isFlipped180", false);
-    p.x = getInt(o, "x", 0);
-    p.y = getInt(o, "y", 0);
+    p.x = getNumber(o, "x", 0.0);
+    p.y = getNumber(o, "y", 0.0);
     return p;
 }
 
@@ -197,8 +214,8 @@ Napi::Object toJs(Napi::Env env, const pmg::pattern::NestingResult& r) {
         o.Set("rotationAngle", p.rotationAngle);
         o.Set("isMirrored", p.isMirrored);
         o.Set("isFlipped180", p.isFlipped180);
-        o.Set("x", Napi::Number::New(env, static_cast<double>(p.x)));
-        o.Set("y", Napi::Number::New(env, static_cast<double>(p.y)));
+        o.Set("x", Napi::Number::New(env, p.x));
+        o.Set("y", Napi::Number::New(env, p.y));
         positions[static_cast<uint32_t>(i)] = o;
     }
     out.Set("positions", positions);

@@ -296,8 +296,8 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
             .rotationAngle = item.getVariant()->getRotationAngle(),
             .isMirrored = item.getVariant()->getIsMirrored(),
             .isFlipped180 = item.isFlipped(),
-            .x = deltaPosition.x / SCALE,
-            .y = deltaPosition.y / SCALE
+            .x = static_cast<double>(deltaPosition.x) / static_cast<double>(SCALE),
+            .y = static_cast<double>(deltaPosition.y) / static_cast<double>(SCALE)
         });
     }
 

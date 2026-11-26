@@ -872,19 +872,19 @@ std::vector<pattern::PatternPiece> getTestPieces()
     std::vector<pattern::PatternPiece> suit;
     suit.reserve(19);
 
-    suit.emplace_back(12428, shape35, constraints35, sa, ca, g, true);
-    suit.emplace_back(12421, shape36, constraints36, sa, ca, g, true);
-    suit.emplace_back(12430, shape37, constraints37, sa, ca, g, true);
-    suit.emplace_back(12429, shape38, constraints38, sa, ca, g, true);
-    suit.emplace_back(12434, shape39, constraints39, sa, ca, g, true);
-    suit.emplace_back(12423, shape42, constraints42, sa, ca, g, true);
-    suit.emplace_back(12422, shape43, constraints43, sa, ca, g, true);
-    suit.emplace_back(12425, shape44, constraints44, sa, ca, g, true);
-    suit.emplace_back(12426, shape48, constraints48, sa, ca, g, true);
-    suit.emplace_back(12431, shape49, constraints49, sa, ca, g, true);
-    suit.emplace_back(12424, shape50, constraints50, sa, ca, g, true);
-    suit.emplace_back(12433, shape52, constraints52, sa, ca, g, true);
-    suit.emplace_back(12427, shape53, constraints53, sa, ca, g, true);
+    // suit.emplace_back(12428, shape35, constraints35, sa, ca, g, true);
+    // suit.emplace_back(12421, shape36, constraints36, sa, ca, g, true);
+    // suit.emplace_back(12430, shape37, constraints37, sa, ca, g, true);
+    // suit.emplace_back(12429, shape38, constraints38, sa, ca, g, true);
+    // suit.emplace_back(12434, shape39, constraints39, sa, ca, g, true);
+    // suit.emplace_back(12423, shape42, constraints42, sa, ca, g, true);
+    // suit.emplace_back(12422, shape43, constraints43, sa, ca, g, true);
+    // suit.emplace_back(12425, shape44, constraints44, sa, ca, g, true);
+    // suit.emplace_back(12426, shape48, constraints48, sa, ca, g, true);
+    // suit.emplace_back(12431, shape49, constraints49, sa, ca, g, true);
+    // suit.emplace_back(12424, shape50, constraints50, sa, ca, g, true);
+    // suit.emplace_back(12433, shape52, constraints52, sa, ca, g, true);
+    // suit.emplace_back(12427, shape53, constraints53, sa, ca, g, true);
 
 
     suit.emplace_back(12521, shape40, constraints40, sa, ca, g, true);

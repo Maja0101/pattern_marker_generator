@@ -10,8 +10,8 @@ struct ItemPlacement {
     int rotationAngle;
     bool isMirrored;
     bool isFlipped180;
-    int64_t x;
-    int64_t y;
+    double x;
+    double y;
 };
 
 struct NestingStats {

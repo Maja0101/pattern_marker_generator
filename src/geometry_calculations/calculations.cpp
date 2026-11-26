@@ -346,8 +346,11 @@ pattern::NestingStats recalculateStats(const pattern::Fabric &fabric, std::vecto
     size_t n = newPlacements.size();
     int64_t minLen = 0;
     for (size_t i = 0; i < n; ++i) {
+        const int64_t placementX = static_cast<int64_t>(std::llround(newPlacements[i].x * static_cast<double>(SCALE)));
+        const int64_t placementY = static_cast<int64_t>(std::llround(newPlacements[i].y * static_cast<double>(SCALE)));
+
         geometry::Point64 unrotated = rotatePointCwBy(
-            geometry::Point64{newPlacements[i].x* SCALE, newPlacements[i].y* SCALE}, 
+            geometry::Point64{placementX, placementY}, 
             fabric.getGrainline()
         );
 

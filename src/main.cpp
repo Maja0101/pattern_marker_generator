@@ -64,7 +64,7 @@ int main()
 
         // Verification of results for new version of advanced algorithm with complex pattern
         pattern::Fabric fabric(1400, 4500, true);
-        nesting::BasicAlgorithm alg(fabric);
+        nesting::AdvancedAlgorithm alg(fabric);
         std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
         pattern::NestingResult result = alg.execute(testPieces);
 
