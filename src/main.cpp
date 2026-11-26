@@ -31,13 +31,13 @@ int main()
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO("Starting Pattern Marker Generator...");
 
-        std::vector<geometry::Point64> fabricPts = {
-            {501, 1352},
-            {546, 477},
-            {1540, 213},
-            {1492, 1002},
-            {1012, 1317}
-        };
+        // std::vector<geometry::Point64> fabricPts = {
+        //     {501, 1352},
+        //     {546, 477},
+        //     {1540, 213},
+        //     {1492, 1002},
+        //     {1012, 1317}
+        // };
 
         // std::vector<geometry::Point64> fabricPts = {
         //     {0, 1686},
@@ -54,19 +54,39 @@ int main()
         //     {1723, 1205},
         //     {1196, 1545}
         // };
+
+        std::vector<geometry::Point64> fabricPts3 = {
+            {93850, 1761690},
+            {138394, 950886},
+            {621773, 44442},
+            {954470, 52019},
+            {1210982, 235110},
+            {1222810, 1914470},
+            {691661, 1908122}
+        };
+
+        std::vector<geometry::Point64> fabricPts4 = {
+            {1608496, 1935107},
+            {1087658, 1982983},
+            {510578, 1538183},
+            {48914, 1208777},
+            {831545, 74270},
+            {1349451, 265775},
+            {1766231, 1417060}
+        };
         
         // Verify the result and compatibilty of the algorithm
         // pattern::Fabric fabric(1000, 750, true);
-        // pattern::Fabric fabric(fabricPts, 0, true);
-        // nesting::BasicAlgorithm alg(fabric);
-        // std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck();
-        // pattern::NestingResult result = alg.execute(piecesToCheck);
+        pattern::Fabric fabric(fabricPts3, 145, false);
+        nesting::BasicAlgorithm alg(fabric);
+        std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck3();
+        pattern::NestingResult result = alg.execute(piecesToCheck);
 
         // Verification of results for new version of advanced algorithm with complex pattern
-        pattern::Fabric fabric(1400, 4500, true);
-        nesting::AdvancedAlgorithm alg(fabric);
-        std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
-        pattern::NestingResult result = alg.execute(testPieces);
+        // pattern::Fabric fabric(1400, 4500, true);
+        // nesting::AdvancedAlgorithm alg(fabric);
+        // std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
+        // pattern::NestingResult result = alg.execute(testPieces);
 
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));
@@ -85,14 +105,14 @@ int main()
             }
         }
 
-        if constexpr (config::DEBUG_MODE_DETAILED) {
-            pattern::NestingStats newStats = nesting::checkStatsFor(fabric, testPieces, result.positions);
-            SPDLOG_INFO(std::format("Scraps: {}, {} smm {}% Fabric: {} mm, {} smm {}% Waste: {} smm {}%", 
-                newStats.usableScrapCount, newStats.usableScrapsArea, newStats.usableScrapsPercentage,
-                newStats.remainingFabricLength, newStats.remainingFabricArea, newStats.remainingFabricPercentage,
-                newStats.wasteArea, newStats.wastePercentage)
-            );
-        } 
+        // if constexpr (config::DEBUG_MODE_DETAILED) {
+        //     pattern::NestingStats newStats = nesting::checkStatsFor(fabric, testPieces, result.positions);
+        //     SPDLOG_INFO(std::format("Scraps: {}, {} smm {}% Fabric: {} mm, {} smm {}% Waste: {} smm {}%", 
+        //         newStats.usableScrapCount, newStats.usableScrapsArea, newStats.usableScrapsPercentage,
+        //         newStats.remainingFabricLength, newStats.remainingFabricArea, newStats.remainingFabricPercentage,
+        //         newStats.wasteArea, newStats.wastePercentage)
+        //     );
+        // } 
 
     }
 

@@ -285,7 +285,7 @@ pattern::NestingResult BottomLeft::performNesting(std::vector<pattern::NestedIte
             SPDLOG_INFO(std::format("Delta point {}", deltaPosition.toString()));
         }
 
-        deltaPosition = geometry::calculations::rotatePointCcwBy(deltaPosition, m_fabric.getGrainline());
+        deltaPosition = geometry::calculations::rotatePointCwBy(deltaPosition, m_fabric.getGrainline());
 
         if constexpr (config::DEBUG_MODE_DETAILED) {
             SPDLOG_INFO(std::format("Delta point after grainline rotation {}", deltaPosition.toString()));

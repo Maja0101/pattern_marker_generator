@@ -125,7 +125,7 @@ Fabric::InitState Fabric::transformBoundary(const std::vector<geometry::Point64>
         }
     }
 
-    state.boundary = geometry::transformPolygon(state.boundary, state.grainline, false, false);
+    state.boundary = geometry::transformPolygon(state.boundary, -state.grainline, false, false);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
         for (const auto& p : state.boundary) {
