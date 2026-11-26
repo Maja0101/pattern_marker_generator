@@ -18,7 +18,6 @@ export interface PatternPiece {
   constraints?: VariantConstraint[];
   seamAllowance?: number;
   cuttingAllowance?: number;
-  grainline?: number;
 }
 
 export interface ItemPlacement {

@@ -34,8 +34,8 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         { .rotationAngle = 90, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
     };
 
-    pmg::pattern::PatternPiece piece1(1, polygon, constraints, 50, 50, 0, true);
-    pmg::pattern::PatternPiece piece2(2, rectangle, constraints, 50, 50, 0, true);
+    pmg::pattern::PatternPiece piece1(1, polygon, constraints, 50, 50, true);
+    pmg::pattern::PatternPiece piece2(2, rectangle, constraints, 50, 50, true);
 
     SECTION("Variant transformation") {
         const std::vector<pmg::geometry::Point64> expected = {
@@ -88,7 +88,7 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
 
     SECTION("On rectangle fabric") {
         constraints[0].rotationAngle = 0;
-        pmg::pattern::PatternPiece piece3(3, rectangle, constraints, 50, 50, 0, true);
+        pmg::pattern::PatternPiece piece3(3, rectangle, constraints, 50, 50, true);
         
         pmg::pattern::Fabric fabric(1600, 2000, true);
         std::vector<pmg::pattern::PatternPiece> pieces = { piece1, piece2, piece3 };
@@ -137,8 +137,8 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         };
 
         constraints[0].rotationAngle = 0;
-        pmg::pattern::PatternPiece piece3(3, trapezium, constraints, 0, 0, 0, true);
-        pmg::pattern::PatternPiece piece4(4, longRectangle, constraints, 0, 0, 0, true);
+        pmg::pattern::PatternPiece piece3(3, trapezium, constraints, 0, 0, true);
+        pmg::pattern::PatternPiece piece4(4, longRectangle, constraints, 0, 0, true);
 
         const std::vector<pmg::geometry::Point64> fabricPts = {
             {100, 100},

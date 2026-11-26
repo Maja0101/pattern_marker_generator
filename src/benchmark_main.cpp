@@ -59,7 +59,6 @@ BenchmarkResult runBenchmark(
     std::size_t twoWayCount,
     int seamAllowance, 
     int cuttingAllowance,
-    int grainline, 
     std::size_t iterations,
     std::uint32_t seed = 124125) {
 
@@ -88,7 +87,7 @@ BenchmarkResult runBenchmark(
         std::vector<pmg::pattern::PatternPiece> pieces;
         pieces.reserve(patternSize);
         for (std::size_t i = 0; i < patternSize; ++i) {
-            pieces.emplace_back(ids[i], shapes[i], constraints[i], seamAllowance, cuttingAllowance, grainline, true);
+            pieces.emplace_back(ids[i], shapes[i], constraints[i], seamAllowance, cuttingAllowance, true);
         }
         return pieces;
     };
@@ -532,7 +531,6 @@ int main() {
 
     const std::vector<std::size_t> testSizes {2, 4, 8, 16};
     const std::vector twoWayRatios {0.0, 0.25, 0.5, 1.0};
-    constexpr int grainline = 0;
     constexpr int seamAllowance = 15;
     constexpr int cuttingAllowance = 5;
 
@@ -551,7 +549,6 @@ int main() {
                     flags,
                     seamAllowance,
                     cuttingAllowance,
-                    grainline,
                     ITERATIONS
                 );
 

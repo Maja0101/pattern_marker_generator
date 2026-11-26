@@ -85,9 +85,9 @@ pattern::PatternPiece parsePiece(const Napi::Object& o) {
     if (o.Has("constraints")) constraints = parseConstraints(requireArray(o, "constraints"));
     const int64_t seamAllowance = getInt(o, "seamAllowance", 0) * COORD_SCALE;
     const int64_t cuttingAllowance = getInt(o, "cuttingAllowance", 0) * COORD_SCALE;
-    return pattern::PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
-                        seamAllowance, cuttingAllowance,
-                        getInt(o, "grainline", 0), false);
+        return pattern::PatternPiece(getInt(o, "id", 0), std::move(points), constraints,
+                            seamAllowance, cuttingAllowance,
+                            false);
 }
 
 constexpr int64_t DEFAULT_WIDTH = 1400000; 

@@ -34,7 +34,7 @@ TEST_CASE("Recalculating statistics", "[statistics]") {
             { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
         };
 
-        patternPieces.emplace_back(1, shape1, constraints1, 10, 5, 0, true);
+        patternPieces.emplace_back(1, shape1, constraints1, 10, 5, true);
 
         std::vector<pmg::geometry::Point64> shape2 = {
             {158, 497},
@@ -56,7 +56,7 @@ TEST_CASE("Recalculating statistics", "[statistics]") {
             { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 2, .twoWay = false }
         };
 
-        patternPieces.emplace_back(2, shape2, constraints2, 10, 5, 0, true);
+        patternPieces.emplace_back(2, shape2, constraints2, 10, 5, true);
 
         std::vector<pmg::geometry::Point64> shape3 = {
             {152, 499},
@@ -73,7 +73,7 @@ TEST_CASE("Recalculating statistics", "[statistics]") {
             { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
         };
 
-        patternPieces.emplace_back(3, shape3, constraints3, 10, 5, 0, true);
+        patternPieces.emplace_back(3, shape3, constraints3, 10, 5, true);
 
         pmg::nesting::BasicAlgorithm alg(fabric);
         pmg::pattern::NestingResult result =  alg.execute(patternPieces);

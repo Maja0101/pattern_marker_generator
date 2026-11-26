@@ -74,7 +74,7 @@ void PatternPiece::initializePatternPieceGeometry(const std::vector<VariantConst
             std::vector<geometry::Point64> transformedBoundary;
             transformedBoundary.reserve(offsetPath.size());
 
-            transformedBoundary = geometry::transformPolygon(offsetPath, -(m_grainline + req.rotationAngle), req.isMirrored, false, false);
+            transformedBoundary = geometry::transformPolygon(offsetPath, -req.rotationAngle, req.isMirrored, false, false);
 
             if constexpr (config::DEBUG_MODE_DETAILED) {
                 for (const auto& p : transformedBoundary) {
@@ -109,8 +109,8 @@ PatternPiece::PatternPiece(int64_t pieceId,
         std::vector<geometry::Point64> originalPoints, 
         const std::vector<VariantConstraint>& constraints,
         int64_t seamAllowance, int64_t cuttingAllowance, 
-        int grainline, bool toBeScaled)
-    : m_id(pieceId), m_originalPolygon(std::move(originalPoints)) , m_seamAllowance(toBeScaled ? seamAllowance * SCALE : seamAllowance), m_cuttingAllowance(toBeScaled ? cuttingAllowance * SCALE : cuttingAllowance), m_grainline(grainline)
+        bool toBeScaled)
+    : m_id(pieceId), m_originalPolygon(std::move(originalPoints)) , m_seamAllowance(toBeScaled ? seamAllowance * SCALE : seamAllowance), m_cuttingAllowance(toBeScaled ? cuttingAllowance * SCALE : cuttingAllowance)
 {
     if constexpr (config::DEBUG_MODE_DETAILED) {
         SPDLOG_INFO(std::format("seam {} cutting {} allowance", m_seamAllowance, m_cuttingAllowance));
