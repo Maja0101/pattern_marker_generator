@@ -273,7 +273,7 @@ TEST_CASE("Calculating score for nesting result", "[evaluation]") {
             { 400000, 500000}, 
             {      0, 500000}  
         };
-        pmg::pattern::Fabric fabric(fabricPts, 90);
+        pmg::pattern::Fabric fabric(fabricPts, 270);
 
         Clipper2Lib::Paths64 placedItems = {
             {

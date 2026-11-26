@@ -39,18 +39,19 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
 
     SECTION("Variant transformation") {
         const std::vector<pmg::geometry::Point64> expected = {
-            {400000, 400000},
-            {300000, 400000},
-            {300000, 600000},
-            {     0, 600000},
-            {     0,      0},
-            {400000,      0}
+            {     0, 200000},
+            {100000, 200000},
+            {100000,      0},
+            {400000,      0},
+            {400000, 600000},
+            {     0, 600000}
         };
+
         
         REQUIRE(piece1.getVariants()[0].getAllowancesDistance() == 100000);
         REQUIRE(piece1.getVariants()[0].getRotationAngle() == 90);
-        REQUIRE(piece1.getVariants()[0].getReferencePoint().x == 200000);
-        REQUIRE(piece1.getVariants()[0].getReferencePoint().y == -300000);
+        REQUIRE(piece1.getVariants()[0].getReferencePoint().x == -800000);
+        REQUIRE(piece1.getVariants()[0].getReferencePoint().y == 700000);
         REQUIRE(piece1.getVariants()[0].getBoundaryForVariant(false) == expected);
     }
 
@@ -102,15 +103,15 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         REQUIRE(result.positions[0].rotationAngle == 90);
         REQUIRE(result.positions[0].isMirrored == false);
         REQUIRE(result.positions[0].isFlipped180 == false);
-        REQUIRE(result.positions[0].x == -900);
-        REQUIRE(result.positions[0].y == 2900);
+        REQUIRE(result.positions[0].x == 1900);
+        REQUIRE(result.positions[0].y == 600);
 
         REQUIRE(result.positions[1].id == 1);
         REQUIRE(result.positions[1].rotationAngle == 90);
         REQUIRE(result.positions[1].isMirrored == false);
         REQUIRE(result.positions[1].isFlipped180 == false);
-        REQUIRE(result.positions[1].x == 800);
-        REQUIRE(result.positions[1].y == 2300);
+        REQUIRE(result.positions[1].x == 1800);
+        REQUIRE(result.positions[1].y == 1300);
 
         REQUIRE(result.positions[2].id == 3);
         REQUIRE(result.positions[2].rotationAngle == 0);
@@ -160,8 +161,8 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         REQUIRE(result.positions[0].isMirrored == false);
         REQUIRE(result.positions[0].isFlipped180 == false);
         REQUIRE(pmg::geometry::pointsSimiliar(
-            pmg::geometry::Point64{result.positions[0].x, result.positions[0].y}, 
-            pmg::geometry::Point64{800,400}, 
+            pmg::geometry::Point64{std::llround(result.positions[0].x * 1000), std::llround(result.positions[0].y * 1000)}, 
+            pmg::geometry::Point64{800000,400000}, 
             1)
         );
 
@@ -170,8 +171,8 @@ TEST_CASE("Input shapes transformations", "[geometry][rotations][BottomLeft]") {
         REQUIRE(result.positions[1].isMirrored == false);
         REQUIRE(result.positions[1].isFlipped180 == false);
         REQUIRE(pmg::geometry::pointsSimiliar(
-            pmg::geometry::Point64{result.positions[1].x, result.positions[1].y}, 
-            pmg::geometry::Point64{800,600}, 
+            pmg::geometry::Point64{std::llround(result.positions[1].x * 1000), std::llround(result.positions[1].y * 1000)}, 
+            pmg::geometry::Point64{800000,600000}, 
             1)
         );
     }
