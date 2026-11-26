@@ -344,7 +344,7 @@ pattern::NestingStats recalculateStats(const pattern::Fabric &fabric, std::vecto
     Clipper2Lib::Paths64 placedItemsPaths;
 
     size_t n = newPlacements.size();
-    int64_t minLen = 0;
+    int64_t maxRightPoint = 0;
     for (size_t i = 0; i < n; ++i) {
         const int64_t placementX = static_cast<int64_t>(std::llround(newPlacements[i].x * static_cast<double>(SCALE)));
         const int64_t placementY = static_cast<int64_t>(std::llround(newPlacements[i].y * static_cast<double>(SCALE)));
@@ -376,7 +376,7 @@ pattern::NestingStats recalculateStats(const pattern::Fabric &fabric, std::vecto
 
         placedItemsPaths.push_back(nestedItems[i].getItemPathAtPosition(rawPosition.x, rawPosition.y));
         nestedItems[i].lockInPosition(rawPosition.x, rawPosition.y);
-        minLen = std::max(nestedItems[i].getItemBoundingBoxAtPosition().right, minLen);
+        maxRightPoint = std::max(nestedItems[i].getItemBoundingBoxAtPosition().right, maxRightPoint);
     }
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
@@ -389,7 +389,7 @@ pattern::NestingStats recalculateStats(const pattern::Fabric &fabric, std::vecto
         }
     }
 
-    if constexpr (config::DEBUG_MODE_DETAILED) {
+    if constexpr (config::DEBUG_MODE) {
         visualisation::SvgExporter::exportLayout(
             "recreated_layout.svg", 
             fabric,
@@ -399,7 +399,7 @@ pattern::NestingStats recalculateStats(const pattern::Fabric &fabric, std::vecto
         );
     }
 
-    return geometry::calculations::evaluate(placedItemsPaths, fabric, minLen);
+    return geometry::calculations::evaluate(placedItemsPaths, fabric, maxRightPoint);
 }
 
 } // namespace pmg::geometry::calculations

@@ -349,7 +349,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck3()
 
     std::vector<pattern::VariantConstraint> constraints1 = {
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false },
-        { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
+        // { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
     patternPieces.emplace_back(1, shape1, constraints1, 5, 20, false);
@@ -370,7 +370,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck3()
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
     };
 
-    patternPieces.emplace_back(2, shape2, constraints2, 5, 20, false);
+    // patternPieces.emplace_back(2, shape2, constraints2, 5, 20, false);
 
     std::vector<geometry::Point64> shape3 = {
         {484800, 855200},
@@ -392,7 +392,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck3()
         { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    patternPieces.emplace_back(3, shape3, constraints3, 5, 20, false);
+    // patternPieces.emplace_back(3, shape3, constraints3, 5, 20, false);
 
     std::vector<geometry::Point64> shape4 = {
         {335900, 926700},
@@ -415,7 +415,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck3()
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
     };
 
-    patternPieces.emplace_back(4, shape4, constraints4, 5, 20, false);
+    // patternPieces.emplace_back(4, shape4, constraints4, 5, 20, false);
 
     std::vector<geometry::Point64> shape5 = {
         {764700, 967600},
@@ -435,7 +435,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck3()
         { .rotationAngle = 0, .isMirrored = true, .requiredQuantity = 1, .twoWay = false }
     };
 
-    patternPieces.emplace_back(5, shape5, constraints5, 5, 20, false);
+    // patternPieces.emplace_back(5, shape5, constraints5, 5, 20, false);
 
     std::vector<geometry::Point64> shape6 = {
         {748700, 938800},
@@ -450,7 +450,7 @@ std::vector<pattern::PatternPiece> getPiecesToCheck3()
         { .rotationAngle = 0, .isMirrored = false, .requiredQuantity = 1, .twoWay = false }
     };
 
-    patternPieces.emplace_back(6, shape6, constraints6, 5, 20, false);
+    // patternPieces.emplace_back(6, shape6, constraints6, 5, 20, false);
 
     return patternPieces;
 }
