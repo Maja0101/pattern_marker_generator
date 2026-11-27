@@ -10,5 +10,9 @@
 # Debug svg file
 *.svg
 
+# Benchamrk results
+*.xml
+
 # Ignore node modules
 /node_modules/
+
