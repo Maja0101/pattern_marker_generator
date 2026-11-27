@@ -12,6 +12,16 @@ endif()
 # All test .cpp files
 file(GLOB TEST_FILES CONFIGURE_DEPENDS "test_*.cpp")
 
+# Single benchmark configuration
+add_executable(single_benchmark
+  ${CATCH2_SOURCE_DIR}/catch2/catch_amalgamated.cpp
+  benchmark_single.cpp
+)
+target_include_directories(single_benchmark PRIVATE ${CATCH2_SOURCE_DIR})
+target_link_libraries(single_benchmark PRIVATE 
+  benchmark_utils
+)
+
 if(TEST_FILES)
   # Create test executable
   add_executable(unit_tests

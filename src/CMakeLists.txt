@@ -30,9 +30,14 @@ add_executable(pattern_marker_generator main.cpp sample_input.cpp)
 
 target_link_libraries(pattern_marker_generator PRIVATE facade)
 
+add_library(benchmark_utils STATIC 
+    utils_benchmark/benchmark_conf.cpp
+)
+target_link_libraries(benchmark_utils PUBLIC facade)
+
 add_executable(calc_benchmark benchmark_main.cpp)
 
-target_link_libraries(calc_benchmark PRIVATE facade)
+target_link_libraries(calc_benchmark PRIVATE benchmark_utils)
 
 if(CMAKE_JS_VERSION)
     add_library(pmg_engine MODULE bridge/addon_bridge.cpp)

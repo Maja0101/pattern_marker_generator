@@ -77,16 +77,16 @@ int main()
         
         // Verify the result and compatibilty of the algorithm
         // pattern::Fabric fabric(1000, 750, true);
-        pattern::Fabric fabric(fabricPts3, 145, false);
-        nesting::BasicAlgorithm alg(fabric);
-        std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck3();
-        pattern::NestingResult result = alg.execute(piecesToCheck);
+        // pattern::Fabric fabric(fabricPts3, 145, false);
+        // nesting::BasicAlgorithm alg(fabric);
+        // std::vector<pmg::pattern::PatternPiece> piecesToCheck = samples::getPiecesToCheck3();
+        // pattern::NestingResult result = alg.execute(piecesToCheck);
 
         // Verification of results for new version of advanced algorithm with complex pattern
-        // pattern::Fabric fabric(1400, 4500, true);
-        // nesting::AdvancedAlgorithm alg(fabric);
-        // std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
-        // pattern::NestingResult result = alg.execute(testPieces);
+        pattern::Fabric fabric(1400, 4500, true);
+        nesting::BasicAlgorithm alg(fabric);
+        std::vector<pmg::pattern::PatternPiece> testPieces = samples::getTestPieces();
+        pattern::NestingResult result = alg.execute(testPieces);
 
 
         if constexpr (config::DEVELOPMENT) SPDLOG_INFO(std::format("The nesting was{} finished", (result.wasSuccessful ? "" : "n't")));

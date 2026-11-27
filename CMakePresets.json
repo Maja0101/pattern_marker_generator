@@ -31,7 +31,8 @@
             "binaryDir": "${sourceDir}/build/bench",
             "cacheVariables": {
                 "CMAKE_CXX_FLAGS_RELEASE": "-O3 -DNDEBUG -march=native",
-                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON"
+                "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON",
+                "BUILD_TESTING": "ON"
             }
         }
     ],
