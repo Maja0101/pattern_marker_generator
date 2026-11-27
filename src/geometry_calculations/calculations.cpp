@@ -389,7 +389,7 @@ pattern::NestingStats recalculateStats(const pattern::Fabric &fabric, std::vecto
         }
     }
 
-    if constexpr (config::DEBUG_MODE) {
+    if constexpr (config::DEBUG_MODE_DETAILED) {
         visualisation::SvgExporter::exportLayout(
             "recreated_layout.svg", 
             fabric,

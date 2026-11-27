@@ -46,6 +46,33 @@ Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
     };
 }
 
+bool isValidIntersection(const HalfPlane &h1, const HalfPlane &h2, const HalfPlane &target) {
+    __int128_t det = (static_cast<__int128_t>(h1.a) * h2.b) - (static_cast<__int128_t>(h2.a) * h1.b);
+
+    // Check if the lines are parallel
+    if (det == 0) return false;
+
+    __int128_t xNum = (static_cast<__int128_t>(h1.b) * h2.c) - (static_cast<__int128_t>(h2.b) * h1.c);
+    __int128_t yNum = (static_cast<__int128_t>(h2.a) * h1.c) - (static_cast<__int128_t>(h1.a) * h2.c);
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("intersection {} {}", xNum, yNum));
+    }
+    
+    // Check the sign of (target.a * xNum + target.b * yNum + target.c * det) / det >= 0
+    __int128_t val = static_cast<__int128_t>(target.a) * xNum +
+                     static_cast<__int128_t>(target.b) * yNum +
+                     static_cast<__int128_t>(target.c) * det;
+
+    if (det < 0) val = -val;
+
+    if constexpr (config::DEBUG_MODE_DETAILED) {
+        SPDLOG_INFO(std::format("val {}", val));
+    }
+
+    return val >= 0;
+} 
+
 std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, const std::vector<Point64> &variantHull) {
     // Calculate half planes for two convex hulls and find points of intersection to get IFP for convex hulls
     
@@ -96,6 +123,7 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
     }
 
     std::deque<HalfPlane> activePlanes;
+
     for (size_t i = 0; i < n; ++i) {
         const auto& currPlane = halfPlanes[i];
 
@@ -103,29 +131,37 @@ std::vector<Point64> calculateConvexIFP(const std::vector<Point64> &fabricHull, 
             SPDLOG_INFO(std::format("i {} current plane {} {} {}", i, currPlane.a, currPlane.b, currPlane.c));
         }
 
-        while(activePlanes.size() >= 2) {
-            Point64 prevIntersection = intersect(activePlanes[activePlanes.size() - 2], activePlanes.back());
-            
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("previous intersection {} {}", prevIntersection.x, prevIntersection.y));
-            }
-
-            __int128_t val = (static_cast<__int128_t>(currPlane.a) * prevIntersection.x) +
-                         (static_cast<__int128_t>(currPlane.b) * prevIntersection.y) +
-                         static_cast<__int128_t>(currPlane.c);
-
-            if constexpr (config::DEBUG_MODE_DETAILED) {
-                SPDLOG_INFO(std::format("val {}", val));
-            }
-
-            if (val < 0) {
-                activePlanes.pop_back();
-            } else {
-                break;
-            }
+        // Eliminate inactive edges from the end of the queue
+        while(activePlanes.size() >= 2 &&
+              !isValidIntersection(activePlanes[activePlanes.size() - 2], activePlanes.back(), currPlane)) {
+            activePlanes.pop_back();
         }
+
+        // Eliminate inactive edges from the front of the queue
+        while(activePlanes.size() >= 2 &&
+              !isValidIntersection(activePlanes[0], activePlanes[1], currPlane)) {
+            activePlanes.pop_front();
+        }
+
         activePlanes.push_back(currPlane);
     }
+
+    // Polygon wrap-around
+    bool changed = true;
+    while (changed && activePlanes.size() >= 3) {
+        changed = false;
+        if (!isValidIntersection(activePlanes[activePlanes.size() - 2], activePlanes.back(), activePlanes.front())) {
+            activePlanes.pop_back();
+            changed = true;
+        }
+        if (activePlanes.size() >= 3 &&
+            !isValidIntersection(activePlanes[0], activePlanes[1], activePlanes.back())) {
+            activePlanes.pop_front();
+            changed = true;
+        }
+    }
+
+    if (activePlanes.size() < 3) return {};
 
     std::vector<Point64> ifpVertices;
     size_t activeN = activePlanes.size();
