@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iomanip>
+#include <sstream>
 
 #include "pattern/svg_exporter.hpp"
 #include "pattern/nested_item.hpp"

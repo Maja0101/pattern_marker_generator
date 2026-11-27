@@ -36,10 +36,10 @@ Shape::Shape(int64_t width, int64_t length, bool toBeScaled)
         int64_t l = (length < 0) ? 0 : ((length * scale) % MAX_VALUE);
         Clipper2Lib::Path64 temp;
         temp.reserve(4);
-        temp.emplace_back(0L, 0L);
-        temp.emplace_back(l, 0L);
-        temp.emplace_back(l, w);
-        temp.emplace_back(0L, w);
+        temp.emplace_back(int64_t{0}, int64_t{0});
+        temp.emplace_back(static_cast<int64_t>(l), int64_t{0});
+        temp.emplace_back(static_cast<int64_t>(l), static_cast<int64_t>(w));
+        temp.emplace_back(int64_t{0}, static_cast<int64_t>(w));
         return temp;
       }()), 
       m_boundary(geometry::fromClipperPath(m_shapePath)),
