@@ -8,6 +8,7 @@
 #include "geometry_calculations/ifp_pocket_calculations.hpp"
 #include "geometry_calculations/calculations.hpp"
 #include "utils/config.hpp"
+#include "geometry_calculations/int128.hpp"
 
 namespace pmg::geometry::calculations::utils {
 
@@ -21,7 +22,7 @@ int64_t dot(int64_t a, int64_t b, const Point64 &p) {
     return (a * p.x) + (b * p.y);
 }
 
-int64_t divToNearest(__int128_t a, __int128_t b) {
+int64_t divToNearest(int128_t a, int128_t b) {
     if (b < 0) {
         a = -a;
         b = -b;
@@ -31,13 +32,16 @@ int64_t divToNearest(__int128_t a, __int128_t b) {
 }
 
 Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
-    __int128_t det = (static_cast<__int128_t>(h1.a) * h2.b) - (static_cast<__int128_t>(h2.a) * h1.b);
+    int128_t det = mul128(h1.a, h2.b) - mul128(h2.a, h1.b);
 
-    __int128_t x = (static_cast<__int128_t>(h1.b) * h2.c) - (static_cast<__int128_t>(h2.b) * h1.c);
-    __int128_t y = (static_cast<__int128_t>(h2.a) * h1.c) - (static_cast<__int128_t>(h1.a) * h2.c);
+    int128_t x   = mul128(h1.b, h2.c) - mul128(h2.b, h1.c);
+    int128_t y   = mul128(h2.a, h1.c) - mul128(h1.a, h2.c);
+
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("det {} x {} y {} intersection {} {}", det, x, y, divToNearest(x, det), divToNearest(y, det)));
+        SPDLOG_INFO(std::format("det {} x {} y {} intersection {} {}",
+            static_cast<int64_t>(det), static_cast<int64_t>(x), static_cast<int64_t>(y),
+            divToNearest(x, det), divToNearest(y, det)));
     }
 
     return {
@@ -47,27 +51,28 @@ Point64 intersect(const HalfPlane &h1, const HalfPlane &h2) {
 }
 
 bool isValidIntersection(const HalfPlane &h1, const HalfPlane &h2, const HalfPlane &target) {
-    __int128_t det = (static_cast<__int128_t>(h1.a) * h2.b) - (static_cast<__int128_t>(h2.a) * h1.b);
+    int128_t det = mul128(h1.a, h2.b) - mul128(h2.a, h1.b);
 
     // Check if the lines are parallel
     if (det == 0) return false;
 
-    __int128_t xNum = (static_cast<__int128_t>(h1.b) * h2.c) - (static_cast<__int128_t>(h2.b) * h1.c);
-    __int128_t yNum = (static_cast<__int128_t>(h2.a) * h1.c) - (static_cast<__int128_t>(h1.a) * h2.c);
+    int128_t xNum = mul128(h1.b, h2.c) - mul128(h2.b, h1.c);
+    int128_t yNum = mul128(h2.a, h1.c) - mul128(h1.a, h2.c);
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("intersection {} {}", xNum, yNum));
+        SPDLOG_INFO(std::format("intersection {} {}",
+            static_cast<int64_t>(xNum), static_cast<int64_t>(yNum)));
     }
     
     // Check the sign of (target.a * xNum + target.b * yNum + target.c * det) / det >= 0
-    __int128_t val = static_cast<__int128_t>(target.a) * xNum +
-                     static_cast<__int128_t>(target.b) * yNum +
-                     static_cast<__int128_t>(target.c) * det;
+    int128_t val = target.a * xNum +
+                   target.b * yNum +
+                   target.c * det;
 
     if (det < 0) val = -val;
 
     if constexpr (config::DEBUG_MODE_DETAILED) {
-        SPDLOG_INFO(std::format("val {}", val));
+        SPDLOG_INFO(std::format("val {}", static_cast<int64_t>(val)));
     }
 
     return val >= 0;
