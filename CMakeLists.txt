@@ -2,6 +2,12 @@
 cmake_minimum_required(VERSION 3.18)
 project(PatternMarkerGenerator VERSION 1.0 LANGUAGES CXX)
 
+# Flag for MSVC
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
+
+
 # Set C++ standard for the project
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
